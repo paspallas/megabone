@@ -3,7 +3,7 @@ import math
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView
 
-from viewUtils import PanControl, ZoomControl
+from megabone.viewUtils import PanControl, ZoomControl
 from .item import AnimatedSpriteItem, BoneGraphicsItem
 from .mode import (
     AnimationMode,
@@ -32,12 +32,15 @@ class SkeletonEditorScene(QGraphicsScene):
 
 
 class SkeletonEditor(QGraphicsView):
+    _width = 2048
+    _height = 2048
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.scene = SkeletonEditorScene(self)
-        self.scene.setSceneRect(-512, -512, 1024, 1024)
-        self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
+        self.scene.setSceneRect(-self._width / 2, -self._height / 2, self._width, self._height)
         self.setScene(self.scene)
+        self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
 
         # Configure the view
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
@@ -63,7 +66,7 @@ class SkeletonEditor(QGraphicsView):
         self.selected_bone = None
         self.bones = []
 
-    def setEditMode(self, mode_name):
+    def setEditMode(self, mode_name: str):
         """Change the current edit mode"""
         if self.current_edit_mode:
             self.current_edit_mode.exit()

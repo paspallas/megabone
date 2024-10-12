@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
 
 from .abstract_editor_mode import AbstractEditorMode
-from editor.gizmo import IKHandle
-from editor.item import BoneGraphicsItem, AnimatedSpriteItem
-from model import PropertyType
+from megabone.editor.gizmo import IKHandle
+from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
+from megabone.model import PropertyType
 
 
 class AnimationMode(AbstractEditorMode):

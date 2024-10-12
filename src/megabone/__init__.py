@@ -1,1 +1,1 @@
-from ui import MegaBoneMainWindow
+from .entry import entry

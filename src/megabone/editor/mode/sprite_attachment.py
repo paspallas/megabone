@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
 from .abstract_editor_mode import AbstractEditorMode
-from editor.item import BoneGraphicsItem, AnimatedSpriteItem
+from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 
 
 class SpriteAttachmentMode(AbstractEditorMode):

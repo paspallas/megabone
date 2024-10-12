@@ -5,8 +5,8 @@ from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from .abstract_editor_mode import AbstractEditorMode
-from editor.item import BoneGraphicsItem
-from IKSolver import FABRIK
+from megabone.editor.item import BoneGraphicsItem
+from megabone.IKSolver import FABRIK
 
 
 class IKMode(AbstractEditorMode):

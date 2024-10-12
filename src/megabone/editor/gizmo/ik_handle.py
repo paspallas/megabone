@@ -4,8 +4,8 @@ from PyQt5.QtWidgets import QGraphicsItem
 
 from .pole_vector import PoleControl
 from .target_control import TargetControl
-from editor.item import BoneGraphicsItem
-from IKSolver import FABRIK
+from megabone.editor.item import BoneGraphicsItem
+from megabone.IKSolver import FABRIK
 
 
 class IKHandle(QGraphicsItem):

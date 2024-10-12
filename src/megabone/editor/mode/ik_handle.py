@@ -1,8 +1,8 @@
 from PyQt5.QtCore import Qt
 
 from .abstract_editor_mode import AbstractEditorMode
-from editor.item import BoneGraphicsItem
-from editor.gizmo import IKHandle
+from megabone.editor.item import BoneGraphicsItem
+from megabone.editor.gizmo import IKHandle
 
 
 class IKHandleMode(AbstractEditorMode):

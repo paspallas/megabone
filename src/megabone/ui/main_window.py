@@ -1,14 +1,15 @@
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QAction
 
-from editor import SkeletonEditor
+from megabone.editor import SkeletonEditor
 
 
 class MegaBoneMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("Megabone")
+        self.setMinimumSize(800, 600)
         self.editor = SkeletonEditor()
         self.setCentralWidget(self.editor)
-        self.setMinimumSize(800, 600)
 
         # self.animation_player = AnimationPlayer()
         # self.animation_dock = QDockWidget("Animation", self)

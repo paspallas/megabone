@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtWidgets import QGraphicsView
 
 from .abstract_editor_mode import AbstractEditorMode
-from editor.item import BoneGraphicsItem
+from megabone.editor.item import BoneGraphicsItem
 
 
 class BoneCreationMode(AbstractEditorMode):
