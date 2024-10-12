@@ -12,6 +12,7 @@ from .mode import (
     IKMode,
     SelectionMode,
     SpriteAttachmentMode,
+    EditorModeType as Mode
 )
 
 
@@ -49,29 +50,29 @@ class SkeletonEditor(QGraphicsView):
 
         # Initialize modes
         self.edit_modes = {
-            "select": SelectionMode(self),
-            "create_bone": BoneCreationMode(self),
-            "attach_sprite": SpriteAttachmentMode(self),
-            "ik": IKMode(self),
-            "ik_handle": IKHandleMode(self),
-            "animation": AnimationMode(self),
+            Mode.Selection: SelectionMode(self),
+            Mode.CreateBone: BoneCreationMode(self),
+            Mode.AttachSprite: SpriteAttachmentMode(self),
+            Mode.MoveIkChain: IKMode(self),
+            Mode.CreateIkHandle: IKHandleMode(self),
+            Mode.Animation: AnimationMode(self),
         }
 
-        # Editing mode
+        # Default editing mode
         self.current_edit_mode = None
-        self.setEditMode("select")  # Default mode
+        self.setEditMode(Mode.Selection)
 
         # Editor properties
         self.selected_sprite = None
         self.selected_bone = None
         self.bones = []
 
-    def setEditMode(self, mode_name: str):
+    def setEditMode(self, mode_type: Mode):
         """Change the current edit mode"""
         if self.current_edit_mode:
             self.current_edit_mode.exit()
 
-        self.current_edit_mode = self.edit_modes[mode_name]
+        self.current_edit_mode = self.edit_modes[mode_type]
         self.current_edit_mode.enter()
 
     def mousePressEvent(self, event):
