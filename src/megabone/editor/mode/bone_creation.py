@@ -1,22 +1,24 @@
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtWidgets import QGraphicsView
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry, AbstractEditorMode, EditorType
 from megabone.editor.item import BoneGraphicsItem
 
 
-class BoneCreationMode(AbstractEditorMode):
-    def __init__(self, editor):
+@EditorModeRegistry.register("Create a new bone")
+class CreateBoneMode(AbstractEditorMode):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
         self.start_point = None
         self.new_bone = None
 
-    def enter(self):
+    def activate(self):
         self.editor.setDragMode(QGraphicsView.NoDrag)
         self.editor.setCursor(Qt.CrossCursor)
         self.editor.setMouseTracking(True)
+        self.editor.showStatusMessage("Shift + Right Click")
 
-    def exit(self):
+    def deactivate(self):
         self.editor.setMouseTracking(False)
 
     def mousePressEvent(self, event, scene_pos):

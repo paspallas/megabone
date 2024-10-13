@@ -4,19 +4,20 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
 from megabone.editor.item import BoneGraphicsItem
 from megabone.IKSolver import FABRIK
 
 
+@EditorModeRegistry.register("Manipulate a bone in the chain")
 class IKMode(AbstractEditorMode):
-    def __init__(self, editor):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
         self.ik_chain = None
         self.target_indicator = None
         self.dragging = False
 
-    def enter(self):
+    def activate(self):
         self.editor.setCursor(Qt.CrossCursor)
         # Create IK target indicator
         if not self.target_indicator:
@@ -25,7 +26,7 @@ class IKMode(AbstractEditorMode):
             self.target_indicator.hide()
             self.editor.scene.addItem(self.target_indicator)
 
-    def exit(self):
+    def deactivate(self):
         if self.target_indicator:
             self.target_indicator.hide()
 

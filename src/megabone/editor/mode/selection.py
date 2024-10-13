@@ -1,17 +1,18 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
 from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 
 
+@EditorModeRegistry.register("Select scene items")
 class SelectionMode(AbstractEditorMode):
-    def __init__(self, editor):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
         self.dragging = False
         self.last_pos = None
 
-    def enter(self):
+    def activate(self):
         self.editor.setDragMode(QGraphicsView.RubberBandDrag)
         self.editor.setCursor(Qt.ArrowCursor)
 

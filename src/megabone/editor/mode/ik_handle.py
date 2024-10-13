@@ -1,17 +1,18 @@
 from PyQt5.QtCore import Qt
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
 from megabone.editor.item import BoneGraphicsItem
 from megabone.editor.gizmo import IKHandle
 
 
+@EditorModeRegistry.register("Create handles for an IK chain")
 class IKHandleMode(AbstractEditorMode):
-    def __init__(self, editor):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
         self.creating_handle = False
         self.start_bone = None
 
-    def enter(self):
+    def activate(self):
         self.editor.setCursor(Qt.CrossCursor)
 
     def mousePressEvent(self, event, scene_pos):

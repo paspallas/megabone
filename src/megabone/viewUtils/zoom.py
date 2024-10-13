@@ -7,7 +7,6 @@ from PyQt5.QtCore import (
     pyqtSlot,
     pyqtSignal,
 )
-from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QGraphicsView, QStyleOptionGraphicsItem
 
 

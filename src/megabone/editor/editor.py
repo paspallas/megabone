@@ -5,15 +5,8 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView
 
 from megabone.viewUtils import PanControl, ZoomControl
 from .item import AnimatedSpriteItem, BoneGraphicsItem
-from .mode import (
-    AnimationMode,
-    BoneCreationMode,
-    IKHandleMode,
-    IKMode,
-    SelectionMode,
-    SpriteAttachmentMode,
-    EditorModeType as Mode
-)
+from .status import StatusMessage
+from .mode import *
 
 
 class SkeletonEditorScene(QGraphicsScene):
@@ -33,13 +26,15 @@ class SkeletonEditorScene(QGraphicsScene):
 
 
 class SkeletonEditor(QGraphicsView):
-    _width = 2048
-    _height = 2048
+    _width = 512
+    _height = 512
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.scene = SkeletonEditorScene(self)
-        self.scene.setSceneRect(-self._width / 2, -self._height / 2, self._width, self._height)
+        self.scene.setSceneRect(
+            -self._width / 2, -self._height / 2, self._width, self._height
+        )
         self.setScene(self.scene)
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
 
@@ -48,32 +43,26 @@ class SkeletonEditor(QGraphicsView):
         ZoomControl(self)
         PanControl(self)
 
-        # Initialize modes
-        self.edit_modes = {
-            Mode.Selection: SelectionMode(self),
-            Mode.CreateBone: BoneCreationMode(self),
-            Mode.AttachSprite: SpriteAttachmentMode(self),
-            Mode.MoveIkChain: IKMode(self),
-            Mode.CreateIkHandle: IKHandleMode(self),
-            Mode.Animation: AnimationMode(self),
-        }
-
-        # Default editing mode
+        # Init the editing modes from the registry
         self.current_edit_mode = None
-        self.setEditMode(Mode.Selection)
+        EditorModeRegistry.init(self)
+
+        # Set default mode
+        self.setEditMode(EditorModeRegistry.Mode.SELECTION_MODE)
 
         # Editor properties
         self.selected_sprite = None
         self.selected_bone = None
         self.bones = []
 
-    def setEditMode(self, mode_type: Mode):
-        """Change the current edit mode"""
-        if self.current_edit_mode:
-            self.current_edit_mode.exit()
+    def setEditMode(self, mode: "EditorModeRegistry.Mode"):
+        new_mode = EditorModeRegistry.get_mode(mode)
 
-        self.current_edit_mode = self.edit_modes[mode_type]
-        self.current_edit_mode.enter()
+        if new_mode != self.current_edit_mode:
+            if self.current_edit_mode:
+                self.current_edit_mode.deactivate()
+            self.current_edit_mode = new_mode
+            self.current_edit_mode.activate()
 
     def mousePressEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
@@ -89,6 +78,9 @@ class SkeletonEditor(QGraphicsView):
         scene_pos = self.mapToScene(event.pos())
         self.current_edit_mode.mouseReleaseEvent(event, scene_pos)
         super().mouseReleaseEvent(event)
+
+    def showStatusMessage(self, message: str):
+        StatusMessage(message, self)
 
     def selectBone(self, bone):
         self.selected_bone = bone

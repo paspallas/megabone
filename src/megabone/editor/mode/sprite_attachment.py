@@ -1,15 +1,16 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 
 
+@EditorModeRegistry.register("Attach sprite to bone")
 class SpriteAttachmentMode(AbstractEditorMode):
-    def __init__(self, editor):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
 
-    def enter(self):
+    def activate(self):
         self.editor.setDragMode(QGraphicsView.NoDrag)
         self.editor.setCursor(Qt.PointingHandCursor)
 

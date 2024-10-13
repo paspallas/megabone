@@ -1,17 +1,18 @@
 from PyQt5.QtCore import Qt
 
-from .abstract_editor_mode import AbstractEditorMode
+from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 from megabone.editor.gizmo import IKHandle
 from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 from megabone.model import PropertyType
 
 
+@EditorModeRegistry.register("Animate the skeleton")
 class AnimationMode(AbstractEditorMode):
-    def __init__(self, editor):
+    def __init__(self, editor: EditorType):
         super().__init__(editor)
         self.selected_track = None
 
-    def enter(self):
+    def activate(self):
         self.editor.setCursor(Qt.CrossCursor)
 
     def mouseMoveEvent(self, event, scene_pos):
