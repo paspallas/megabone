@@ -7,6 +7,8 @@ from typing import OrderedDict, Optional, Type, TypeVar, TYPE_CHECKING
 from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 
+from megabone.resource_manager import ResourceManager as res
+
 if TYPE_CHECKING:
     from megabone.editor import SkeletonEditor
 
@@ -23,6 +25,8 @@ def camel_to_snake(name: str) -> str:
 
 
 class EditorModeRegistry:
+    """Manages editing modes for the editor"""
+
     class Mode(Enum):
         @classmethod
         def add_member(cls, name, value):
@@ -60,7 +64,7 @@ class EditorModeRegistry:
             action = QAction(editor)
             action.setText(mode_instance.description)
             if mode_instance.icon_name:
-                action.setIcon(QIcon(mode_instance.icon_name))
+                action.setIcon(res.get_icon(mode_instance.icon_name))
             action.triggered.connect(lambda checked, m=mode: editor.setEditMode(m))
             cls.actions[mode] = action
         return cls.actions
