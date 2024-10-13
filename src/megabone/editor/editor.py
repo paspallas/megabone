@@ -39,6 +39,7 @@ class SkeletonEditor(QGraphicsView):
         self.fitInView(self.scene.sceneRect(), Qt.KeepAspectRatio)
 
         # Configure the view
+        self.setMouseTracking(True)
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
         ZoomControl(self)
         PanControl(self)

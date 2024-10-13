@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow, QToolBar
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QStatusBar
 
 from megabone.editor import SkeletonEditor
 from megabone.editor.mode import EditorModeRegistry
+from megabone.util import StatusBarManager as status
 
 
 class MegaBoneMainWindow(QMainWindow):
@@ -9,6 +10,13 @@ class MegaBoneMainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Megabone")
         self.setMinimumSize(800, 600)
+
+        # Create status bar and initialize manager
+        self.status_bar = QStatusBar()
+        self.setStatusBar(self.status_bar)
+        status().initialize(self.status_bar)
+        status().add_region("left", 200)
+        status().add_region("right", 800)
 
         self.editor = SkeletonEditor(self)
         self.setCentralWidget(self.editor)

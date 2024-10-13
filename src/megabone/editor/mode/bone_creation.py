@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QGraphicsView
 
 from .editor_mode_register import EditorModeRegistry, AbstractEditorMode, EditorType
 from megabone.editor.item import BoneGraphicsItem
+from megabone.util import StatusBarManager as status
 
 
 @EditorModeRegistry.register("Create a new bone", "B")
@@ -15,11 +16,11 @@ class CreateBoneMode(AbstractEditorMode):
     def activate(self):
         self.editor.setDragMode(QGraphicsView.NoDrag)
         self.editor.setCursor(Qt.CrossCursor)
-        self.editor.setMouseTracking(True)
         self.editor.showStatusMessage("Shift + Right Click")
+        status().set_status("Create Bone", "right")
 
     def deactivate(self):
-        self.editor.setMouseTracking(False)
+        status().clear_status("right")
 
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
