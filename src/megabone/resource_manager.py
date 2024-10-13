@@ -16,7 +16,7 @@ class ResourceManager:
 
     @staticmethod
     def get_scaled_icon(name: str, size: int) -> QIcon:
-        icon = ResourceManager._icon_cache[name]
+        icon = ResourceManager.get_icon(name)
         if icon:
             pixmap = icon.pixmap(size)
             return QIcon(
