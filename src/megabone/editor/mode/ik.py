@@ -9,7 +9,7 @@ from megabone.editor.item import BoneGraphicsItem
 from megabone.IKSolver import FABRIK
 
 
-@EditorModeRegistry.register("Manipulate a bone in the chain")
+@EditorModeRegistry.register("Manipulate a bone in the chain", "I")
 class IKMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)

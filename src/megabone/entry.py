@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from qtmodern import styles
 from typing import List
 
-from .ui import MegaBoneMainWindow
+from .ui import MegaBoneMainWindow as Win
 
 
 def entry(args: List[str]) -> None:
@@ -13,7 +13,7 @@ def entry(args: List[str]) -> None:
     app = QApplication(sys.argv)
     styles.dark(app)
     
-    window = MegaBoneMainWindow()
+    window = Win()
     desktop = QApplication.desktop().screenGeometry(0)
     window.move(desktop.left(), desktop.top())
     window.showMaximized()

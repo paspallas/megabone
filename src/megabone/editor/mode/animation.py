@@ -6,7 +6,7 @@ from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 from megabone.model import PropertyType
 
 
-@EditorModeRegistry.register("Animate the skeleton")
+@EditorModeRegistry.register("Animate the skeleton", "N")
 class AnimationMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)

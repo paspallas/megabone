@@ -2,10 +2,9 @@ import re
 
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from enum import Enum, auto
+from enum import Enum
 from typing import OrderedDict, Optional, Type, TypeVar, TYPE_CHECKING
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QAction, QActionGroup
 
 from megabone.resource_manager import ResourceManager as res
 
@@ -38,13 +37,18 @@ class EditorModeRegistry:
     actions: OrderedDict[Mode, QAction] = OrderedDict()
 
     @classmethod
-    def register(cls, description: str, icon_name: Optional[str] = None):
+    def register(
+        cls, description: str, shortcut: Optional[str], icon_name: Optional[str] = None
+    ):
         def decorator(mode_class: Type["AbstractEditorMode"]):
             cls.Mode.add_member(camel_to_snake(mode_class.__name__), cls.mode_value)
             cls.mode_classes[cls.mode_value] = mode_class
             cls.mode_value += 1
+
             mode_class.description = description
+            mode_class.shortcut = shortcut
             mode_class.icon_name = icon_name
+
             return mode_class
 
         return decorator
@@ -60,19 +64,32 @@ class EditorModeRegistry:
 
     @classmethod
     def create_actions(cls, editor: "SkeletonEditor") -> OrderedDict[Mode, QAction]:
+        group = QActionGroup(editor)
+        group.setExclusive(True)
+
         for mode, mode_instance in cls.mode_instances.items():
             action = QAction(editor)
             action.setText(mode_instance.description)
+            action.setCheckable(True)
+
+            if mode_instance.shortcut:
+                action.setShortcut(mode_instance.shortcut)
+
             if mode_instance.icon_name:
                 action.setIcon(res.get_icon(mode_instance.icon_name))
+
             action.triggered.connect(lambda checked, m=mode: editor.setEditMode(m))
+
+            group.addAction(action)
             cls.actions[mode] = action
+
         return cls.actions
 
 
 class AbstractEditorMode(ABC):
     description: str = ""
     icon_path: Optional[str] = None
+    shortcut: Optional[str] = None
 
     def __init__(self, editor: EditorType):
         self.editor = editor

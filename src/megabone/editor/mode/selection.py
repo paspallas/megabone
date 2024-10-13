@@ -5,7 +5,7 @@ from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditor
 from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 
 
-@EditorModeRegistry.register("Select scene items")
+@EditorModeRegistry.register("Select scene items", "S")
 class SelectionMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)

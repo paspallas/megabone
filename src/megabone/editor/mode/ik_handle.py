@@ -5,7 +5,7 @@ from megabone.editor.item import BoneGraphicsItem
 from megabone.editor.gizmo import IKHandle
 
 
-@EditorModeRegistry.register("Create handles for an IK chain")
+@EditorModeRegistry.register("Create handles for an IK chain", "H")
 class IKHandleMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)

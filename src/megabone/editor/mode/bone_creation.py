@@ -5,7 +5,7 @@ from .editor_mode_register import EditorModeRegistry, AbstractEditorMode, Editor
 from megabone.editor.item import BoneGraphicsItem
 
 
-@EditorModeRegistry.register("Create a new bone")
+@EditorModeRegistry.register("Create a new bone", "B")
 class CreateBoneMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)

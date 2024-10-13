@@ -5,7 +5,7 @@ from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, Editor
 from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
 
 
-@EditorModeRegistry.register("Attach sprite to bone")
+@EditorModeRegistry.register("Attach sprite to bone", "A")
 class SpriteAttachmentMode(AbstractEditorMode):
     def __init__(self, editor: EditorType):
         super().__init__(editor)
