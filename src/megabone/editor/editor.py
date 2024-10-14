@@ -1,6 +1,7 @@
 import math
 
 from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView
 
 from megabone.viewUtils import PanControl, ZoomControl
@@ -112,7 +113,7 @@ class SkeletonEditor(QGraphicsView):
             bone.calculateAngle()
         )
 
-    def addSprite(self, pixmap, pos):
+    def addSprite(self, pixmap: QPixmap, pos: QPointF):
         sprite = AnimatedSpriteItem(pixmap)
         sprite.setPos(pos)
         self.scene.addItem(sprite)

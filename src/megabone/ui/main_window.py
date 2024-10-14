@@ -1,3 +1,5 @@
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QToolBar, QStatusBar
 
 from megabone.editor import SkeletonEditor
@@ -20,6 +22,8 @@ class MegaBoneMainWindow(QMainWindow):
 
         self.editor = SkeletonEditor(self)
         self.setCentralWidget(self.editor)
+
+        self.editor.addSprite(QPixmap("sample/yokozuna/body_piece.png"), QPointF(0, 0))
 
         # self.animation_player = AnimationPlayer()
         # self.animation_dock = QDockWidget("Animation", self)
