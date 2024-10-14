@@ -7,13 +7,15 @@ class PivotHandle(QGraphicsEllipseItem):
     def __init__(self, parent, size: int = 8):
         super().__init__(parent)
         self.sprite_item = parent
+        self.setParentItem(parent)
         self.setZValue(1000)
         self.setPen(QPen(Qt.white, 1))
         self.setBrush(QColor(255, 255, 255, 64))
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
-        self.setCursor(Qt.CrossCursor)
         self.setRect(-size / 2, -size / 2, size, size)
+
+        self.position = QPointF(0, 0)
 
     def paint(self, painter, option, widget):
         super().paint(painter, option, widget)
@@ -53,4 +55,5 @@ class PivotHandle(QGraphicsEllipseItem):
         self.update_sprite_anchor()
 
     def update_sprite_anchor(self):
+        self.position = self.pos()
         self.sprite_item.set_anchor_point(self.pos())

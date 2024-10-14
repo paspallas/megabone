@@ -23,7 +23,11 @@ class MegaBoneMainWindow(QMainWindow):
         self.editor = SkeletonEditor(self)
         self.setCentralWidget(self.editor)
 
-        self.editor.addSprite(QPixmap("sample/yokozuna/body_piece.png"), QPointF(0, 0))
+        self.editor.addSprite(QPixmap("sample/yokozuna/body_piece.png"))
+        self.editor.addSprite(QPixmap("sample/yokozuna/limb_piece.png"))
+        self.editor.addSprite(QPixmap("sample/yokozuna/limb_piece.png"))
+        self.editor.addSprite(QPixmap("sample/yokozuna/shoulder_piece.png"))
+        self.editor.addSprite(QPixmap("sample/yokozuna/hand_piece.png"))
 
         # self.animation_player = AnimationPlayer()
         # self.animation_dock = QDockWidget("Animation", self)

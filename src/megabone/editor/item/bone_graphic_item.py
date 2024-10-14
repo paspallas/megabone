@@ -119,9 +119,14 @@ class BoneGraphicsItem(QGraphicsItem):
 
     def updateSpriteTransform(self, sprite):
         """Update the transform of an attached sprite based on bone position"""
-        local_pos = sprite.bone_offset
-        local_rotation = sprite.initial_rotation
 
+        # TODO separate model from view
+        # rotation = self.calculateAngle()
+        # pos = self.start_point + sprite.bone_offset.rotated(rotation)
+        # sprite.initial_rotation = rotation
+
+        # sprite.setPos(pos)
+        # sprite.setRotation(sprite.rotation)
         # Create transform
         transform = QTransform()
 
@@ -133,10 +138,10 @@ class BoneGraphicsItem(QGraphicsItem):
         transform.rotate(math.degrees(bone_angle))
 
         # Apply local position offset
-        transform.translate(local_pos.x(), local_pos.y())
+        transform.translate(sprite.pos().x(), sprite.pos().y())
 
         # Apply local rotation
-        transform.rotate(local_rotation)
+        transform.rotate(sprite.rotation())
 
         # Set the sprite's transform
         sprite.setTransform(transform)

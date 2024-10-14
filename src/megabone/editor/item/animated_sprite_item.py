@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtGui import QPixmap, QPainter
+from PyQt5.QtGui import QPixmap, QPainter, QTransform
 
 from megabone.editor.gizmo import PivotHandle
 
@@ -23,7 +23,28 @@ class AnimatedSpriteItem(QGraphicsItem):
         self.pivot_handle.hide()
         self.update_pivot_handle_pos()
 
-        self.setTransformOriginPoint(self.anchor_point)
+        # self.setTransformOriginPoint(self.boundingRect().center())
+
+    # def setRotation(self, angle: float):
+    # self.setTransformOriginPoint(self.anchor_point)
+    # super().setRotation(angle)
+    #   print(
+    #      f"center {self.boundingRect().center().x(), self.boundingRect().center().y()}"
+    # )
+    #  print(f"pivot {self.anchor_point.x(), self.anchor_point.y()}")
+
+    # transform = QTransform()
+
+    # # 1. Translate to pivot point
+    # transform.translate(pivot_pos.x(), pivot_pos.y())
+
+    # # 2. Rotate
+    # transform.rotate(angle)
+
+    # # 3. Translate back
+    # transform.translate(-pivot_pos.x(), -pivot_pos.y())
+
+    # self.setTransform(transform)
 
     def boundingRect(self) -> QRectF:
         return QRectF(self.pixmap.rect())
@@ -43,11 +64,11 @@ class AnimatedSpriteItem(QGraphicsItem):
     def update_bone_offset(self):
         pass
         # TODO change the bone sprites list to acomodate the changes
-        if self.attached_bone:
-            new_offset = self.pos() - self.attached_bone.start_point
-            for i, (sprite, _) in enumerate(self.attached_bone.sprites):
-                if sprite == self:
-                    self.attached_bone.sprites[i] = (sprite, new_offset)
+        # if self.attached_bone:
+        #     new_offset = self.pos() - self.attached_bone.start_point
+        #     for i, (sprite, _) in enumerate(self.attached_bone.sprites):
+        #         if sprite == self:
+        #             self.attached_bone.sprites[i] = (sprite, new_offset)
 
     def itemChange(self, change, value):
         if change == QGraphicsItem.ItemPositionChange and self.scene():
@@ -61,7 +82,7 @@ class AnimatedSpriteItem(QGraphicsItem):
             super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        # Avoid manipulating the sprite when the pivot handle is active
+        # TODO remove Avoid manipulating the sprite when the pivot handle is active
         if not self.pivot_handle.isVisible():
             super().mouseMoveEvent(event)
 

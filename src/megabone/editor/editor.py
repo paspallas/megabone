@@ -1,18 +1,14 @@
 import math
 
-from PyQt5.QtCore import Qt, QPointF, QRectF, QLineF
-from PyQt5.QtGui import QPixmap, QColor, QPen, QPainter, QBrush
+from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QSizePolicy, QFrame
 
 from megabone.viewUtils import PanControl, ZoomControl
+from .grid import EditorGrid
 from .item import AnimatedSpriteItem, BoneGraphicsItem
 from .status import StatusMessage
 from .mode import *
-
-__backGridColor__ = QColor("#080808")
-__foreGridColor__ = QColor(210, 210, 210, 200)
-__darkColor__ = QColor("#404040")
-__lightColor__ = QColor("#666666")
 
 
 class SkeletonEditorScene(QGraphicsScene):
@@ -32,7 +28,7 @@ class SkeletonEditorScene(QGraphicsScene):
 
 
 class SkeletonEditor(QGraphicsView):
-    # Default size corresponds with the Megadrive sprite plane
+    # Default scene size corresponds with the Megadrive sprite plane
     _width = 512
     _height = 512
 
@@ -44,8 +40,7 @@ class SkeletonEditor(QGraphicsView):
         )
         self.setScene(self.scene)
 
-        # Configure grid size
-        self.grid_size = grid_size
+        self.grid = EditorGrid(self)
 
         # Configure the view
         self.centerOn(0, 0)
@@ -55,7 +50,6 @@ class SkeletonEditor(QGraphicsView):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setTransformationAnchor(QGraphicsView.NoAnchor)
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        self.setOptimizationFlag(QGraphicsView.DontAdjustForAntialiasing)
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setFrameStyle(QFrame.NoFrame)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -100,54 +94,6 @@ class SkeletonEditor(QGraphicsView):
         self.current_edit_mode.mouseReleaseEvent(event, scene_pos)
         super().mouseReleaseEvent(event)
 
-    def drawBackground(self, painter: QPainter, rect: QRectF) -> None:
-        painter.setPen(QPen(Qt.NoPen))
-
-        left = int(rect.left() - rect.left() % self.grid_size)
-        top = int(rect.top() - rect.top() % self.grid_size)
-
-        for y in range(top, int(rect.bottom()), self.grid_size):
-            for x in range(left, int(rect.right()), self.grid_size):
-                is_dark = (x / self.grid_size + y / self.grid_size) % 2
-
-                color = __darkColor__ if is_dark else __lightColor__
-                painter.fillRect(
-                    QRectF(x, y, self.grid_size, self.grid_size), QBrush(color)
-                )
-
-        l = rect.left()
-        r = rect.right()
-        t = rect.top()
-        b = rect.bottom()
-
-        # center visual indicator
-        lines = [QLineF(l, 0, r, 0), QLineF(0, t, 0, b)]
-
-        pen = QPen(__backGridColor__, 0, Qt.SolidLine)
-        pen.setCosmetic(True)
-        painter.setPen(pen)
-        painter.drawLines(*lines)
-        pen.setColor(__foreGridColor__)
-        painter.setPen(pen)
-        painter.drawRect(QRectF(-160, -112, 320, 224))
-
-    def drawForeground(self, painter: QPainter, rect) -> None:
-        start = 6
-        end = 2
-        lines = [
-            QLineF(-start, 0, -end, 0),
-            QLineF(0, -start, 0, -end),
-            QLineF(end, 0, start, 0),
-            QLineF(0, start, 0, end),
-        ]
-
-        painter.setRenderHint(QPainter.Antialiasing)
-        pen = QPen(__foreGridColor__, 2, Qt.SolidLine)
-        pen.setCosmetic(True)
-        painter.setPen(pen)
-        painter.drawLines(*lines)
-        painter.drawEllipse(QPointF(0, 0), 1, 1)
-
     def showStatusMessage(self, message: str):
         StatusMessage(message, self)
 
@@ -168,6 +114,8 @@ class SkeletonEditor(QGraphicsView):
             self.selected_sprite.setSelected(False)
             self.selected_sprite = None
 
+    # TODO move all operations to a controller class
+
     def attachSpriteToBone(self, sprite: AnimatedSpriteItem, bone: BoneGraphicsItem):
         if sprite.attached_bone:
             sprite.attached_bone.connected_sprites.remove(sprite)
@@ -176,11 +124,15 @@ class SkeletonEditor(QGraphicsView):
         bone.connected_sprites.append(sprite)
         sprite.attached_bone = bone
         sprite.bone_offset = sprite.pos() - bone.end_point
+
+        # Set default anchor point of the sprite to the end_point of the bone
+        sprite.setTransformOriginPoint(sprite.mapFromItem(bone, bone.end_point))
         sprite.initial_rotation = sprite.rotation() - math.degrees(
             bone.calculateAngle()
         )
 
-    def addSprite(self, pixmap: QPixmap, pos: QPointF):
+    def addSprite(self, pixmap: QPixmap, pos: QPointF = QPointF(0, 0)):
+        # pixmap.setMask(pixmap.createMaskFromColor(Qt.magenta))
         sprite = AnimatedSpriteItem(pixmap)
         sprite.setPos(pos)
         self.scene.addItem(sprite)
