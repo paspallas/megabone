@@ -14,13 +14,10 @@ class CreateBoneMode(AbstractEditorMode):
         self.new_bone = None
 
     def activate(self):
-        self.editor.setDragMode(QGraphicsView.NoDrag)
         self.editor.setCursor(Qt.CrossCursor)
-        self.editor.showStatusMessage("Shift + Right Click")
-        status().set_status("Create Bone", "right")
 
     def deactivate(self):
-        status().clear_status("right")
+        self.editor.setCursor(Qt.ArrowCursor)
 
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
@@ -41,6 +38,7 @@ class CreateBoneMode(AbstractEditorMode):
 
             else:
                 # Finish drawing bone
+                self.new_bone.setSelected(False)
                 self.new_bone = None
 
     def mouseMoveEvent(self, event, scene_pos):
