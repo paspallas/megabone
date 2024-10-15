@@ -1,2 +1,2 @@
-from .bone_graphic_item import BoneGraphicsItem
-from .animated_sprite_item import AnimatedSpriteItem
+from .bone import BoneItem
+from .sprite import SpriteItem

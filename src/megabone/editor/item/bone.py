@@ -13,7 +13,7 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QGraphicsItem
 
 
-class BoneGraphicsItem(QGraphicsItem):
+class BoneItem(QGraphicsItem):
     def __init__(self, start_point, end_point, parent=None):
         super().__init__(parent)
         self.start_point = start_point

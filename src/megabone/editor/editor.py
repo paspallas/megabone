@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QSizePolicy, QFrame
 
 from megabone.viewUtils import PanControl, ZoomControl
 from .grid import EditorGrid
-from .item import AnimatedSpriteItem, BoneGraphicsItem
+from .item import SpriteItem, BoneItem
 from .status import StatusMessage
 from .mode import *
 
@@ -116,7 +116,7 @@ class SkeletonEditor(QGraphicsView):
 
     # TODO move all operations to a controller class
 
-    def attachSpriteToBone(self, sprite: AnimatedSpriteItem, bone: BoneGraphicsItem):
+    def attachSpriteToBone(self, sprite: SpriteItem, bone: BoneItem):
         if sprite.attached_bone:
             sprite.attached_bone.connected_sprites.remove(sprite)
 
@@ -133,7 +133,7 @@ class SkeletonEditor(QGraphicsView):
 
     def addSprite(self, pixmap: QPixmap, pos: QPointF = QPointF(0, 0)):
         # pixmap.setMask(pixmap.createMaskFromColor(Qt.magenta))
-        sprite = AnimatedSpriteItem(pixmap)
+        sprite = SpriteItem(pixmap)
         sprite.setPos(pos)
         self.scene.addItem(sprite)
         return sprite

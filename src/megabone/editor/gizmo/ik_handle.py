@@ -4,14 +4,12 @@ from PyQt5.QtWidgets import QGraphicsItem
 
 from .pole_vector import PoleControl
 from .target_control import TargetControl
-from megabone.editor.item import BoneGraphicsItem
+from megabone.editor.item import BoneItem
 from megabone.IKSolver import FABRIK
 
 
 class IKHandle(QGraphicsItem):
-    def __init__(
-        self, start_bone: BoneGraphicsItem, end_bone: BoneGraphicsItem, parent=None
-    ):
+    def __init__(self, start_bone: BoneItem, end_bone: BoneItem, parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)

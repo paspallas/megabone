@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt
 
 from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
-from megabone.editor.item import BoneGraphicsItem
+from megabone.editor.item import BoneItem
 from megabone.editor.gizmo import IKHandle
 
 
@@ -19,7 +19,7 @@ class IKHandleMode(AbstractEditorMode):
         if event.button() == Qt.LeftButton:
             item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
 
-            if isinstance(item, BoneGraphicsItem):
+            if isinstance(item, BoneItem):
                 if not self.creating_handle:
                     # Start creating handle
                     self.creating_handle = True

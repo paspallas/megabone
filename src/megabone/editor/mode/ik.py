@@ -5,7 +5,7 @@ from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
-from megabone.editor.item import BoneGraphicsItem
+from megabone.editor.item import BoneItem
 from megabone.IKSolver import FABRIK
 
 
@@ -34,7 +34,7 @@ class IKMode(AbstractEditorMode):
         if event.button() == Qt.LeftButton:
             # Check if we clicked on a bone
             item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
-            if isinstance(item, BoneGraphicsItem):
+            if isinstance(item, BoneItem):
                 # Create IK chain from clicked bone up to root or branch
                 # We have to take into account if the bone is not an end effector
                 # in that case we need the chain from the selected bone up to the last child bone

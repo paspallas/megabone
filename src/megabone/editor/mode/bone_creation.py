@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtWidgets import QGraphicsView
 
 from .editor_mode_register import EditorModeRegistry, AbstractEditorMode, EditorType
-from megabone.editor.item import BoneGraphicsItem
+from megabone.editor.item import BoneItem
 from megabone.util import StatusBarManager as status
 
 
@@ -23,14 +23,14 @@ class CreateBoneMode(AbstractEditorMode):
         if event.button() == Qt.LeftButton:
             if self.new_bone is None:
                 # Start drawing a new bone
-                self.new_bone = BoneGraphicsItem(scene_pos, scene_pos + QPointF(1, 1))
+                self.new_bone = BoneItem(scene_pos, scene_pos + QPointF(1, 1))
 
                 if event.modifiers() & Qt.ShiftModifier:
                     # If shift is held and we clicked on a bone, use it as parent
                     parent_bone = self.editor.scene.itemAt(
                         scene_pos, self.editor.transform()
                     )
-                    if isinstance(parent_bone, BoneGraphicsItem):
+                    if isinstance(parent_bone, BoneItem):
                         self.new_bone.setParentBone(parent_bone)
 
                 self.editor.scene.addItem(self.new_bone)

@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 
 from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 from megabone.editor.gizmo import IKHandle
-from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
+from megabone.editor.item import BoneItem, SpriteItem
 from megabone.model import PropertyType
 
 
@@ -26,7 +26,7 @@ class AnimationMode(AbstractEditorMode):
             # Get clicked item
             item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
 
-            if isinstance(item, (BoneGraphicsItem, IKHandle, AnimatedSpriteItem)):
+            if isinstance(item, (BoneItem, IKHandle, SpriteItem)):
                 # If we have a selected track and it matches the item type
                 if self.selected_track and isinstance(
                     item, self.selected_track.target.__class__
@@ -36,7 +36,7 @@ class AnimationMode(AbstractEditorMode):
                         self.editor.animation_player.current_animation.current_frame
                     )
 
-                    if isinstance(item, BoneGraphicsItem):
+                    if isinstance(item, BoneItem):
                         value = item.calculateAngle()
                     elif isinstance(item, IKHandle):
                         if self.selected_track.property_type == PropertyType.IK_TARGET:

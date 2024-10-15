@@ -1,11 +1,11 @@
 from PyQt5.QtCore import Qt, QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtGui import QPixmap, QPainter, QTransform
+from PyQt5.QtGui import QPixmap, QPainter
 
 from megabone.editor.gizmo import PivotHandle
 
 
-class AnimatedSpriteItem(QGraphicsItem):
+class SpriteItem(QGraphicsItem):
     def __init__(self, pixmap: QPixmap, anchor_point=QPointF(0, 0), parent=None):
         super().__init__(parent)
         self.setFlag(QGraphicsItem.ItemIsMovable)

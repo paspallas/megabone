@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
 from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
-from megabone.editor.item import BoneGraphicsItem, AnimatedSpriteItem
+from megabone.editor.item import BoneItem, SpriteItem
 
 
 @EditorModeRegistry.register("Select scene items", "S")
@@ -20,9 +20,9 @@ class SelectionMode(AbstractEditorMode):
         if event.button() == Qt.LeftButton:
             item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
             if item:
-                if isinstance(item, BoneGraphicsItem):
+                if isinstance(item, BoneItem):
                     self.editor.selectBone(item)
-                elif isinstance(item, AnimatedSpriteItem):
+                elif isinstance(item, SpriteItem):
                     self.editor.selectSprite(item)
             else:
                 self.editor.clearSelection()
