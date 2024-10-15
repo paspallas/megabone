@@ -23,29 +23,6 @@ class AnimatedSpriteItem(QGraphicsItem):
         self.pivot_handle.hide()
         self.update_pivot_handle_pos()
 
-        # self.setTransformOriginPoint(self.boundingRect().center())
-
-    # def setRotation(self, angle: float):
-    # self.setTransformOriginPoint(self.anchor_point)
-    # super().setRotation(angle)
-    #   print(
-    #      f"center {self.boundingRect().center().x(), self.boundingRect().center().y()}"
-    # )
-    #  print(f"pivot {self.anchor_point.x(), self.anchor_point.y()}")
-
-    # transform = QTransform()
-
-    # # 1. Translate to pivot point
-    # transform.translate(pivot_pos.x(), pivot_pos.y())
-
-    # # 2. Rotate
-    # transform.rotate(angle)
-
-    # # 3. Translate back
-    # transform.translate(-pivot_pos.x(), -pivot_pos.y())
-
-    # self.setTransform(transform)
-
     def boundingRect(self) -> QRectF:
         return QRectF(self.pixmap.rect())
 
