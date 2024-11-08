@@ -5,12 +5,13 @@ from PyQt5.QtWidgets import QGraphicsItem
 from .pole_vector import PoleControl
 from .target_control import TargetControl
 from megabone.editor.item import BoneItem
+from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.IKSolver import FABRIK
 
 
-class IKHandle(QGraphicsItem):
+class IKHandle(LayeredItemMixin, QGraphicsItem):
     def __init__(self, start_bone: BoneItem, end_bone: BoneItem, parent=None):
-        super().__init__(parent)
+        super().__init__(layer=Layer.GIZMO, parent=parent)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setAcceptHoverEvents(True)
@@ -58,7 +59,6 @@ class IKHandle(QGraphicsItem):
         return rect
 
     def paint(self, painter, option, widget):
-        # if self.hovering or self.selected:
         # Draw chain influence visualization
         painter.setPen(QPen(QColor(255, 165, 0, 127), 1, Qt.DashLine))
         for bone in self.chain.bones:

@@ -18,7 +18,7 @@ class SelectionMode(AbstractEditorMode):
 
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
-            item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
+            item = self.editor.scene().itemAt(scene_pos, self.editor.transform())
             if item:
                 if isinstance(item, BoneItem):
                     self.editor.selectBone(item)

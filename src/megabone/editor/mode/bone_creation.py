@@ -27,14 +27,16 @@ class CreateBoneMode(AbstractEditorMode):
 
                 if event.modifiers() & Qt.ShiftModifier:
                     # If shift is held and we clicked on a bone, use it as parent
-                    parent_bone = self.editor.scene.itemAt(
+                    parent_bone = self.editor.scene().itemAt(
                         scene_pos, self.editor.transform()
                     )
                     if isinstance(parent_bone, BoneItem):
                         self.new_bone.setParentBone(parent_bone)
 
-                self.editor.scene.addItem(self.new_bone)
+                # TODO manage addition of all items to the editor in a centralized place
+                self.editor.scene().addItem(self.new_bone)
                 self.editor.bones.append(self.new_bone)
+                self.editor.layer_control.add_item(self.new_bone)
 
             else:
                 # Finish drawing bone

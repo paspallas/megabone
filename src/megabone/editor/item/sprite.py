@@ -2,12 +2,13 @@ from PyQt5.QtCore import Qt, QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtGui import QPixmap, QPainter
 
+from megabone.editor.layer import LayeredItemMixin, Layer
 from megabone.editor.gizmo import PivotHandle
 
 
-class SpriteItem(QGraphicsItem):
+class SpriteItem(LayeredItemMixin, QGraphicsItem):
     def __init__(self, pixmap: QPixmap, anchor_point=QPointF(0, 0), parent=None):
-        super().__init__(parent)
+        super().__init__(parent=parent, layer=Layer.SPRITE)
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.pixmap = pixmap

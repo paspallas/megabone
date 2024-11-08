@@ -12,10 +12,12 @@ from PyQt5.QtGui import (
 )
 from PyQt5.QtWidgets import QGraphicsItem
 
+from megabone.editor.layer import Layer, LayeredItemMixin
 
-class BoneItem(QGraphicsItem):
+
+class BoneItem(LayeredItemMixin, QGraphicsItem):
     def __init__(self, start_point, end_point, parent=None):
-        super().__init__(parent)
+        super().__init__(layer=Layer.BONE, parent=parent)
         self.start_point = start_point
         self.end_point = end_point
         self.setAcceptHoverEvents(True)

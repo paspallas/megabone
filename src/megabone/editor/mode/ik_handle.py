@@ -28,9 +28,10 @@ class IKHandleMode(AbstractEditorMode):
                 else:
                     # Finish creating handle
                     handle = IKHandle(self.start_bone, item)
-                    self.editor.scene.addItem(handle)
-                    self.editor.scene.addItem(handle.target)
-                    self.editor.scene.addItem(handle.pole)
+                    self.editor.scene().addItem(handle)
+                    self.editor.scene().addItem(handle.target)
+                    self.editor.scene().addItem(handle.pole)
+
                     self.creating_handle = False
                     self.start_bone = None
                     self.editor.setCursor(Qt.CrossCursor)

@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../claude"
+		},
+		{
+			"path": "../../puppet/src/app"
+		},
+		{
+			"path": "../../AdventureDrive/src/app"
+		}
+	],
+	"settings": {}
+}

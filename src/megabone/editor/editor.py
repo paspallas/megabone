@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QSizePolicy, QFrame
 from megabone.viewUtils import PanControl, ZoomControl
 from .grid import EditorGrid
 from .item import SpriteItem, BoneItem
+from .layer import LayerManager
 from .status import StatusMessage
 from .mode import *
 
@@ -34,13 +35,14 @@ class SkeletonEditor(QGraphicsView):
 
     def __init__(self, parent=None, grid_size: int = 32):
         super().__init__(parent)
-        self.scene = SkeletonEditorScene(self)
-        self.scene.setSceneRect(
+        self._scene = SkeletonEditorScene(self)
+        self._scene.setSceneRect(
             -self._width / 2, -self._height / 2, self._width, self._height
         )
-        self.setScene(self.scene)
+        self.setScene(self._scene)
 
         self.grid = EditorGrid(self)
+        self.layers = LayerManager(self)
 
         # Configure the view
         self.centerOn(0, 0)
@@ -135,7 +137,8 @@ class SkeletonEditor(QGraphicsView):
         # pixmap.setMask(pixmap.createMaskFromColor(Qt.magenta))
         sprite = SpriteItem(pixmap)
         sprite.setPos(pos)
-        self.scene.addItem(sprite)
+        self._scene.addItem(sprite)
+        self.layers.add_item(sprite)
         return sprite
 
     def selectSprite(self, sprite):
