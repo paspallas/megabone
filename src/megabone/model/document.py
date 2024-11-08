@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtGui import QUndoStack
+from PyQt5.QtWidgets import QUndoStack
 
 from .bone import BoneModel
 from .sprite import SpriteModel
