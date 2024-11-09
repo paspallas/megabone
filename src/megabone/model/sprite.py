@@ -18,7 +18,7 @@ class SpriteModel(QObject):
     sprite_removed = pyqtSignal(str)
 
     def __init__(self) -> None:
-        super.__init__()
+        super().__init__()
         self._sprites: Dict[str, Sprite] = {}
 
     def add_sprite(self, sprite: Sprite) -> None:

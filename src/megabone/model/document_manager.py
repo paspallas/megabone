@@ -25,7 +25,7 @@ class DocumentManager(QObject):
     def create_document(self) -> str:
         """Create a new empty document and return its ID"""
         doc = Document()
-        doc_id = self._generate_document_id()
+        doc_id = self.generate_document_id()
         self._documents[doc_id] = doc
 
         # Connect to document signals
@@ -67,6 +67,7 @@ class DocumentManager(QObject):
         del self._documents[doc_id]
         self._unsaved_changes.discard(doc_id)
         self.document_removed.emit(doc_id)
+
         return True
 
     def _on_document_changed(self, doc_id: str) -> None:

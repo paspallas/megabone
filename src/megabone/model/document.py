@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QUndoStack
+from PyQt5.QtWidgets import QMessageBox, QUndoStack
 
 from .bone import BoneModel
 from .sprite import SpriteModel
@@ -40,7 +40,7 @@ class Document(QObject):
                 json.dump(document_data, f)
             return True
         except Exception as e:
-            # open an error window
+            QMessageBox.critical("Couldn't save file.")
             return False
 
     @classmethod

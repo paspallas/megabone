@@ -1,9 +1,9 @@
-from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt5.QtCore import QPointF, Qt
 
-from .editor_mode_register import EditorModeRegistry, AbstractEditorMode, EditorType
 from megabone.editor.item import BoneItem
-from megabone.util import StatusBarManager as status
+from megabone.widget import StatusBarManager as status
+
+from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 
 
 @EditorModeRegistry.register("Create a new bone", "B")
@@ -36,7 +36,7 @@ class CreateBoneMode(AbstractEditorMode):
                 # TODO manage addition of all items to the editor in a centralized place
                 self.editor.scene().addItem(self.new_bone)
                 self.editor.bones.append(self.new_bone)
-                self.editor.layer_control.add_item(self.new_bone)
+                # self.editor.layer_control.add_item(self.new_bone)
 
             else:
                 # Finish drawing bone

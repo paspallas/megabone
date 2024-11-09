@@ -1,15 +1,16 @@
 import math
 
-from PyQt5.QtCore import Qt, QPointF
+from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QSizePolicy, QFrame
+from PyQt5.QtWidgets import QFrame, QGraphicsScene, QGraphicsView, QSizePolicy
 
 from megabone.viewUtils import PanControl, ZoomControl
+
 from .grid import EditorGrid
-from .item import SpriteItem, BoneItem
+from .item import BoneItem, SpriteItem
 from .layer import LayerManager
-from .status import StatusMessage
 from .mode import *
+from .status import StatusMessage
 
 
 class SkeletonEditorScene(QGraphicsScene):
@@ -29,7 +30,7 @@ class SkeletonEditorScene(QGraphicsScene):
 
 
 class SkeletonEditor(QGraphicsView):
-    # Default scene size corresponds with the Megadrive sprite plane
+    # Default scene size corresponds with the Megadrive sprite plane size
     _width = 512
     _height = 512
 
@@ -42,7 +43,7 @@ class SkeletonEditor(QGraphicsView):
         self.setScene(self._scene)
 
         self.grid = EditorGrid(self)
-        self.layers = LayerManager(self)
+        self.layer_manager = LayerManager(self)
 
         # Configure the view
         self.centerOn(0, 0)
@@ -138,7 +139,7 @@ class SkeletonEditor(QGraphicsView):
         sprite = SpriteItem(pixmap)
         sprite.setPos(pos)
         self._scene.addItem(sprite)
-        self.layers.add_item(sprite)
+        self.layer_manager.add_item(sprite)
         return sprite
 
     def selectSprite(self, sprite):
