@@ -1,11 +1,11 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QDockWidget, QMainWindow, QStatusBar, QTabWidget, QToolBar
+from PyQt5.QtWidgets import QMainWindow, QStatusBar, QTabWidget, QToolBar
 
 from megabone.editor import SkeletonEditor
 from megabone.editor.mode import EditorModeRegistry
 from megabone.model.document_manager import DocumentManager
-from megabone.widget import MenuBuilder
+from megabone.widget import DockConfig, DockManager, MenuBuilder
 from megabone.widget import StatusBarManager as status
 
 
@@ -28,15 +28,20 @@ class MegaBoneMainWindow(QMainWindow):
         status().add_region("left", 200)
         status().add_region("right", 800)
 
-        # Main editor area
+        # Main editing area
         self.tabs = QTabWidget()
         self.tabs.setTabsClosable(True)
         self.setCentralWidget(self.tabs)
 
-        # Docking area
-        self.dock = QDockWidget("Dockable", self)
-        self.dock.setAllowedAreas((Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea))
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.dock)
+        # Docked widgets
+        self.dock_manager = DockManager(self, self.view_menu.menu)
+        self.dock_manager.create_dock(
+            "Explorer", DockConfig(title="Explorer", area=Qt.RightDockWidgetArea)
+        )
+        self.dock_manager.create_dock(
+            "History", DockConfig(title="History", area=Qt.RightDockWidgetArea)
+        )
+        self.dock_manager.hide_all()
 
         # self.editor = SkeletonEditor(self)
         # self.editor.addSprite(QPixmap("sample/yokozuna/body_piece.png"))
@@ -44,11 +49,6 @@ class MegaBoneMainWindow(QMainWindow):
         # self.editor.addSprite(QPixmap("sample/yokozuna/limb_piece.png"))
         # self.editor.addSprite(QPixmap("sample/yokozuna/shoulder_piece.png"))
         # self.editor.addSprite(QPixmap("sample/yokozuna/hand_piece.png"))
-
-        # self.animation_player = AnimationPlayer()
-        # self.animation_dock = QDockWidget("Animation", self)
-        # self.animation_dock.setWidget(self.animation_player)
-        # self.addDockWidget(Qt.BottomDockWidgetArea, self.animation_dock)
 
         # Create unique toolbar
         self.toolbar = QToolBar()
@@ -73,9 +73,11 @@ class MegaBoneMainWindow(QMainWindow):
         self.file_menu = (
             MenuBuilder("File", self)
             .add_action("new", "New", shortcut="Ctrl+N", triggered=self.new_document)
-            .add_action("open", "Open", shortcut="Ctrl+O", triggered=self.open_document)
+            .add_action(
+                "open", "Open...", shortcut="Ctrl+O", triggered=self.open_document
+            )
             .add_action("save", "Save", shortcut="Ctrl+S", triggered=self.save_document)
-            .add_action("save_as", "Save as...")
+            .add_action("save_as", "Save As...")
             .add_separator()
             .begin_submenu("Export")
             .add_action("sprite_sheet", "As Sprite Sheet")
@@ -90,18 +92,14 @@ class MegaBoneMainWindow(QMainWindow):
             .add_action("redo", "Redo", shortcut="Ctrl+Y")
         )
 
-        self.view_menu = (
-            MenuBuilder("View", self)
-            .add_action("explorer", "Explorer", checkable=True)
-            .add_action("history", "History", checkable=True)
-        )
-
         self.help_menu = (
             MenuBuilder("Help", self)
             .add_action("docs", "Documentation")
             .add_separator()
             .add_action("about", "About")
         )
+
+        self.view_menu = MenuBuilder("View", self)
 
         self.menuBar().addMenu(self.file_menu.build())
         self.menuBar().addMenu(self.edit_menu.build())
