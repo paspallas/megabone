@@ -1,6 +1,4 @@
-from typing import Callable
-
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QFileDialog
 
 
 class FileDialog:
@@ -22,6 +20,7 @@ class FileDialog:
     @staticmethod
     def save_file() -> str:
         options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
         file_name, _ = QFileDialog.getSaveFileName(
             None, "Save File", "", "Megabone Files (*.mgb)", options=options
         )
@@ -33,7 +32,7 @@ class FileDialog:
                 return file_name
 
     @staticmethod
-    def select_directory():
+    def select_directory() -> str:
         directory = QFileDialog.getExistingDirectory(
             None,
             "Select Directory",
@@ -42,4 +41,4 @@ class FileDialog:
         )
 
         if directory:
-            pass
+            return directory
