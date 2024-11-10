@@ -10,7 +10,7 @@ class FileDialog:
             None,
             "Open File",  # title
             "",  # Starting directory
-            "Megabone Files (*.mgb)",  # File types
+            "Megabone Project File (*.mgb)",  # File types
             options=options,
         )
 
@@ -22,7 +22,7 @@ class FileDialog:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file_name, _ = QFileDialog.getSaveFileName(
-            None, "Save File", "", "Megabone Files (*.mgb)", options=options
+            None, "Save File", "", "Megabone Project File (*.mgb)", options=options
         )
 
         if file_name:
