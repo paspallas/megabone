@@ -2,6 +2,7 @@ from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QStatusBar, QTabWidget, QToolBar
 
+from megabone.dialog import FileDialog
 from megabone.editor import SkeletonEditor
 from megabone.editor.mode import EditorModeRegistry
 from megabone.model.document_manager import DocumentManager
@@ -64,17 +65,24 @@ class MegaBoneMainWindow(QMainWindow):
         index = self.tabs.addTab(editor, id)
 
     def open_document(self):
-        pass
+        file = FileDialog.open_file()
+        if file:
+            pass
 
     def save_document(self):
-        pass
+        file = FileDialog.save_file()
+        if file:
+            pass
 
     def setup_menu_bar(self):
         self.file_menu = (
             MenuBuilder("File", self)
             .add_action("new", "New", shortcut="Ctrl+N", triggered=self.new_document)
             .add_action(
-                "open", "Open...", shortcut="Ctrl+O", triggered=self.open_document
+                "open",
+                "Open...",
+                shortcut="Ctrl+O",
+                triggered=self.open_document,
             )
             .add_action("save", "Save", shortcut="Ctrl+S", triggered=self.save_document)
             .add_action("save_as", "Save As...")
