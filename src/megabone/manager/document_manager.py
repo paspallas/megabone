@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 from typing import Dict, Optional, Set
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -8,34 +9,45 @@ from megabone.model.document import Document
 
 
 class DocumentManager(QObject):
-    """Manage multiple documents and coordinate its views"""
+    """Manage multiple documents"""
 
-    document_added = pyqtSignal(str)
-    document_removed = pyqtSignal(str)
-    active_document_changed = pyqtSignal(str)
+    documentAdded = pyqtSignal(str)
+    documentRemoved = pyqtSignal(str)
+    activeDocumentChanged = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
 
         self._documents: Dict[str, Document] = {}
         self._active_document_id: Optional[str] = None
-        # self._view_sync_groups: Dict[str, Set[BaseAnimationView]] = {}
         self._unsaved_changes: Set[str] = set()
 
-    def create_document(self) -> str:
-        """Create a new empty document and return its ID"""
-        doc = Document()
-        doc_id = self.generate_document_id()
+    def get_document(self, doc_id: str) -> Document:
+        """Get a document by its ID"""
+        return self._documents.get(doc_id, None)
+
+    def _add_document(self, doc: Document) -> str:
+        """Add a document to the collection and return its ID"""
+        doc_id = uuid.uuid4().hex
         self._documents[doc_id] = doc
 
         # Connect to document signals
-        doc.document_changed.connect(lambda: self._on_document_changed(doc_id))
+        doc.documentChanged.connect(lambda: self._on_document_changed(doc_id))
 
-        self.document_added.emit(doc_id)
+        self.documentAdded.emit(doc_id)
         return doc_id
 
-    def generate_document_id(self) -> str:
-        return uuid.uuid4().hex
+    def load_document(self, file_path: Path) -> str:
+        """Load a document from file"""
+        doc = Document.load(file_path)
+
+        if doc:
+            return self._add_document(doc)
+
+    def create_document(self) -> str:
+        """Create a new empty document"""
+        doc = Document()
+        return self._add_document(doc)
 
     def set_active_document(self, doc_id: str) -> None:
         if doc_id not in self._documents:
@@ -43,7 +55,7 @@ class DocumentManager(QObject):
 
         if self._active_document_id != doc_id:
             self._active_document_id = doc_id
-            self.active_document_changed.emit(doc_id)
+            self.activeDocumentChanged.emit(doc_id)
 
     def close_document(self, doc_id: str) -> bool:
         """Attempts to close a document. Returns True on success"""
@@ -66,9 +78,21 @@ class DocumentManager(QObject):
 
         del self._documents[doc_id]
         self._unsaved_changes.discard(doc_id)
-        self.document_removed.emit(doc_id)
+        self.documentRemoved.emit(doc_id)
 
         return True
+
+    def on_autosave_failed(self, doc_id: str, error_message: str) -> None:
+        doc = self.get_document(doc_id)
+        if not doc:
+            return
+
+        QMessageBox.warning(
+            None,
+            "Autosave Failed",
+            f"Failed to create backup for {doc_id}:\n{error_message}\n\n"
+            "Please save your work manually as soon as possible.",
+        )
 
     def _on_document_changed(self, doc_id: str) -> None:
         self._unsaved_changes.add(doc_id)

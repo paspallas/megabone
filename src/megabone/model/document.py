@@ -10,7 +10,7 @@ from .sprite import SpriteModel
 
 
 class Document(QObject):
-    document_changed = pyqtSignal()
+    documentChanged = pyqtSignal()
 
     def __init__(self) -> None:
         super().__init__()
@@ -18,6 +18,7 @@ class Document(QObject):
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.undo_stack = QUndoStack()
+        self.name = ""
         self._file_path: Optional[Path] = None
 
     def save(self, file_path: Optional[Path] = None) -> bool:
@@ -28,6 +29,7 @@ class Document(QObject):
             return False
 
         document_data = {
+            "name": self.name,
             "bones": [self._bone_to_dict(bone) for bone in self.bones._bones.values()],
             "sprites": [
                 self._sprites_to_dict(sprite)
@@ -39,13 +41,21 @@ class Document(QObject):
             with self._file_path.open("w", encoding="utf-8") as f:
                 json.dump(document_data, f)
             return True
-        except Exception as e:
-            QMessageBox.critical("Couldn't save file.")
+
+        except Exception:
+            QMessageBox.critical(
+                None,
+                "Save File Error",
+                f"Unable to save file: {self._file_path}",
+                QMessageBox.Ok,
+            )
+
             return False
 
     @classmethod
     def load(cls, file_path: Path) -> "Document":
         doc = cls()
+
         try:
             with file_path.open("r", encoding="utf-8") as f:
                 data = json.load(f)
@@ -60,10 +70,16 @@ class Document(QObject):
             doc._file_path = file_path
             return doc
 
-        except Exception as e:
-            # Open error window
+        except Exception:
+            QMessageBox.critical(
+                None,
+                "Open File Error",
+                f"Unable to open file: {file_path}",
+                QMessageBox.Ok,
+            )
+
             return None
 
     def create_undo_command(self, command) -> None:
         self.undo_stack.push(command)
-        self.document_changed.emit()
+        self.documentChanged.emit()
