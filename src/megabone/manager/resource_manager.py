@@ -1,4 +1,5 @@
 from typing import Dict
+
 from PyQt5.QtCore import QFile, QIODevice
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QApplication

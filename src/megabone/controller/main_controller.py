@@ -4,12 +4,13 @@ from PyQt5.QtWidgets import QMainWindow
 from megabone.dialog import FileDialog
 from megabone.editor import SkeletonEditor
 from megabone.editor.mode import EditorModeRegistry
-from megabone.model.document_manager import DocumentManager
+from megabone.manager import DocumentManager
 
 
 class MainController(QObject):
     enterFullScreen = pyqtSignal()
     enterZenMode = pyqtSignal()
+    wantQuit = pyqtSignal()
     documentCreated = pyqtSignal()
 
     def __init__(self, main_window: QMainWindow) -> None:
@@ -29,7 +30,6 @@ class MainController(QObject):
             self.main_window.toolbar.addAction(action)
 
         index = self.main_window.tabs.addTab(editor, id)
-        editor.showModalDialog()
         self.documentCreated.emit()
 
     def on_open(self):

@@ -1,16 +1,24 @@
+from enum import Enum, auto
 from typing import Dict
 
 from PyQt5.QtWidgets import QMenuBar
 
-from megabone.widget import MenuBuilder
+from megabone.builder import MenuBuilder
 
 from .main_controller import MainController
+
+
+class MenuType(Enum):
+    FILE = auto()
+    EDIT = auto()
+    VIEW = auto()
+    HELP = auto()
 
 
 class MainMenuController:
     def __init__(self, controller: MainController) -> None:
         self.controller = controller
-        self._menus: Dict[str, MenuBuilder] = {}
+        self._menus: Dict[MenuType, MenuBuilder] = {}
 
         self.create_menus()
 
@@ -18,7 +26,7 @@ class MainMenuController:
         self.controller.documentCreated.connect(self._on_document_created)
 
     def create_menus(self):
-        self._menus["File"] = (
+        self._menus[MenuType.FILE] = (
             MenuBuilder("File")
             .action("New", self.controller.on_new, "Ctrl+N")
             .action(
@@ -46,21 +54,21 @@ class MainMenuController:
             .disable_items("Save", "Save As...")
         )
 
-        self._menus["Edit"] = (
+        self._menus[MenuType.EDIT] = (
             MenuBuilder("Edit")
             .action("Undo", self.controller.on_undo, "Ctrl+Z")
             .action("Redo", self.controller.on_redo, "Ctrl+Y")
             .disable_items("Undo", "Redo")
         )
 
-        self._menus["Help"] = (
+        self._menus[MenuType.HELP] = (
             MenuBuilder("Help")
             .action("Documentation")
             .separator()
             .action("About", callback=self.controller.on_about)
         )
 
-        self._menus["View"] = (
+        self._menus[MenuType.VIEW] = (
             MenuBuilder("View")
             .action("Full Screen", self.controller.on_full_screen, "F11")
             .action("Zen Mode", self.controller.on_zen_mode, "Ctrl+Shift+Z")
@@ -69,12 +77,12 @@ class MainMenuController:
             .back()
         )
 
-    def populate_menu_bar(self, bar: QMenuBar, *menus: str) -> None:
+    def populate_menu_bar(self, menubar: QMenuBar, *menus: MenuType) -> None:
         for menu in menus:
-            bar.addMenu(self._menus.get(menu).build())
+            menubar.addMenu(self._menus.get(menu).build())
 
     def get_builder(self, name: str) -> MenuBuilder:
         return self._menus.get(name, None)
 
     def _on_document_created(self):
-        self.file.enable_items("Save", "Save As...")
+        self._menus.get(MenuType.FILE).enable_items("Save", "Save As...")

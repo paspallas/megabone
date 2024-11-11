@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 
 from megabone.dialog.modal import DialogType, ModalDialogFactory
-from megabone.viewUtils import *
+from megabone.filters import *
 
 from .grid import EditorGrid
 from .item import BoneItem, SpriteItem

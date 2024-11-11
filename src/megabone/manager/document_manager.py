@@ -4,7 +4,7 @@ from typing import Dict, Optional, Set
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
 
-from .document import Document
+from megabone.model.document import Document
 
 
 class DocumentManager(QObject):

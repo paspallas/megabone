@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QPointF, Qt
 
 from megabone.editor.item import BoneItem
-from megabone.widget import StatusBarManager as status
+from megabone.manager import StatusBarManager as status
 
 from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 

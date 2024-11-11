@@ -1,12 +1,12 @@
 import re
-
 from abc import ABC, abstractmethod
 from collections import OrderedDict
 from enum import Enum
-from typing import OrderedDict, Optional, Type, TypeVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, OrderedDict, Type, TypeVar
+
 from PyQt5.QtWidgets import QAction, QActionGroup
 
-from megabone.resource_manager import ResourceManager as res
+from megabone.manager.resource_manager import ResourceManager as res
 
 if TYPE_CHECKING:
     from megabone.editor import SkeletonEditor
