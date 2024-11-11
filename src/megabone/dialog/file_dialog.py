@@ -8,9 +8,9 @@ class FileDialog:
         options |= QFileDialog.DontUseNativeDialog
         file_name, _ = QFileDialog.getOpenFileName(
             None,
-            "Open File",  # title
-            "",  # Starting directory
-            "Megabone Project File (*.mgb)",  # File types
+            "Open File",
+            "",
+            "Megabone Project File (*.mgb)",
             options=options,
         )
 

@@ -15,7 +15,7 @@ class Layer(Enum):
 
 
 class LayeredItemMixin:
-    _items_per_layer = 1000
+    _items_per_layer = 50_000
 
     def __init__(self, *args, layer: Layer, z_index: float = 0, **kwargs) -> None:
         super().__init__(*args, **kwargs)

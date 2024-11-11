@@ -2,9 +2,8 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QMainWindow
 
 from megabone.dialog import FileDialog
-from megabone.editor import SkeletonEditor
-from megabone.editor.mode import EditorModeRegistry
 from megabone.manager import DocumentManager
+from megabone.views.editor_view import MainEditor
 
 
 class MainController(QObject):
@@ -24,12 +23,11 @@ class MainController(QObject):
 
     def on_new(self):
         id = self.document_manager.create_document()
-        editor = SkeletonEditor()
-        actions = EditorModeRegistry.create_actions(editor)
-        for action in actions.values():
-            self.main_window.toolbar.addAction(action)
+        # actions = EditorModeRegistry.create_actions(editor)
+        # for action in actions.values():
+        #     self.main_window.toolbar.addAction(action)
 
-        index = self.main_window.tabs.addTab(editor, id)
+        index = self.main_window.tabs.addTab(MainEditor(), id)
         self.documentCreated.emit()
 
     def on_open(self):

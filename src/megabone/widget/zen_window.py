@@ -18,10 +18,8 @@ class ZenWindow(QMainWindow):
         self.stored_geometry = self.saveGeometry()
 
     def _restore_state(self) -> None:
-        if self.stored_window_state:
-            self.restoreState(self.stored_window_state)
-        if self.stored_geometry:
-            self.restoreGeometry(self.stored_geometry)
+        self.restoreState(self.stored_window_state)
+        self.restoreGeometry(self.stored_geometry)
 
     def toggle_full_screen(self) -> None:
         if not self.isFullScreen():

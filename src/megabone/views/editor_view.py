@@ -1,66 +1,19 @@
 import math
 
-from PyQt5.QtCore import QEvent, QObject, QPointF, QRect, Qt, pyqtSignal
-from PyQt5.QtGui import QColor, QPixmap
-from PyQt5.QtWidgets import (
-    QFrame,
-    QGraphicsItem,
-    QGraphicsRectItem,
-    QGraphicsScene,
-    QGraphicsView,
-    QSizePolicy,
-)
+from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtWidgets import QFrame, QGraphicsView, QSizePolicy
 
-from megabone.dialog.modal import DialogType, ModalDialogFactory
-from megabone.filters import *
+from megabone.editor.grid import EditorGrid
+from megabone.editor.item import BoneItem, SpriteItem
+from megabone.editor.layer import LayerManager
+from megabone.editor.mode import *
+from megabone.event_filter import *
 
-from .grid import EditorGrid
-from .item import BoneItem, SpriteItem
-from .layer import LayerManager
-from .mode import *
-from .status import StatusMessage
+from .editor_scene import ModalEditorScene
 
 
-class OverlayItem(QGraphicsRectItem):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.setFlag(QGraphicsItem.ItemIsSelectable, False)
-        self.setBrush(QColor(10, 10, 10, 200))
-        self.setZValue(10_000_000)
-        self.hide()
-
-
-class ModalEditorScene(QGraphicsScene):
-    dialogClose = pyqtSignal()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.modal_active = False
-
-        # Create an overlay item for hiding the scene
-        self.overlay = OverlayItem()
-        self.addItem(self.overlay)
-
-    def setOverlaySize(self, rect: QRect) -> None:
-        self.overlay.setRect(
-            -rect.width() / 2, -rect.height() / 2, rect.width(), rect.height()
-        )
-
-    def itemAt(self, position: QPointF, transform):
-        items = self.items(position)
-
-        # Check items shape
-        for item in items:
-            item_pos = item.mapFromScene(position)
-            if item.shape().contains(item_pos):
-                return item
-
-        return None
-
-
-class SkeletonEditor(QGraphicsView):
+class MainEditor(QGraphicsView):
     _width = 512
     _height = 512
 
@@ -85,8 +38,8 @@ class SkeletonEditor(QGraphicsView):
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
         self.setCacheMode(QGraphicsView.CacheBackground)
         self.setFrameStyle(QFrame.NoFrame)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setDragMode(QGraphicsView.RubberBandDrag)
         ZoomControl(self)
         PanControl(self)
@@ -119,13 +72,6 @@ class SkeletonEditor(QGraphicsView):
         self.modal_scene.setOverlaySize(self.viewport().rect())
         self.modal_scene.overlay.show()
 
-        # Create the dialog
-        self.dialog = ModalDialogFactory.create_dialog(
-            DialogType.NAME_INPUT, self, prompt="New Bone Name:"
-        )
-        self.dialog.show()
-        self.dialog.finished.connect(self.modal_scene.dialogClose.emit)
-
     def onModalDialogClose(self):
         self.modal_scene.overlay.hide()
 
@@ -143,9 +89,6 @@ class SkeletonEditor(QGraphicsView):
         scene_pos = self.mapToScene(event.pos())
         self.current_edit_mode.mouseReleaseEvent(event, scene_pos)
         super().mouseReleaseEvent(event)
-
-    def showStatusMessage(self, message: str):
-        StatusMessage(message, self)
 
     def selectBone(self, bone):
         self.selected_bone = bone
