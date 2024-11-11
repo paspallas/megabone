@@ -27,7 +27,7 @@ class MainController(QObject):
             self.main_window.toolbar.addAction(action)
 
         index = self.main_window.tabs.addTab(editor, id)
-
+        editor.showModalDialog()
         self.documentCreated.emit()
 
     def open(self):

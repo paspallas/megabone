@@ -1,9 +1,5 @@
 from PyQt5.QtCore import QEvent, QObject, QPoint, Qt
-from PyQt5.QtWidgets import (
-    QAbstractScrollArea,
-    QApplication,
-    QGraphicsView,
-)
+from PyQt5.QtWidgets import QAbstractScrollArea, QApplication, QGraphicsView
 
 
 class PanControl(QObject):

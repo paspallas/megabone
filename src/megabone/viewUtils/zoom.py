@@ -4,8 +4,8 @@ from PyQt5.QtCore import (
     QObject,
     Qt,
     QTimeLine,
-    pyqtSlot,
     pyqtSignal,
+    pyqtSlot,
 )
 from PyQt5.QtWidgets import QGraphicsView, QStyleOptionGraphicsItem
 

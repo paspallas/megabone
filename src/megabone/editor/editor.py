@@ -1,10 +1,18 @@
 import math
 
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFrame, QGraphicsScene, QGraphicsView, QSizePolicy
+from PyQt5.QtCore import QEvent, QObject, QPointF, QRect, Qt, pyqtSignal
+from PyQt5.QtGui import QColor, QPixmap
+from PyQt5.QtWidgets import (
+    QFrame,
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsScene,
+    QGraphicsView,
+    QSizePolicy,
+)
 
-from megabone.viewUtils import PanControl, ZoomControl
+from megabone.dialog.modal import DialogType, ModalDialogFactory
+from megabone.viewUtils import *
 
 from .grid import EditorGrid
 from .item import BoneItem, SpriteItem
@@ -13,9 +21,32 @@ from .mode import *
 from .status import StatusMessage
 
 
-class SkeletonEditorScene(QGraphicsScene):
+class OverlayItem(QGraphicsRectItem):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.setFlag(QGraphicsItem.ItemIsSelectable, False)
+        self.setBrush(QColor(10, 10, 10, 200))
+        self.setZValue(10_000_000)
+        self.hide()
+
+
+class ModalEditorScene(QGraphicsScene):
+    dialogClose = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.modal_active = False
+
+        # Create an overlay item for hiding the scene
+        self.overlay = OverlayItem()
+        self.addItem(self.overlay)
+
+    def setOverlaySize(self, rect: QRect) -> None:
+        self.overlay.setRect(
+            -rect.width() / 2, -rect.height() / 2, rect.width(), rect.height()
+        )
 
     def itemAt(self, position: QPointF, transform):
         items = self.items(position)
@@ -30,19 +61,18 @@ class SkeletonEditorScene(QGraphicsScene):
 
 
 class SkeletonEditor(QGraphicsView):
-    # Default scene size corresponds with the Megadrive sprite plane size
     _width = 512
     _height = 512
 
     def __init__(self, parent=None, grid_size: int = 32):
         super().__init__(parent)
-        self._scene = SkeletonEditorScene(self)
-        self._scene.setSceneRect(
+        self.modal_scene = ModalEditorScene(self)
+        self.modal_scene.setSceneRect(
             -self._width / 2, -self._height / 2, self._width, self._height
         )
-        self.setScene(self._scene)
+        self.setScene(self.modal_scene)
 
-        self.grid = EditorGrid(self)
+        self.grid = EditorGrid(self, size=grid_size)
         self.layer_manager = LayerManager(self)
 
         # Configure the view
@@ -73,6 +103,9 @@ class SkeletonEditor(QGraphicsView):
         self.selected_bone = None
         self.bones = []
 
+        # Connect signals
+        self.modal_scene.dialogClose.connect(self.onModalDialogClose)
+
     def setEditMode(self, mode: "EditorModeRegistry.Mode"):
         new_mode = EditorModeRegistry.get_mode(mode)
 
@@ -81,6 +114,20 @@ class SkeletonEditor(QGraphicsView):
                 self.current_edit_mode.deactivate()
             self.current_edit_mode = new_mode
             self.current_edit_mode.activate()
+
+    def showModalDialog(self):
+        self.modal_scene.setOverlaySize(self.viewport().rect())
+        self.modal_scene.overlay.show()
+
+        # Create the dialog
+        self.dialog = ModalDialogFactory.create_dialog(
+            DialogType.NAME_INPUT, self, prompt="New Bone Name:"
+        )
+        self.dialog.show()
+        self.dialog.finished.connect(self.modal_scene.dialogClose.emit)
+
+    def onModalDialogClose(self):
+        self.modal_scene.overlay.hide()
 
     def mousePressEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
@@ -138,7 +185,7 @@ class SkeletonEditor(QGraphicsView):
         # pixmap.setMask(pixmap.createMaskFromColor(Qt.magenta))
         sprite = SpriteItem(pixmap)
         sprite.setPos(pos)
-        self._scene.addItem(sprite)
+        self.modal_scene.addItem(sprite)
         self.layer_manager.add_item(sprite)
         return sprite
 

@@ -18,7 +18,9 @@ class MainMenuController:
     def create_menus(self):
         self.file = (
             MenuBuilder("File", self.window)
-            .add_action("new", "New", shortcut="Ctrl+N", triggered=self.controller.new)
+            .add_action(
+                "new", "New...", shortcut="Ctrl+N", triggered=self.controller.new
+            )
             .add_action(
                 "open",
                 "Open...",
@@ -28,7 +30,12 @@ class MainMenuController:
             .add_action(
                 "save", "Save", shortcut="Ctrl+S", triggered=self.controller.save
             )
-            .add_action("save_as", "Save As...", triggered=self.controller.save)
+            .add_action(
+                "save_as",
+                "Save As...",
+                shortcut="Ctrl+Shift+S",
+                triggered=self.controller.save,
+            )
             .add_separator()
             .begin_submenu("Export")
             .add_action("sprite_sheet", "As Sprite Sheet")
