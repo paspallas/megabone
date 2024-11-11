@@ -81,6 +81,7 @@ class DockManager:
 
         # Create the new dock
         dock = CustomDockWidget(config.title, self.main_window)
+        dock.setObjectName(dock_id)
         dock.close_action = config.close_action
         dock.close_handler = config.on_close
         dock.visibility_handler = config.on_visibility_changed

@@ -8,6 +8,8 @@ from megabone.model.document_manager import DocumentManager
 
 
 class MainController(QObject):
+    enterFullScreen = pyqtSignal()
+    enterZenMode = pyqtSignal()
     documentCreated = pyqtSignal()
 
     def __init__(self, main_window: QMainWindow) -> None:
@@ -19,7 +21,7 @@ class MainController(QObject):
         self.active_document = None
         self.document_manager = DocumentManager()
 
-    def new(self):
+    def on_new(self):
         id = self.document_manager.create_document()
         editor = SkeletonEditor()
         actions = EditorModeRegistry.create_actions(editor)
@@ -30,24 +32,30 @@ class MainController(QObject):
         editor.showModalDialog()
         self.documentCreated.emit()
 
-    def open(self):
+    def on_open(self):
         file = FileDialog.open_file()
         if file:
             pass
 
-    def save(self):
+    def on_save(self):
         file = FileDialog.save_file()
         if file:
             pass
 
-    def undo(self):
+    def on_undo(self):
         pass
 
-    def redo(self):
+    def on_redo(self):
         pass
 
-    def about(self):
+    def on_about(self):
         pass
 
-    def quit(self):
+    def on_quit(self):
         self.main_window.close()
+
+    def on_full_screen(self):
+        self.main_window.toggle_full_screen()
+
+    def on_zen_mode(self):
+        self.main_window.toggle_zen_mode()

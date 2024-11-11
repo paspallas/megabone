@@ -1,4 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow
+from typing import Dict
+
+from PyQt5.QtWidgets import QMenuBar
 
 from megabone.widget import MenuBuilder
 
@@ -6,9 +8,9 @@ from .main_controller import MainController
 
 
 class MainMenuController:
-    def __init__(self, controller: MainController, window: QMainWindow) -> None:
+    def __init__(self, controller: MainController) -> None:
         self.controller = controller
-        self.window = window
+        self._menus: Dict[str, MenuBuilder] = {}
 
         self.create_menus()
 
@@ -16,63 +18,63 @@ class MainMenuController:
         self.controller.documentCreated.connect(self._on_document_created)
 
     def create_menus(self):
-        self.file = (
-            MenuBuilder("File", self.window)
-            .add_action(
-                "new", "New...", shortcut="Ctrl+N", triggered=self.controller.new
-            )
-            .add_action(
-                "open",
+        self._menus["File"] = (
+            MenuBuilder("File")
+            .action("New", self.controller.on_new, "Ctrl+N")
+            .action(
                 "Open...",
                 shortcut="Ctrl+O",
-                triggered=self.controller.open,
+                callback=self.controller.on_open,
             )
-            .add_action(
-                "save", "Save", shortcut="Ctrl+S", triggered=self.controller.save
-            )
-            .add_action(
-                "save_as",
+            .submenu("Open Recent")
+            .disable()
+            .back()
+            .separator()
+            .action("Save", self.controller.on_save, "Ctrl+S")
+            .action(
                 "Save As...",
-                shortcut="Ctrl+Shift+S",
-                triggered=self.controller.save,
+                self.controller.on_save,
+                "Ctrl+Shift+S",
             )
-            .add_separator()
-            .begin_submenu("Export")
-            .add_action("sprite_sheet", "As Sprite Sheet")
-            .end_submenu()
-            .add_separator()
-            .add_action(
-                "exit", "Exit", shortcut="Ctrl+Q", triggered=self.controller.quit
-            )
+            .separator()
+            .submenu("Export")
+            .action("As Sprite Sheet")
+            .disable()
+            .back()
+            .separator()
+            .action("Exit", self.controller.on_quit, "Ctrl+Q")
+            .disable_items("Save", "Save As...")
         )
 
-        self.edit = (
-            MenuBuilder("Edit", self.window)
-            .add_action(
-                "undo", "Undo", shortcut="Ctrl+Z", triggered=self.controller.undo
-            )
-            .add_action(
-                "redo", "Redo", shortcut="Ctrl+Y", triggered=self.controller.redo
-            )
+        self._menus["Edit"] = (
+            MenuBuilder("Edit")
+            .action("Undo", self.controller.on_undo, "Ctrl+Z")
+            .action("Redo", self.controller.on_redo, "Ctrl+Y")
+            .disable_items("Undo", "Redo")
         )
 
-        self.help = (
-            MenuBuilder("Help", self.window)
-            .add_action("docs", "Documentation")
-            .add_separator()
-            .add_action("about", "About", triggered=self.controller.about)
+        self._menus["Help"] = (
+            MenuBuilder("Help")
+            .action("Documentation")
+            .separator()
+            .action("About", callback=self.controller.on_about)
         )
 
-        self.view = MenuBuilder("View", self.window)
+        self._menus["View"] = (
+            MenuBuilder("View")
+            .action("Full Screen", self.controller.on_full_screen, "F11")
+            .action("Zen Mode", self.controller.on_zen_mode, "Ctrl+Shift+Z")
+            .separator()
+            .submenu("Show")
+            .back()
+        )
 
-        self.window.menuBar().addMenu(self.file.build())
-        self.window.menuBar().addMenu(self.edit.build())
-        self.window.menuBar().addMenu(self.view.build())
-        self.window.menuBar().addMenu(self.help.build())
+    def populate_menu_bar(self, bar: QMenuBar, *menus: str) -> None:
+        for menu in menus:
+            bar.addMenu(self._menus.get(menu).build())
 
-        # Disable menus until a document is created
-        self.file.disable_items("save", "save_as")
-        self.edit.disable_items("undo", "redo")
+    def get_builder(self, name: str) -> MenuBuilder:
+        return self._menus.get(name, None)
 
     def _on_document_created(self):
-        self.file.enable_items("save", "save_as")
+        self.file.enable_items("Save", "Save As...")
