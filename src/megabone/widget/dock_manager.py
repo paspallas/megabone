@@ -164,6 +164,10 @@ class DockManager:
         self.toggle_dock(dock_id, False)
         self._uncheck_menu_item(dock_id)
 
-    def hide_all(self):
+    def hide(self):
+        for dock in self.docks.keys():
+            self.toggle_dock(dock, False)
+
+    def deactivate_all(self):
         for dock in self.docks.keys():
             self.hide_dock(dock)
