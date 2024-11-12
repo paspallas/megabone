@@ -1,5 +1,3 @@
-import uuid
-from pathlib import Path
 from typing import Dict, Optional, Set
 
 from PyQt5.QtCore import QObject, pyqtSignal
