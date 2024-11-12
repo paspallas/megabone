@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -9,6 +9,17 @@ class Bone:
     id: str
     parent_id: Optional[str]
     position: tuple[float, float]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "parent_id": self.parent_id,
+            "position": (self.position[0], self.position[1]),
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "Bone":
+        return cls(data["id"], data["parent_id"], data["position"])
 
 
 class BoneModel(QObject):
@@ -23,3 +34,10 @@ class BoneModel(QObject):
     def add_bone(self, bone: Bone) -> None:
         self._bones[bone.id] = bone
         self.bone_added.emit(bone)
+
+    def serialize(self) -> List[Dict[str, Any]]:
+        return [bone.to_dict() for bone in self._bones.values()]
+
+    def deserialize(self, data: List[Dict[str, Any]]) -> None:
+        for item in data:
+            self.add_bone(Bone.from_dict(data))

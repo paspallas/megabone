@@ -13,7 +13,7 @@ from megabone.event_filter import *
 from .editor_scene import ModalEditorScene
 
 
-class MainEditor(QGraphicsView):
+class MainEditorView(QGraphicsView):
     _width = 512
     _height = 512
 

@@ -1,84 +1,53 @@
 import json
-from pathlib import Path
 from typing import Optional
+from uuid import uuid4 as genid
 
 from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QMessageBox, QUndoStack
+from PyQt5.QtWidgets import QUndoStack
 
 from .bone import BoneModel
 from .sprite import SpriteModel
 
 
 class Document(QObject):
+    """Document model"""
+
     documentChanged = pyqtSignal()
 
     def __init__(self) -> None:
         super().__init__()
-
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.undo_stack = QUndoStack()
-        self.name = ""
-        self._file_path: Optional[Path] = None
 
-    def save(self, file_path: Optional[Path] = None) -> bool:
+        self.id = genid().hex
+        self.file_path: Optional[str] = None
+
+    def save(self, file_path: Optional[str] = None) -> None:
         if file_path:
-            self._file_path = file_path
+            self.file_path = file_path
 
-        if not self._file_path:
-            return False
-
-        document_data = {
-            "name": self.name,
-            "bones": [self._bone_to_dict(bone) for bone in self.bones._bones.values()],
-            "sprites": [
-                self._sprites_to_dict(sprite)
-                for sprite in self.sprites._sprites.values()
-            ],
+        content = {
+            "id": self.id,
+            "bones": self.bones.serialize(),
+            "sprites": self.sprites.serialize(),
         }
 
-        try:
-            with self._file_path.open("w", encoding="utf-8") as f:
-                json.dump(document_data, f)
-            return True
-
-        except Exception:
-            QMessageBox.critical(
-                None,
-                "Save File Error",
-                f"Unable to save file: {self._file_path}",
-                QMessageBox.Ok,
-            )
-
-            return False
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            f.write(json.dumps(content, indent=4))
 
     @classmethod
-    def load(cls, file_path: Path) -> "Document":
+    def load(cls, file_path: str) -> "Document":
         doc = cls()
 
-        try:
-            with file_path.open("r", encoding="utf-8") as f:
-                data = json.load(f)
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
 
-            # Load bone data first to maintain hierarchy
-            for bone_data in data["bones"]:
-                doc.bones.add_bone(cls._dict_to_bone(bone_data))
+            doc.bones.deserialize(data["bones"])
+            doc.sprites.deserialize(data["sprites"])
+            doc.file_path = file_path
 
-            for sprite_data in data["sprites"]:
-                doc.sprites.add_sprite(cls._dict_to_sprite(sprite_data))
-
-            doc._file_path = file_path
-            return doc
-
-        except Exception:
-            QMessageBox.critical(
-                None,
-                "Open File Error",
-                f"Unable to open file: {file_path}",
-                QMessageBox.Ok,
-            )
-
-            return None
+        return doc
 
     def create_undo_command(self, command) -> None:
         self.undo_stack.push(command)

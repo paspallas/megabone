@@ -28,20 +28,16 @@ class MainMenuController:
     def create_menus(self):
         self._menus[MenuType.FILE] = (
             MenuBuilder("File")
-            .action("New", self.controller.on_new, "Ctrl+N")
-            .action(
-                "Open...",
-                shortcut="Ctrl+O",
-                callback=self.controller.on_open,
-            )
+            .action("New", self.controller.on_new_document, "Ctrl+N")
+            .action("Open...", self.controller.on_open_document, "Ctrl+O")
             .submenu("Open Recent")
             .disable()
             .back()
             .separator()
-            .action("Save", self.controller.on_save, "Ctrl+S")
+            .action("Save", self.controller.on_save_document, "Ctrl+S")
             .action(
                 "Save As...",
-                self.controller.on_save,
+                self.controller.on_save_document_as,
                 "Ctrl+Shift+S",
             )
             .separator()
@@ -65,7 +61,7 @@ class MainMenuController:
             MenuBuilder("Help")
             .action("Documentation")
             .separator()
-            .action("About", callback=self.controller.on_about)
+            .action("About", self.controller.on_about)
         )
 
         self._menus[MenuType.VIEW] = (

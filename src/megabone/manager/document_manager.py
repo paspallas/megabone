@@ -22,32 +22,18 @@ class DocumentManager(QObject):
         self._active_document_id: Optional[str] = None
         self._unsaved_changes: Set[str] = set()
 
-    def get_document(self, doc_id: str) -> Document:
+    def get_document(self, doc_id: str) -> Optional[Document]:
         """Get a document by its ID"""
         return self._documents.get(doc_id, None)
 
-    def _add_document(self, doc: Document) -> str:
-        """Add a document to the collection and return its ID"""
-        doc_id = uuid.uuid4().hex
-        self._documents[doc_id] = doc
+    def add_document(self, doc: Document) -> None:
+        """Add a document to the collection"""
+        self._documents[doc.id] = doc
 
         # Connect to document signals
-        doc.documentChanged.connect(lambda: self._on_document_changed(doc_id))
+        doc.documentChanged.connect(lambda: self._on_document_changed(doc.id))
 
-        self.documentAdded.emit(doc_id)
-        return doc_id
-
-    def load_document(self, file_path: Path) -> str:
-        """Load a document from file"""
-        doc = Document.load(file_path)
-
-        if doc:
-            return self._add_document(doc)
-
-    def create_document(self) -> str:
-        """Create a new empty document"""
-        doc = Document()
-        return self._add_document(doc)
+        self.documentAdded.emit(doc.id)
 
     def set_active_document(self, doc_id: str) -> None:
         if doc_id not in self._documents:
