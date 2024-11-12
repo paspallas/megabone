@@ -1,9 +1,11 @@
+from collections import OrderedDict
 from enum import Enum, auto
-from typing import Dict
+from typing import OrderedDict
 
 from PyQt5.QtWidgets import QMenuBar
 
 from megabone.builder import MenuBuilder
+from megabone.manager import DocumentManager
 
 from .main_controller import MainController
 
@@ -16,28 +18,29 @@ class MenuType(Enum):
 
 
 class MainMenuController:
-    def __init__(self, controller: MainController) -> None:
+    def __init__(self, controller: MainController, documents: DocumentManager) -> None:
         self.controller = controller
-        self._menus: Dict[MenuType, MenuBuilder] = {}
+        self.documents = documents
+        self._menus: OrderedDict[MenuType, MenuBuilder] = OrderedDict()
 
         self.create_menus()
 
         # Connect to signals
-        self.controller.documentCreated.connect(self._on_document_created)
+        self.documents.documentAdded.connect(self._on_document_created)
 
     def create_menus(self):
         self._menus[MenuType.FILE] = (
             MenuBuilder("File")
-            .action("New", self.controller.on_new_document, "Ctrl+N")
-            .action("Open...", self.controller.on_open_document, "Ctrl+O")
+            .action("New", self.documents.create_document, "Ctrl+N")
+            .action("Open...", self.documents.open_document, "Ctrl+O")
             .submenu("Open Recent")
             .disable()
             .back()
             .separator()
-            .action("Save", self.controller.on_save_document, "Ctrl+S")
+            .action("Save", self.documents.save_document, "Ctrl+S")
             .action(
                 "Save As...",
-                self.controller.on_save_document_as,
+                self.documents.save_document_as,
                 "Ctrl+Shift+S",
             )
             .separator()
@@ -57,13 +60,6 @@ class MainMenuController:
             .disable_items("Undo", "Redo")
         )
 
-        self._menus[MenuType.HELP] = (
-            MenuBuilder("Help")
-            .action("Documentation")
-            .separator()
-            .action("About", self.controller.on_about)
-        )
-
         self._menus[MenuType.VIEW] = (
             MenuBuilder("View")
             .action("Full Screen", self.controller.on_full_screen, "F11")
@@ -73,9 +69,20 @@ class MainMenuController:
             .back()
         )
 
+        self._menus[MenuType.HELP] = (
+            MenuBuilder("Help")
+            .action("Documentation")
+            .separator()
+            .action("About", self.controller.on_about)
+        )
+
     def populate_menu_bar(self, menubar: QMenuBar, *menus: MenuType) -> None:
-        for menu in menus:
-            menubar.addMenu(self._menus.get(menu).build())
+        if len(menus) == 0:
+            for menu in self._menus.values():
+                menubar.addMenu(menu.build())
+        else:
+            for menu in menus:
+                menubar.addMenu(self._menus.get(menu).build())
 
     def get_builder(self, name: str) -> MenuBuilder:
         return self._menus.get(name, None)

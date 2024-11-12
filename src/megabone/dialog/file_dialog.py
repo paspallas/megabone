@@ -1,44 +1,53 @@
+from pathlib import Path
+from typing import Optional
+
 from PyQt5.QtWidgets import QFileDialog
+
+import megabone.util.constants as c
 
 
 class FileDialog:
     @staticmethod
-    def open_file() -> str:
+    def open_file() -> Optional[Path]:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        file_name, _ = QFileDialog.getOpenFileName(
+        file, _ = QFileDialog.getOpenFileName(
             None,
-            "Open File",
+            "Open File...",
             "",
-            "Megabone Project File (*.mgb)",
+            c._DEFAULT_DESCRIPTOR,
             options=options,
         )
 
-        if file_name:
-            return file_name
+        if file:
+            return Path(file)
 
     @staticmethod
-    def save_file() -> str:
+    def save_file() -> Optional[Path]:
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        file_name, _ = QFileDialog.getSaveFileName(
-            None, "Save File", "", "Megabone Project File (*.mgb)", options=options
+        file, _ = QFileDialog.getSaveFileName(
+            None,
+            "Save File As...",
+            "",
+            c._DEFAULT_DESCRIPTOR,
+            options=options,
         )
 
-        if file_name:
-            # Check if the user provided a file extension
-            if not file_name.endswith(".mgb"):
-                file_name += ".mgb"  # Default extension
-                return file_name
+        if file:
+            if not file.endswith(c._DEFAULT_FILE_EXT):
+                file += c._DEFAULT_FILE_EXT
+
+            return Path(file)
 
     @staticmethod
-    def select_directory() -> str:
-        directory = QFileDialog.getExistingDirectory(
+    def select_directory() -> Optional[Path]:
+        folder = QFileDialog.getExistingDirectory(
             None,
             "Select Directory",
             "",
             QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
         )
 
-        if directory:
-            return directory
+        if folder:
+            return Path(folder)

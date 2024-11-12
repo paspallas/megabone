@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from typing import Optional
 from uuid import uuid4 as genid
 
@@ -21,11 +22,11 @@ class Document(QObject):
         self.undo_stack = QUndoStack()
 
         self.id = genid().hex
-        self.file_path: Optional[str] = None
+        self.path: Optional[Path] = None
 
-    def save(self, file_path: Optional[str] = None) -> None:
-        if file_path:
-            self.file_path = file_path
+    def save(self, path: Optional[Path] = None) -> None:
+        if path:
+            self.path = path
 
         content = {
             "id": self.id,
@@ -33,19 +34,18 @@ class Document(QObject):
             "sprites": self.sprites.serialize(),
         }
 
-        with open(self.file_path, "w", encoding="utf-8") as f:
-            f.write(json.dumps(content, indent=4))
+        path.write_text(json.dumps(content, indent=4), encoding="utf-8")
 
     @classmethod
-    def load(cls, file_path: str) -> "Document":
+    def load(cls, path: Path) -> "Document":
         doc = cls()
 
-        with open(file_path, "r", encoding="utf-8") as f:
+        with path.open("r", encoding="utf-8") as f:
             data = json.load(f)
 
             doc.bones.deserialize(data["bones"])
             doc.sprites.deserialize(data["sprites"])
-            doc.file_path = file_path
+            doc.path = path
 
         return doc
 
