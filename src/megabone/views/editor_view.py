@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QFrame, QGraphicsView, QSizePolicy
 from megabone.editor.grid import EditorGrid
 from megabone.editor.item import BoneItem, SpriteItem
 from megabone.editor.layer import LayerManager
-from megabone.editor.mode import *
 from megabone.event_filter import *
 
 from .editor_scene import ModalEditorScene
@@ -17,7 +16,7 @@ class MainEditorView(QGraphicsView):
     _width = 512
     _height = 512
 
-    def __init__(self, parent=None, grid_size: int = 32):
+    def __init__(self, parent=None, doc_id: str = "", grid_size: int = 32):
         super().__init__(parent)
         self.modal_scene = ModalEditorScene(self)
         self.modal_scene.setSceneRect(
@@ -27,6 +26,7 @@ class MainEditorView(QGraphicsView):
 
         self.grid = EditorGrid(self, size=grid_size)
         self.layer_manager = LayerManager(self)
+        self.doc_id = doc_id
 
         # Configure the view
         self.centerOn(0, 0)
@@ -44,13 +44,6 @@ class MainEditorView(QGraphicsView):
         ZoomControl(self)
         PanControl(self)
 
-        # Init the editing modes from the registry
-        self.current_edit_mode = None
-        EditorModeRegistry.init(self)
-
-        # Set default mode
-        self.setEditMode(EditorModeRegistry.Mode.SELECTION_MODE)
-
         # Editor properties
         self.selected_sprite = None
         self.selected_bone = None
@@ -58,15 +51,6 @@ class MainEditorView(QGraphicsView):
 
         # Connect signals
         self.modal_scene.dialogClose.connect(self.onModalDialogClose)
-
-    def setEditMode(self, mode: "EditorModeRegistry.Mode"):
-        new_mode = EditorModeRegistry.get_mode(mode)
-
-        if new_mode != self.current_edit_mode:
-            if self.current_edit_mode:
-                self.current_edit_mode.deactivate()
-            self.current_edit_mode = new_mode
-            self.current_edit_mode.activate()
 
     def showModalDialog(self):
         self.modal_scene.setOverlaySize(self.viewport().rect())
@@ -76,18 +60,15 @@ class MainEditorView(QGraphicsView):
         self.modal_scene.overlay.hide()
 
     def mousePressEvent(self, event):
-        scene_pos = self.mapToScene(event.pos())
-        self.current_edit_mode.mousePressEvent(event, scene_pos)
+        self.controller.handle_mouse_press(self, event)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        scene_pos = self.mapToScene(event.pos())
-        self.current_edit_mode.mouseMoveEvent(event, scene_pos)
+        self.controller.handle_mouse_move(self, event)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        scene_pos = self.mapToScene(event.pos())
-        self.current_edit_mode.mouseReleaseEvent(event, scene_pos)
+        self.controller.handle_mouse_release(self, event)
         super().mouseReleaseEvent(event)
 
     def selectBone(self, bone):

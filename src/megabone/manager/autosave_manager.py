@@ -18,7 +18,6 @@ class AutoSaveManager(QObject):
     _SAVE_INTERVAL_SECS = 2 * 60 * 1000
 
     autosaveCompleted = pyqtSignal(str)  # document id
-    autosaveFailed = pyqtSignal(str, str)  # document id, error message
     backupRecovered = pyqtSignal(str)  # document id
 
     def __init__(self, document_manager: DocumentManager):
@@ -35,7 +34,7 @@ class AutoSaveManager(QObject):
         self._autosave_timer.setInterval(self._SAVE_INTERVAL_SECS)
         self._autosave_timer.start()
 
-        # Connect to signals
+        # Connect signals
         self.document_manager.documentAdded.connect(self._on_document_added)
         self.document_manager.documentRemoved.connect(self._on_document_removed)
 
@@ -73,7 +72,7 @@ class AutoSaveManager(QObject):
                 self._dirty_documents.discard(doc_id)
                 self.autosaveCompleted.emit(doc_id)
             except Exception as e:
-                self.autosaveFailed.emit(doc_id, str(e))
+                self.document_manager.on_autosave_failed(doc_id, str(e))
 
     def _save_backup(self, doc_id: str, document: Document) -> None:
         """Save a backup of the document"""

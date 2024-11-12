@@ -1,4 +1,4 @@
-from .animation import AnimationMode
+from .abstract_mode import AbstractEditorMode
 from .bone_creation import CreateBoneMode
 from .editor_mode_register import AbstractEditorMode, EditorModeRegistry
 from .ik import IKMode
@@ -14,5 +14,5 @@ __all__ = [
     "IKMode",
     "IKHandleMode",
     "SpriteAttachmentMode",
-    "AnimationMode",
+    "AbstractEditorMode",
 ]

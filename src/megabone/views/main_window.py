@@ -3,25 +3,22 @@ from PyQt5.QtWidgets import QStatusBar, QToolBar
 
 from megabone.controller import MainController, MainMenuController
 from megabone.controller import MenuType as m
+from megabone.editor.mode import EditorModeRegistry
 from megabone.manager import DockConfig, DockManager
 from megabone.manager import StatusBarManager as status
-from megabone.manager import TabManager
 from megabone.widget import ZenWindow
 
 
 class MegaBoneMainWindow(ZenWindow):
     def __init__(self):
         super().__init__()
-
         self.setWindowTitle("Megabone")
         self.setMinimumSize(800, 600)
 
-        # Main editor area
-        self.editor_area = TabManager(self)
-        self.setCentralWidget(self.editor_area)
-
         # Delegate user interaction to controllers
-        self.main_controller = MainController(self.editor_area)
+        self.main_controller = MainController()
+        self.setCentralWidget(self.main_controller.get_tab_widget())
+
         self.menu = MainMenuController(self.main_controller)
         self.menu.populate_menu_bar(self.menuBar(), m.FILE, m.EDIT, m.VIEW, m.HELP)
 
@@ -48,6 +45,11 @@ class MegaBoneMainWindow(ZenWindow):
         self.toolbar = QToolBar()
         self.toolbar.setObjectName("ToolBar")
         self.addToolBar(self.toolbar)
+
+        for action in EditorModeRegistry.create_actions(
+            self.main_controller.edit_controller
+        ).values():
+            self.toolbar.addAction(action)
 
         # Connect signals
         self.main_controller.requestFullScreen.connect(self.toggle_full_screen)

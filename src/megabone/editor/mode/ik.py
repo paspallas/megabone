@@ -4,27 +4,30 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPen
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
-from .editor_mode_register import EditorModeRegistry, EditorType, AbstractEditorMode
 from megabone.editor.item import BoneItem
 from megabone.IKSolver import FABRIK
+
+from .abstract_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry
 
 
 @EditorModeRegistry.register("Manipulate a bone in the chain", "I")
 class IKMode(AbstractEditorMode):
-    def __init__(self, editor: EditorType):
-        super().__init__(editor)
+    def __init__(self, controller):
+        super().__init__(controller)
         self.ik_chain = None
         self.target_indicator = None
         self.dragging = False
 
     def activate(self):
-        self.editor.setCursor(Qt.CrossCursor)
+        self.view.setCursor(Qt.CrossCursor)
+
         # Create IK target indicator
         if not self.target_indicator:
             self.target_indicator = QGraphicsEllipseItem(-5, -5, 10, 10)
             self.target_indicator.setPen(QPen(Qt.red, 1))
             self.target_indicator.hide()
-            self.editor.scene.addItem(self.target_indicator)
+            self.scene.addItem(self.target_indicator)
 
     def deactivate(self):
         if self.target_indicator:
@@ -33,7 +36,7 @@ class IKMode(AbstractEditorMode):
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
             # Check if we clicked on a bone
-            item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
+            item = self.scene.itemAt(scene_pos, self.view.transform())
             if isinstance(item, BoneItem):
                 # Create IK chain from clicked bone up to root or branch
                 # We have to take into account if the bone is not an end effector

@@ -1,26 +1,28 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsView
 
-from .editor_mode_register import AbstractEditorMode, EditorModeRegistry, EditorType
 from megabone.editor.item import BoneItem, SpriteItem
+
+from .abstract_mode import AbstractEditorMode
+from .editor_mode_register import EditorModeRegistry
 
 
 @EditorModeRegistry.register("Attach sprite to bone", "A")
 class SpriteAttachmentMode(AbstractEditorMode):
-    def __init__(self, editor: EditorType):
-        super().__init__(editor)
+    def __init__(self, controller):
+        super().__init__(controller)
 
     def activate(self):
-        self.editor.setDragMode(QGraphicsView.NoDrag)
-        self.editor.setCursor(Qt.PointingHandCursor)
+        self.view.setDragMode(QGraphicsView.NoDrag)
+        self.view.setCursor(Qt.PointingHandCursor)
 
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
-            item = self.editor.scene.itemAt(scene_pos, self.editor.transform())
+            item = self.scene.itemAt(scene_pos, self.view.transform())
             if isinstance(item, SpriteItem):
-                self.editor.selectSprite(item)
-            elif isinstance(item, BoneItem) and self.editor.selected_sprite:
-                self.editor.attachSpriteToBone(self.editor.selected_sprite, item)
+                self.view.selectSprite(item)
+            elif isinstance(item, BoneItem) and self.view.selected_sprite:
+                self.view.attachSpriteToBone(self.view.selected_sprite, item)
 
     def mouseMoveEvent(self, event, scene_pos):
         pass

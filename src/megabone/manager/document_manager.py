@@ -7,7 +7,7 @@ from megabone.model.document import Document
 
 
 class DocumentManager(QObject):
-    """Manage multiple documents"""
+    """Manage the collection of documents."""
 
     documentAdded = pyqtSignal(str)
     documentRemoved = pyqtSignal(str)
@@ -21,11 +21,9 @@ class DocumentManager(QObject):
         self._unsaved_changes: Set[str] = set()
 
     def get_document(self, doc_id: str) -> Optional[Document]:
-        """Get a document by its ID"""
         return self._documents.get(doc_id, None)
 
     def add_document(self, doc: Document) -> None:
-        """Add a document to the collection"""
         self._documents[doc.id] = doc
 
         # Connect to document signals
@@ -42,7 +40,6 @@ class DocumentManager(QObject):
             self.activeDocumentChanged.emit(doc_id)
 
     def close_document(self, doc_id: str) -> bool:
-        """Attempts to close a document. Returns True on success"""
         if doc_id not in self._documents:
             return True
 

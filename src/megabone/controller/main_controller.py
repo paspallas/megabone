@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+from typing import Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMessageBox
 from megabone.dialog import FileDialog
 from megabone.manager import AutoSaveManager, DocumentManager, TabManager
 from megabone.model.document import Document
-from megabone.views.editor_view import MainEditorView
+from megabone.views import MainEditorView
 
 from .editor_controller import EditorController
 
@@ -18,59 +18,37 @@ class MainController(QObject):
     requestFullScreen = pyqtSignal()
     requestZenMode = pyqtSignal()
     requestQuit = pyqtSignal()
-    documentCreated = pyqtSignal()
+    documentCreated = pyqtSignal(str, MainEditorView)  # doc_id
 
-    def __init__(self, editor_area: TabManager) -> None:
+    def __init__(self) -> None:
         super().__init__()
-
-        self._editor_area = editor_area
-
-        self._document_manager = DocumentManager()
-        self._autosave = AutoSaveManager(self._document_manager)
-
-        self._editors: Dict[int, str] = {}
-        self.active_document = None
+        self.active_document: Optional[Document] = None
+        self.document_manager = DocumentManager()
+        self.autosave = AutoSaveManager(self.document_manager)
+        self.edit_controller = EditorController(self.document_manager)
 
         # Connect signals
-        self._autosave.autosaveFailed.connect(self._document_manager.on_autosave_failed)
-        # self._editor_area.currentChanged.connect(self._on_editor_select)
-        # self._editor_area.tabClosed.connect(self._on_editor_close)
+        self.edit_controller.activeViewChanged.connect(self.on_active_view_change)
 
-    def on_active_document_change(self) -> None:
-        index = self._editor_area.currentIndex()
-        self.active_document = self._document_manager.get_document(
-            self._editors.get(index)
-        )
+    def get_tab_widget(self) -> TabManager:
+        return self.edit_controller.tab_widget
+
+    def on_active_view_change(self, view: MainEditorView) -> None:
+        self.active_document = self.document_manager.get_document(view.doc_id)
 
     def on_new_document(self) -> None:
         doc = Document()
-        self._document_manager.add_document(doc)
-
-        index = self._editor_area.addTab(MainEditorView(), "Untitled.mgb*")
-        self._editor_area.select(index)
-        self._editors[index] = doc.id
-
-        self.on_active_document_change()
-        self.documentCreated.emit()
-
-        # actions = EditorModeRegistry.create_actions(editor)
-        # for action in actions.values():
-        #     self.main_window.toolbar.addAction(action)
-
-    # def _on_editor_select(self, index: int) -> None:
-    #     doc_id = self._editors.get(index)
-    #     self._active_document = self._document_manager.get_document(doc_id)
-
-    # def _on_editor_close(self, index: int) -> None:
-    #     if index in self._editors.keys():
-    #         self._editors.pop(index)
+        self.document_manager.add_document(doc)
+        view = self.edit_controller.create_editor(doc.id, "Untitled*")
+        self.documentCreated.emit(doc.id, view)
 
     def on_open_document(self) -> None:
         file_path = FileDialog.open_file()
         if file_path:
             try:
                 doc = Document.load(file_path)
-                self._document_manager.add_document(doc)
+                self.document_manager.add_document(doc)
+                self.edit_controller.create_editor(doc.id, Path(file_path).stem)
             except Exception:
                 QMessageBox.critical(
                     None,
@@ -101,6 +79,9 @@ class MainController(QObject):
         if file_path:
             try:
                 self.active_document.save(file_path)
+                self.edit_controller.set_view_title(
+                    self.active_document.id, Path(file_path).stem
+                )
             except Exception:
                 self._save_error()
 
