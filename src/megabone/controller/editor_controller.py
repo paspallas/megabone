@@ -24,8 +24,9 @@ class EditorController(QObject):
         # Connect signals
         self.tab_widget.viewActivated.connect(self.set_active_view)
         self.tab_widget.viewClosed.connect(self.on_close_view)
-        self.documents.savedDocumentAs.connect(self.set_view_title)
-        self.documents.openedDocument.connect(self.set_view_title)
+        self.documents.openedDocument.connect(self.tab_widget.set_view_title)
+        self.documents.closedDocument.connect(self.tab_widget.close_view)
+        self.documents.savedDocumentAs.connect(self.tab_widget.set_view_title)
         self.documents.createdDocument.connect(self.create_editor)
 
         # Register and init all edit modes
@@ -49,8 +50,6 @@ class EditorController(QObject):
         self.views[doc_id] = view
 
         self.tab_widget.add_editor(view, title)
-
-        # New views start in the selection mode
         self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
 
     def set_active_view(self, view: MainEditorView) -> None:
@@ -60,17 +59,8 @@ class EditorController(QObject):
         # On view change reset to the default edit mode
         self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
 
-    def set_view_title(self, doc_id: str, title: str) -> None:
-        for i in range(self.tab_widget.count()):
-            container = self.tab_widget.widget(i)
-            view = container.findChild(MainEditorView)
-            if view.doc_id == doc_id:
-                self.tab_widget.set_title(i, title)
-                return
-
-    def on_close_view(self, index: int, view: MainEditorView) -> None:
-        if self.documents.close_document(view.doc_id):
-            self.tab_widget.removeTab(index)
+    def on_close_view(self, view: MainEditorView) -> None:
+        self.documents.close_document(view.doc_id)
 
     def handle_mouse_press(self, view: MainEditorView, event) -> None:
         if view != self.current_view:

@@ -35,8 +35,8 @@ class AutoSaveManager(QObject):
         self._autosave_timer.start()
 
         # Connect signals
-        self.document_manager.documentAdded.connect(self._on_document_added)
-        self.document_manager.documentRemoved.connect(self._on_document_removed)
+        self.document_manager.addedDocument.connect(self._on_document_added)
+        self.document_manager.closedDocument.connect(self._on_document_removed)
 
     def _setup_backup_directory(self) -> Path:
         """Create and return the backup directory path"""

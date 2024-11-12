@@ -29,12 +29,11 @@ class Document(QObject):
             self.path = path
 
         content = {
-            "id": self.id,
             "bones": self.bones.serialize(),
             "sprites": self.sprites.serialize(),
         }
 
-        path.write_text(json.dumps(content, indent=4), encoding="utf-8")
+        self.path.write_text(json.dumps(content, indent=4), encoding="utf-8")
 
     @classmethod
     def load(cls, path: Path) -> "Document":

@@ -10,8 +10,8 @@ from megabone.model.document import Document
 class DocumentManager(QObject):
     """Manages a collection of documents and IO operations"""
 
-    documentAdded = pyqtSignal(str)  # doc_id
-    documentRemoved = pyqtSignal(str)  # doc_id
+    addedDocument = pyqtSignal(str)  # doc_id
+    closedDocument = pyqtSignal(str)  # doc_id
     activeDocumentChanged = pyqtSignal(str)  # doc_id
     savedDocumentAs = pyqtSignal(str, str)  # doc_id, path_stem
     openedDocument = pyqtSignal(str, str)  # doc_id, path_stem
@@ -40,7 +40,7 @@ class DocumentManager(QObject):
         self._documents[document.id] = document
         self.track_changes(document)
         self.connect_to_document(document)
-        self.documentAdded.emit(document.id)
+        self.addedDocument.emit(document.id)
 
     def get_active_document(self) -> Optional[Document]:
         return self._documents.get(self._active_document_id, None)
@@ -74,34 +74,29 @@ class DocumentManager(QObject):
                     QMessageBox.Ok,
                 )
 
-    def save_document(self, document: Document = None) -> bool:
+    def save_document(self, document: Document = None) -> None:
         doc = document or self.get_active_document()
         if doc.path:
             try:
                 doc.save()
-                return True
             except Exception:
                 self._save_error(doc)
-                return False
+        else:
+            self.save_document_as(doc)
 
-        return self.save_document_as(doc)
-
-    def save_document_as(self, document: Document = None) -> bool:
+    def save_document_as(self, document: Document = None) -> None:
         doc = document or self.get_active_document()
         path = FileDialog.save_file()
         if path:
             try:
                 doc.save(path)
                 self.savedDocumentAs.emit(doc.id, path.stem)
-                return True
             except Exception:
                 self._save_error(doc)
 
-        return False
-
-    def close_document(self, doc_id: str) -> bool:
-        if doc_id not in self._documents:
-            return True
+    def close_document(self, doc_id: Optional[str]) -> None:
+        if not doc_id:
+            doc_id = self._active_document_id
 
         if doc_id in self._unsaved_changes:
             doc = self.get_document(doc_id)
@@ -115,17 +110,13 @@ class DocumentManager(QObject):
             )
 
             if response == QMessageBox.Cancel:
-                return False
+                return
             elif response == QMessageBox.Save:
-                return self.save_document(doc)
-            elif response == QMessageBox.Discard:
-                return True
+                self.save_document(doc)
 
         self._documents.pop(doc_id)
         self._unsaved_changes.discard(doc_id)
-        self.documentRemoved.emit(doc_id)
-
-        return True
+        self.closedDocument.emit(doc_id)
 
     def on_autosave_failed(self, doc_id: str, error_message: str) -> None:
         doc = self.get_document(doc_id)

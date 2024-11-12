@@ -5,7 +5,7 @@ from megabone.views import MainEditorView
 
 
 class TabManager(QTabWidget):
-    viewClosed = pyqtSignal(int, MainEditorView)  # tab index, view
+    viewClosed = pyqtSignal(MainEditorView)
     viewActivated = pyqtSignal(MainEditorView)
 
     def __init__(self, parent=None):
@@ -32,6 +32,22 @@ class TabManager(QTabWidget):
     def set_title(self, index: int, title: str) -> None:
         self.setTabText(index, title)
 
+    def set_view_title(self, doc_id: str, title: str) -> None:
+        for i in range(self.count()):
+            container = self.widget(i)
+            view = container.findChild(MainEditorView)
+            if view.doc_id == doc_id:
+                self.set_title(i, title)
+                break
+
+    def close_view(self, doc_id) -> None:
+        for i in range(self.count()):
+            container = self.widget(i)
+            view = container.findChild(MainEditorView)
+            if view.doc_id == doc_id:
+                self.removeTab(i)
+                break
+
     def _handle_tab_change(self, index: int) -> None:
         if index >= 0:
             # Get the container widget and find the editor view
@@ -43,4 +59,4 @@ class TabManager(QTabWidget):
     def _on_tab_close(self, index: int) -> None:
         container = self.widget(index)
         view = container.findChild(MainEditorView)
-        self.viewClosed.emit(index, view)
+        self.viewClosed.emit(view)

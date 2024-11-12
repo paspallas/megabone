@@ -26,7 +26,7 @@ class MainMenuController:
         self.create_menus()
 
         # Connect to signals
-        self.documents.documentAdded.connect(self._on_document_created)
+        self.documents.addedDocument.connect(self._on_document_created)
 
     def create_menus(self):
         self._menus[MenuType.FILE] = (
@@ -44,13 +44,15 @@ class MainMenuController:
                 "Ctrl+Shift+S",
             )
             .separator()
+            .action("Close Editor", self.documents.close_document, "Ctrl+F4")
+            .separator()
             .submenu("Export")
             .action("As Sprite Sheet")
             .disable()
             .back()
             .separator()
             .action("Exit", self.controller.on_quit, "Ctrl+Q")
-            .disable_items("Save", "Save As...")
+            .disable_items("Save", "Save As...", "Close Editor")
         )
 
         self._menus[MenuType.EDIT] = (
@@ -88,4 +90,6 @@ class MainMenuController:
         return self._menus.get(name, None)
 
     def _on_document_created(self):
-        self._menus.get(MenuType.FILE).enable_items("Save", "Save As...")
+        self._menus.get(MenuType.FILE).enable_items(
+            "Save", "Save As...", "Close Editor"
+        )
