@@ -25,7 +25,9 @@ class DocumentManager(QObject):
         self._unsaved_changes: Set[str] = set()
 
     def connect_to_document(self, document: Document) -> None:
-        document.documentChanged.connect(lambda: self._on_document_changed(document.id))
+        document.documentModified.connect(
+            lambda: self._on_document_changed(document.id)
+        )
 
     def disconnect_from_document(self, document: Document) -> None:
         pass

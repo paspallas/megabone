@@ -126,7 +126,7 @@ class AutoSaveManager(QObject):
             return
 
         # Connect to document changes
-        document.documentChanged.connect(lambda: self.mark_document_dirty(doc_id))
+        document.documentModified.connect(lambda: self.mark_document_dirty(doc_id))
 
     def _on_document_removed(self, doc_id: str) -> None:
         """Clean up when a document is removed"""
