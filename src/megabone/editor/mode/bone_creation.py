@@ -28,10 +28,10 @@ class CreateBoneMode(AbstractEditorMode):
 
                 # Create a new bone
                 self.new_bone = BoneItem(
+                    self.bones,
                     scene_pos,
                     scene_pos + QPointF(1, 1),
                     bone_id,
-                    self.bones,
                 )
 
                 # Add to the model

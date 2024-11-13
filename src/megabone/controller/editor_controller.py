@@ -2,6 +2,7 @@ from typing import Dict, Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
+from megabone.editor.item import ItemFactory
 from megabone.editor.mode import *
 from megabone.manager import DocumentManager, TabManager
 from megabone.views import MainEditorView
@@ -51,6 +52,10 @@ class EditorController(QObject):
 
         self.tab_widget.add_editor(view, title)
         self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
+
+        ItemFactory.add_items_from_document(
+            self.documents.get_document(doc_id), view.scene()
+        )
 
     def set_active_view(self, view: MainEditorView) -> None:
         self.current_view = view

@@ -27,10 +27,10 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def __init__(
         self,
+        model: BoneModel,
         start_point: QPointF,
         end_point: QPointF,
         item_id: str,
-        model: BoneModel,
         parent=None,
     ):
         super().__init__(layer=Layer.BONE, parent=parent, item_id=item_id, model=model)
@@ -161,9 +161,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             # Update sprites when bone moves
             self.update_all_sprites()
 
-            # Update the model
-            self.update_model()
-
+        self.update_model()
         return super().itemChange(change, value)
 
     def paint(self, painter, option, widget):

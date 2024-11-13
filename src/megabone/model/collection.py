@@ -48,6 +48,9 @@ class BaseCollectionModel(QObject):
     def get_item(self, item_id: str) -> Optional[Serializable]:
         return self._items.get(item_id)
 
+    def get_items(self) -> List[Serializable]:
+        return [item for item in self._items.values()]
+
     def to_list(self) -> List[Dict[str, Any]]:
         """Serialize all items to list of dictionary"""
         return [item.to_dict() for item in self._items.values()]

@@ -17,15 +17,14 @@ class Document(QObject):
 
     documentModified = pyqtSignal()
 
-    def __init__(self) -> None:
+    def __init__(self, path: Optional[Path] = None) -> None:
         super().__init__()
         self.doc_id = util.gen_unique_id()
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.keyframes = KeyframeModel()
         self.undo_stack = QUndoStack()
-
-        self.path: Optional[Path] = None
+        self.path = path
 
         # Connect submodel signals
         for model in [self.bones, self.sprites, self.keyframes]:
@@ -59,7 +58,7 @@ class Document(QObject):
     @staticmethod
     def load(path: Path) -> "Document":
         with path.open("r", encoding="utf-8") as f:
-            return Document().from_dict(json.load(f))
+            return Document(path).from_dict(json.load(f))
 
     def create_undo_command(self, command) -> None:
         self.undo_stack.push(command)
