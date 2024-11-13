@@ -1,6 +1,6 @@
 import math
 
-from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import (
     QBrush,
     QColor,
@@ -13,11 +13,27 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import QGraphicsItem
 
 from megabone.editor.layer import Layer, LayeredItemMixin
+from megabone.model.bone import BoneData, BoneModel
+
+from .model_item import ModelBoundItem
 
 
-class BoneItem(LayeredItemMixin, QGraphicsItem):
-    def __init__(self, start_point, end_point, parent=None):
-        super().__init__(layer=Layer.BONE, parent=parent)
+class BoneItem(LayeredItemMixin, ModelBoundItem):
+    _bone_width_start = 6
+    _bone_width_end = 2
+    _primary_color = QColor(230, 230, 230)
+    _hover_color = QColor(200, 200, 255)
+    _selected_color = QColor(100, 150, 255)
+
+    def __init__(
+        self,
+        start_point: QPointF,
+        end_point: QPointF,
+        item_id: str,
+        model: BoneModel,
+        parent=None,
+    ):
+        super().__init__(layer=Layer.BONE, parent=parent, item_id=item_id, model=model)
         self.start_point = start_point
         self.end_point = end_point
         self.setAcceptHoverEvents(True)
@@ -33,13 +49,6 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
 
         self.is_hovered = False
         self.is_selected = False
-
-        # Custom properties
-        self.bone_width_start = 6
-        self.bone_width_end = 2
-        self.primary_color = QColor(230, 230, 230)
-        self.hover_color = QColor(200, 200, 255)
-        self.selected_color = QColor(100, 150, 255)
 
     def boundingRect(self) -> QRectF:
         return self.shape().boundingRect()
@@ -59,20 +68,20 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
 
         # Calculate corner points for the bone shape
         start_left = QPointF(
-            self.start_point.x() + nx * self.bone_width_start / 2,
-            self.start_point.y() + ny * self.bone_width_start / 2,
+            self.start_point.x() + nx * self._bone_width_start / 2,
+            self.start_point.y() + ny * self._bone_width_start / 2,
         )
         start_right = QPointF(
-            self.start_point.x() - nx * self.bone_width_start / 2,
-            self.start_point.y() - ny * self.bone_width_start / 2,
+            self.start_point.x() - nx * self._bone_width_start / 2,
+            self.start_point.y() - ny * self._bone_width_start / 2,
         )
         end_left = QPointF(
-            self.end_point.x() + nx * self.bone_width_end / 2,
-            self.end_point.y() + ny * self.bone_width_end / 2,
+            self.end_point.x() + nx * self._bone_width_end / 2,
+            self.end_point.y() + ny * self._bone_width_end / 2,
         )
         end_right = QPointF(
-            self.end_point.x() - nx * self.bone_width_end / 2,
-            self.end_point.y() - ny * self.bone_width_end / 2,
+            self.end_point.x() - nx * self._bone_width_end / 2,
+            self.end_point.y() - ny * self._bone_width_end / 2,
         )
 
         # Draw the bone shape
@@ -122,13 +131,6 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
     def updateSpriteTransform(self, sprite):
         """Update the transform of an attached sprite based on bone position"""
 
-        # TODO separate model from view
-        # rotation = self.calculateAngle()
-        # pos = self.start_point + sprite.bone_offset.rotated(rotation)
-        # sprite.initial_rotation = rotation
-
-        # sprite.setPos(pos)
-        # sprite.setRotation(sprite.rotation)
         # Create transform
         transform = QTransform()
 
@@ -158,6 +160,10 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
         if change == QGraphicsItem.ItemPositionChange:
             # Update sprites when bone moves
             self.update_all_sprites()
+
+            # Update the model
+            self.update_model()
+
         return super().itemChange(change, value)
 
     def paint(self, painter, option, widget):
@@ -168,11 +174,11 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
 
         # Set colors based on state
         if self.is_selected:
-            base_color = self.selected_color
+            base_color = self._selected_color
         elif self.is_hovered:
-            base_color = self.hover_color
+            base_color = self._hover_color
         else:
-            base_color = self.primary_color
+            base_color = self._primary_color
 
         gradient.setColorAt(0, base_color.lighter(120))
         gradient.setColorAt(1, base_color.darker(120))
@@ -184,7 +190,7 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
         painter.drawPath(path)
 
         # Add joint circles at the ends
-        joint_radius = min(self.bone_width_start, self.bone_width_end) * 0.6
+        joint_radius = min(self._bone_width_start, self._bone_width_end) * 0.6
         painter.setBrush(QBrush(base_color.darker(120)))
         painter.drawEllipse(self.start_point, joint_radius, joint_radius)
 
@@ -203,3 +209,13 @@ class BoneItem(LayeredItemMixin, QGraphicsItem):
             self.is_selected = not self.is_selected
             self.update()
         super().mousePressEvent(event)
+
+    def create_model_data(self) -> BoneData:
+        return BoneData(
+            id=self.item_id,
+            start_point=tuple([self.start_point.x(), self.start_point.y()]),
+            end_point=tuple([self.end_point.x(), self.end_point.y()]),
+        )
+
+    def apply_model_data(self, data: BoneData):
+        pass

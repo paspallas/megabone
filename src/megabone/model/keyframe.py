@@ -43,4 +43,4 @@ class KeyframeData(Serializable):
 
 class KeyframeModel(BaseCollectionModel):
     def __init__(self):
-        super().__init__(KeyframeData)
+        super().__init__(KeyframeData, "keyframes")

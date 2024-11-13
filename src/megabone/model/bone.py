@@ -7,10 +7,11 @@ from .serializable import Serializable
 
 @dataclass
 class BoneData(Serializable):
-    parent_id: Optional[str]
-    position: tuple[float, float]
+    start_point: tuple[float, float]
+    end_point: tuple[float, float]
+    parent_id: Optional[str] = ""
 
 
 class BoneModel(BaseCollectionModel):
     def __init__(self):
-        super().__init__(BoneData)
+        super().__init__(BoneData, "bones")

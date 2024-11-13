@@ -13,4 +13,4 @@ class SpriteData(Serializable):
 
 class SpriteModel(BaseCollectionModel):
     def __init__(self):
-        super().__init__(SpriteData)
+        super().__init__(SpriteData, "sprites")

@@ -79,12 +79,12 @@ class AutoSaveManager(QObject):
         backup_file = self._get_backup_path(doc_id)
 
         # Create the temp file first
-        temp_file = backup_file.with_sufix(".tmp")
-        document.save(tempfile)
+        temp_file = backup_file.with_suffix(".tmp")
+        document.save(temp_file)
 
         # Atomic replacement of the backup file
         if backup_file.exists():
-            backup_file.with_sufix(".bak").write_bytes(backup_file.read_bytes())
+            backup_file.with_suffix(".bak").write_bytes(backup_file.read_bytes())
         temp_file.replace(backup_file)
 
     def _get_backup_path(self, doc_id: str) -> Path:

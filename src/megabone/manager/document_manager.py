@@ -26,23 +26,23 @@ class DocumentManager(QObject):
 
     def connect_to_document(self, document: Document) -> None:
         document.documentModified.connect(
-            lambda: self._on_document_changed(document.id)
+            lambda: self._on_document_changed(document.doc_id)
         )
 
     def disconnect_from_document(self, document: Document) -> None:
         pass
 
     def track_changes(self, document: Document) -> None:
-        self._unsaved_changes.add(document.id)
+        self._unsaved_changes.add(document.doc_id)
 
     def get_document(self, doc_id: str) -> Optional[Document]:
         return self._documents.get(doc_id, None)
 
     def add_document(self, document: Document) -> None:
-        self._documents[document.id] = document
+        self._documents[document.doc_id] = document
         self.track_changes(document)
         self.connect_to_document(document)
-        self.addedDocument.emit(document.id)
+        self.addedDocument.emit(document.doc_id)
 
     def get_active_document(self) -> Optional[Document]:
         return self._documents.get(self._active_document_id, None)
@@ -58,7 +58,7 @@ class DocumentManager(QObject):
     def create_document(self) -> None:
         doc = Document()
         self.add_document(doc)
-        self.createdDocument.emit(doc.id)
+        self.createdDocument.emit(doc.doc_id)
 
     def open_document(self) -> None:
         path = FileDialog.open_file()
@@ -66,8 +66,8 @@ class DocumentManager(QObject):
             try:
                 doc = Document.load(path)
                 self.add_document(doc)
-                self.createdDocument.emit(doc.id)
-                self.openedDocument.emit(doc.id, path.stem)
+                self.createdDocument.emit(doc.doc_id)
+                self.openedDocument.emit(doc.doc_id, path.stem)
             except Exception:
                 QMessageBox.critical(
                     None,
@@ -92,7 +92,7 @@ class DocumentManager(QObject):
         if path:
             try:
                 doc.save(path)
-                self.savedDocumentAs.emit(doc.id, path.stem)
+                self.savedDocumentAs.emit(doc.doc_id, path.stem)
             except Exception:
                 self._save_error(doc)
 

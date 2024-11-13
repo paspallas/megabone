@@ -1,10 +1,11 @@
 import json
 from pathlib import Path
 from typing import Optional
-from uuid import uuid4 as genid
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QUndoStack
+
+import megabone.util.utils as util
 
 from .bone import BoneModel
 from .keyframe import KeyframeModel
@@ -18,7 +19,7 @@ class Document(QObject):
 
     def __init__(self) -> None:
         super().__init__()
-        self.id = genid().hex
+        self.doc_id = util.gen_unique_id()
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.keyframes = KeyframeModel()
@@ -35,18 +36,18 @@ class Document(QObject):
     def to_dict(self) -> dict:
         """Serialize document to dictionary"""
         return {
-            "id": self.id,
-            "bones": self.bones.to_dict(),
-            "sprites": self.sprites.to_dict(),
-            "keyframes": self.keyframes.to_dict(),
+            "doc_id": self.doc_id,
+            self.bones.key_name: self.bones.to_list(),
+            self.sprites.key_name: self.sprites.to_list(),
+            self.keyframes.key_name: self.keyframes.to_list(),
         }
 
     def from_dict(self, data: dict) -> "Document":
         """Load document from dictionary"""
-        self.id = data.get("id", self.id)
-        self.bones.from_dict(data.get("bones", {"items": {}}))
-        self.sprites.from_dict(data.get("sprites", {"items": {}}))
-        self.keyframes.from_dict(data.get("keyframes", {"items": {}}))
+        self.doc_id = data.get("doc_id", self.doc_id)
+        self.bones.from_list(data.get(self.bones.key_name, []))
+        self.sprites.from_list(data.get(self.sprites.key_name, []))
+        self.keyframes.from_list(data.get(self.keyframes.key_name, []))
 
         return self
 

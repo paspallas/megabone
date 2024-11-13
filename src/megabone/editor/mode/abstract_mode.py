@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from megabone.model.bone import BoneModel
+from megabone.model.keyframe import KeyframeModel
+from megabone.model.sprite import SpriteModel
 from megabone.views import MainEditorView, ModalEditorScene
 
 
@@ -19,6 +22,18 @@ class AbstractEditorMode(ABC):
     @property
     def view(self) -> MainEditorView:
         return self.controller.current_view
+
+    @property
+    def sprites(self) -> SpriteModel:
+        return self.controller.documents.get_active_document().sprites
+
+    @property
+    def bones(self) -> BoneModel:
+        return self.controller.documents.get_active_document().bones
+
+    @property
+    def keys(self) -> KeyframeModel:
+        return self.controller.documents.get_active_document().keyframes
 
     def activate(self):
         """Called when entering this state"""

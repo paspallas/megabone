@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from typing import Dict, Optional, Type
+from typing import Any, Dict, List, Optional, Type
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -17,11 +17,12 @@ class BaseCollectionModel(QObject):
     itemRemoved = pyqtSignal(str)
     itemModified = pyqtSignal(str, UpdateSource)
 
-    def __init__(self, data_class: Type[Serializable]):
+    def __init__(self, data_class: Type[Serializable], key_name: str):
         super().__init__()
         self._items: Dict[str, Serializable] = {}
         self._updating = False
         self._data_class = data_class
+        self.key_name = key_name
 
     def add_item(self, item_id: str, data: Serializable, source: UpdateSource):
         if not self._updating:
@@ -47,14 +48,12 @@ class BaseCollectionModel(QObject):
     def get_item(self, item_id: str) -> Optional[Serializable]:
         return self._items.get(item_id)
 
-    def to_dict(self) -> dict:
-        """Serialize all items to dictionary"""
-        return {
-            "items": {item_id: item.to_dict() for item_id, item in self._items.items()}
-        }
+    def to_list(self) -> List[Dict[str, Any]]:
+        """Serialize all items to list of dictionary"""
+        return [item.to_dict() for item in self._items.values()]
 
-    def from_dict(self, data: dict):
-        """Load items from dictionary"""
+    def from_list(self, data: List[Dict[str, Any]]):
+        """Load items from list of dictionary"""
         self._items.clear()
-        for item_id, item_data in data.get("items", {}).items():
-            self._items[item_id] = self._data_class.from_dict(item_data)
+        for item_data in data:
+            self._items[item_data.get("id", "")] = self._data_class.from_dict(item_data)
