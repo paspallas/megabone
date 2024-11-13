@@ -45,11 +45,10 @@ class CreateBoneMode(AbstractEditorMode):
                     if isinstance(parent_bone, BoneItem):
                         self.new_bone.setParentBone(parent_bone)
 
-                self.scene.addItem(self.new_bone)
-                self.view.bones.append(self.new_bone)
-                # TODO manage layers correctly
-                # self.editor.layer_control.add_item(self.new_bone)
+                self.view.add_item(self.new_bone)
 
+                # TODO remove this!
+                self.view.bones.append(self.new_bone)
             else:
                 # Finish drawing bone
                 self.new_bone.setSelected(False)

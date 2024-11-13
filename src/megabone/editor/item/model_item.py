@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from PyQt5.QtWidgets import QGraphicsItem
 
 from megabone.model.collection import BaseCollectionModel, UpdateSource
@@ -32,10 +34,10 @@ class ModelBoundItem(QGraphicsItem):
         if data:
             self.apply_model_data(data)
 
+    @abstractmethod
     def create_model_data(self) -> Serializable:
-        """Override to create data object"""
-        raise NotImplementedError()
+        pass
 
+    @abstractmethod
     def apply_model_data(self, data: Serializable):
-        """Override to apply data object"""
-        raise NotImplementedError()
+        pass

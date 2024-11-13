@@ -17,18 +17,18 @@ class Layer(Enum):
 class LayeredItemMixin:
     _items_per_layer = 100_000
 
-    def __init__(self, *args, layer: Layer, z_index: float = 0, **kwargs) -> None:
+    def __init__(self, *args, layer: Layer, z_index: int = 0, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.layer = layer
         self.z_index = z_index
 
-    def update_z_value(self, z_index: float) -> None:
+    def update_z_value(self, z_index: int) -> None:
         """Set actual z-index after layer sorting"""
         self.z_index = z_index
         self.setZValue(self.calculate_value())
 
     def calculate_value(self) -> float:
-        return self.layer.value * self._items_per_layer + self.z_index
+        return float(self.layer.value * self._items_per_layer + self.z_index)
 
     def __repr__(self) -> str:
         return f"Layer item(z-index={self.z_index}, layer={self.layer})"
@@ -43,8 +43,13 @@ class LayerManager:
 
     def add_item(self, item: QGraphicsItem) -> None:
         self.items.append(item)
+
         # New items are placed on top by default
         item.update_z_value(len(self.items))
+        self.sort_layer(item.layer)
+
+    def remove_item(self, item: QGraphicsItem) -> None:
+        self.items.remove(item)
         self.sort_layer(item.layer)
 
     def sort_layer(self, layer: Layer) -> None:
@@ -85,6 +90,9 @@ class LayerManager:
 
     def _increase_z_index(self) -> None:
         if item := self._get_item():
+            if item.layer != Layer.SPRITE:
+                return
+
             items = self._get_layer_items(item.layer)
             index = items.index(item)
             if index < len(items) - 1:
@@ -94,6 +102,9 @@ class LayerManager:
 
     def _decrease_z_index(self) -> None:
         if item := self._get_item():
+            if item.layer != Layer.SPRITE:
+                return
+
             items = self._get_layer_items(item.layer)
             index = items.index(item)
             if index > 0:

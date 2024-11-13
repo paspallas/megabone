@@ -1,5 +1,6 @@
+from collections import OrderedDict
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional, OrderedDict, Type
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -19,7 +20,7 @@ class BaseCollectionModel(QObject):
 
     def __init__(self, data_class: Type[Serializable], key_name: str):
         super().__init__()
-        self._items: Dict[str, Serializable] = {}
+        self._items: OrderedDict[str, Serializable] = OrderedDict()
         self._updating = False
         self._data_class = data_class
         self.key_name = key_name

@@ -9,7 +9,9 @@ from .serializable import Serializable
 class BoneData(Serializable):
     start_point: tuple[float, float]
     end_point: tuple[float, float]
+    z_index: Optional[int] = 0
     parent_id: Optional[str] = ""
+    sprite_id: Optional[str] = ""
 
 
 class BoneModel(BaseCollectionModel):

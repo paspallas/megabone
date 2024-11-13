@@ -71,6 +71,14 @@ class MainEditorView(QGraphicsView):
         self.controller.handle_mouse_release(self, event)
         super().mouseReleaseEvent(event)
 
+    def add_item(self, item):
+        self.scene().addItem(item)
+        self.layer_manager.add_item(item)
+
+    def remove_item(self, item):
+        self.scene().removeItem(item)
+        self.layer_manager.remove_item(item)
+
     def selectBone(self, bone):
         self.selected_bone = bone
 

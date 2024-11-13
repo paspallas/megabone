@@ -10,12 +10,14 @@ from megabone.model.document import Document
 class DocumentManager(QObject):
     """Manages a collection of documents and IO operations"""
 
-    addedDocument = pyqtSignal(str)  # doc_id
-    closedDocument = pyqtSignal(str)  # doc_id
-    activeDocumentChanged = pyqtSignal(str)  # doc_id
-    savedDocumentAs = pyqtSignal(str, str)  # doc_id, path_stem
-    openedDocument = pyqtSignal(str, str)  # doc_id, path_stem
-    createdDocument = pyqtSignal(str)  # doc_id
+    addedDocument = pyqtSignal(str)  # id
+    closedDocument = pyqtSignal(str)  # id
+    activeDocumentChanged = pyqtSignal(str)  # id
+    savedDocumentAs = pyqtSignal(str, str)  # id, path
+    openedDocument = pyqtSignal(str, str)  # id, path
+    """An opened from file document was added to the collection"""
+    createdDocument = pyqtSignal(str)
+    """A newly created document was added to the collection"""
 
     def __init__(self):
         super().__init__()
@@ -39,10 +41,14 @@ class DocumentManager(QObject):
         return self._documents.get(doc_id, None)
 
     def add_document(self, document: Document) -> None:
-        self._documents[document.doc_id] = document
-        self.track_changes(document)
-        self.connect_to_document(document)
-        self.addedDocument.emit(document.doc_id)
+        if document.doc_id not in self._documents:
+            self._documents[document.doc_id] = document
+
+            self.track_changes(document)
+            self.connect_to_document(document)
+
+            self.addedDocument.emit(document.doc_id)
+            self.createdDocument.emit(document.doc_id)
 
     def get_active_document(self) -> Optional[Document]:
         return self._documents.get(self._active_document_id, None)
@@ -56,18 +62,15 @@ class DocumentManager(QObject):
             self.activeDocumentChanged.emit(doc_id)
 
     def create_document(self) -> None:
-        doc = Document()
-        self.add_document(doc)
-        self.createdDocument.emit(doc.doc_id)
+        self.add_document(Document())
 
     def open_document(self) -> None:
         path = FileDialog.open_file()
         if path:
             try:
-                doc = Document.load(path)
+                doc = Document().load(path)
                 self.add_document(doc)
-                self.createdDocument.emit(doc.doc_id)
-                self.openedDocument.emit(doc.doc_id, path.stem)
+                self.openedDocument.emit(doc.doc_id, doc.path.stem)
             except Exception:
                 QMessageBox.critical(
                     None,
