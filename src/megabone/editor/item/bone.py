@@ -45,6 +45,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         self.end_point = end_point
 
         self.parent_bone = None
+        self._parent_id = ""
         self.child_bones = []
         self.connected_sprites = []
 
@@ -216,7 +217,15 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     @property
     def parent_id(self) -> str:
-        return "" if not self.parent_bone else self.parent_bone.item_id
+        if self._parent_id:
+            return self._parent_id
+        elif self.parent_bone:
+            return self.parent_bone.item_id
+        return ""
+
+    @parent_id.setter
+    def parent_id(self, id: str):
+        self._parent_id = id
 
     def create_data_for_model(self) -> BoneData:
         return BoneData(

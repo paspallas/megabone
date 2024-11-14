@@ -21,15 +21,15 @@ class KeyframeData(Serializable):
     value: Any = None
     easing: EaseType = EaseType.LINEAR
 
-    def interpolate(self, other_keyframe, t):
+    def interpolate(self, other, t):
         """Interpolate between this keyframe and another"""
         if isinstance(self.value, QPointF):
             return QPointF(
-                self._ease(self.value.x(), other_keyframe.value.x(), t),
-                self._ease(self.value.y(), other_keyframe.value.y(), t),
+                self._ease(self.value.x(), other.value.x(), t),
+                self._ease(self.value.y(), other.value.y(), t),
             )
         elif isinstance(self.value, (int, float)):
-            return self._ease(self.value, other_keyframe.value, t)
+            return self._ease(self.value, other.value, t)
 
     def _ease(self, start, end, t):
         match self.easing:

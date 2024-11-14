@@ -20,21 +20,21 @@ class EditorController(QObject):
         self.current_view: Optional[MainEditorView] = None
         self.current_mode: Optional[AbstractEditorMode] = None
 
-        self.tab_widget = TabManager()
+        self.editor_views = TabManager()
 
         # Connect signals
-        self.tab_widget.viewActivated.connect(self.set_active_view)
-        self.tab_widget.viewClosed.connect(self.on_close_view)
-        self.documents.openedDocument.connect(self.tab_widget.set_view_title)
-        self.documents.closedDocument.connect(self.tab_widget.close_view)
-        self.documents.savedDocumentAs.connect(self.tab_widget.set_view_title)
+        self.editor_views.viewActivated.connect(self.set_active_view)
+        self.editor_views.viewClosed.connect(self.on_close_view)
+        self.documents.openedDocument.connect(self.editor_views.set_view_title)
+        self.documents.closedDocument.connect(self.editor_views.close_view)
+        self.documents.savedDocumentAs.connect(self.editor_views.set_view_title)
         self.documents.createdDocument.connect(self.create_editor)
 
         # Register and init all edit modes
         EditorModeRegistry.init(self)
 
     def views_container(self) -> TabManager:
-        return self.tab_widget
+        return self.editor_views
 
     def set_edit_mode(self, mode: EditorModeRegistry.Mode):
         new_mode = EditorModeRegistry.get_mode(mode)
@@ -50,12 +50,10 @@ class EditorController(QObject):
         view.controller = self
         self.views[doc_id] = view
 
-        self.tab_widget.add_editor(view, title)
+        self.editor_views.add_editor(view, title)
         self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
 
-        ItemFactory.add_items_from_document(
-            self.documents.get_document(doc_id), view.scene()
-        )
+        ItemFactory.add_items_from_document(self.documents.get_document(doc_id), view)
 
     def set_active_view(self, view: MainEditorView) -> None:
         self.current_view = view

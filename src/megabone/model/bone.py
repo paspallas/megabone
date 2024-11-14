@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
 
 from PyQt5.QtCore import QPointF
 
@@ -9,17 +8,11 @@ from .serializable import Serializable
 
 @dataclass
 class BoneData(Serializable):
-    start_point: Optional[QPointF] = None
-    end_point: Optional[QPointF] = None
-    z_index: Optional[int] = 0
-    parent_id: Optional[str] = ""
-    sprite_id: Optional[str] = ""
-
-    def __post_init__(self):
-        super().__post_init__()
-        if not self.start_point or not self.end_point:
-            self.start_point = QPointF(0, 0)
-            self.end_point = QPointF(0, 0)
+    start_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
+    end_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
+    z_index: int = 0
+    parent_id: str = ""
+    sprite_id: str = ""
 
 
 class BoneModel(BaseCollectionModel):
