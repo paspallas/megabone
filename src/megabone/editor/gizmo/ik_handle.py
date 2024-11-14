@@ -1,12 +1,13 @@
-from PyQt5.QtCore import Qt, QRectF
+from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem
 
-from .pole_vector import PoleControl
-from .target_control import TargetControl
 from megabone.editor.item import BoneItem
 from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.IKSolver import FABRIK
+
+from .pole_vector import PoleControl
+from .target_control import TargetControl
 
 
 class IKHandle(LayeredItemMixin, QGraphicsItem):

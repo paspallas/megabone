@@ -25,19 +25,23 @@ class ModelBoundItem(QGraphicsItem):
     def update_model(self):
         """Update model with current view state"""
         if not self._updating:
-            data = self.create_model_data()
+            data = self.create_data_for_model()
             self._model.modify_item(self.item_id, data, UpdateSource.VIEW)
 
     def update_from_model(self):
         """Update view with current model state"""
         data = self._model.get_item(self.item_id)
         if data:
-            self.apply_model_data(data)
+            self.apply_data_from_model(data)
+
+    def itemChange(self, change, value):
+        self.update_model()
+        return super().itemChange(change, value)
 
     @abstractmethod
-    def create_model_data(self) -> Serializable:
+    def create_data_for_model(self) -> Serializable:
         pass
 
     @abstractmethod
-    def apply_model_data(self, data: Serializable):
+    def apply_data_from_model(self, data: Serializable):
         pass

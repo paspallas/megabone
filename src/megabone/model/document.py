@@ -1,11 +1,10 @@
 import json
+import uuid
 from pathlib import Path
 from typing import Optional
 
 from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QUndoStack
-
-import megabone.util.utils as util
 
 from .bone import BoneModel
 from .keyframe import KeyframeModel
@@ -19,7 +18,7 @@ class Document(QObject):
 
     def __init__(self, path: Optional[Path] = None) -> None:
         super().__init__()
-        self.doc_id = util.gen_unique_id()
+        self.doc_id = uuid.uuid4().hex
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.keyframes = KeyframeModel()

@@ -1,9 +1,13 @@
 import math
+from typing import List
 
 from PyQt5.QtCore import QPointF
 
+from megabone.editor.item import BoneItem
+
+
 class FABRIK:
-    def __init__(self, bones):
+    def __init__(self, bones: List[BoneItem]):
         self.bones = bones
         self.lengths = []
         self.total_length = 0
@@ -133,3 +137,4 @@ class FABRIK:
             bone.end_point = points[i + 1]
             bone.update()
             bone.updateChildrenTransform()
+            bone.update_model()

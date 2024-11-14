@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QPointF, Qt
 
-import megabone.util.utils as util
 from megabone.editor.item import BoneItem
+from megabone.model.bone import BoneData
 from megabone.model.collection import UpdateSource
 
 from .abstract_mode import AbstractEditorMode
@@ -24,19 +24,14 @@ class CreateBoneMode(AbstractEditorMode):
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
             if self.new_bone is None:
-                bone_id = util.gen_unique_id()
+                bone_data = BoneData.create()
 
-                # Create a new bone
+                # Create the bone item
                 self.new_bone = BoneItem(
                     self.bones,
                     scene_pos,
                     scene_pos + QPointF(1, 1),
-                    bone_id,
-                )
-
-                # Add to the model
-                self.bones.add_item(
-                    bone_id, self.new_bone.create_model_data(), UpdateSource.VIEW
+                    bone_data.id,
                 )
 
                 if event.modifiers() & Qt.ShiftModifier:
@@ -46,6 +41,9 @@ class CreateBoneMode(AbstractEditorMode):
                         self.new_bone.setParentBone(parent_bone)
 
                 self.view.add_item(self.new_bone)
+
+                # Add to the model
+                self.bones.add_item(bone_data.id, bone_data, UpdateSource.VIEW)
 
                 # TODO remove this!
                 self.view.bones.append(self.new_bone)

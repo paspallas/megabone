@@ -31,14 +31,20 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         start_point: QPointF,
         end_point: QPointF,
         item_id: str,
-        parent=None,
+        z_index: int = 0,
+        parent: QGraphicsItem = None,
     ):
-        super().__init__(layer=Layer.BONE, parent=parent, item_id=item_id, model=model)
+        super().__init__(
+            layer=Layer.BONE,
+            z_index=z_index,
+            parent=parent,
+            item_id=item_id,
+            model=model,
+        )
+        self.is_hovered = False
+        self.is_selected = False
         self.start_point = start_point
         self.end_point = end_point
-        self.setAcceptHoverEvents(True)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
-
         self.parent_bone = None
         self.child_bones = []
         self.connected_sprites = []
@@ -47,8 +53,8 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         self.local_length = self.calculateLength()
         self.local_angle = self.calculateAngle()
 
-        self.is_hovered = False
-        self.is_selected = False
+        self.setAcceptHoverEvents(True)
+        self.setFlag(QGraphicsItem.ItemIsSelectable)
 
     def boundingRect(self) -> QRectF:
         return self.shape().boundingRect()
@@ -94,74 +100,11 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
         return path
 
-    def calculateLength(self):
-        return math.sqrt(
-            (self.end_point.x() - self.start_point.x()) ** 2
-            + (self.end_point.y() - self.start_point.y()) ** 2
-        )
-
-    def calculateAngle(self):
-        dx = self.end_point.x() - self.start_point.x()
-        dy = self.end_point.y() - self.start_point.y()
-
-        return math.atan2(dy, dx)
-
-    def detachParentBone(self):
-        if self.parent_bone:
-            self.parent_bone.child_bones.remove(self)
-
-    def setParentBone(self, parent_bone):
-        self.detachParentBone()
-        self.parent_bone = parent_bone
-
-        if parent_bone:
-            parent_bone.child_bones.append(self)
-            # Update start point to parent's end point
-            self.start_point = parent_bone.end_point
-            self.update()
-
-    def updateChildrenTransform(self):
-        for child in self.child_bones:
-            # Update child's start point to match parent's end point
-            child.start_point = self.end_point
-            child.update()
-            # Recursively update all descendants
-            child.updateChildrenTransform()
-
-    def updateSpriteTransform(self, sprite):
-        """Update the transform of an attached sprite based on bone position"""
-
-        # Create transform
-        transform = QTransform()
-
-        # Move to bone start position
-        transform.translate(self.start_pos.x(), self.start_pos.y())
-
-        # Apply bone rotation
-        bone_angle = self.calculateAngle()
-        transform.rotate(math.degrees(bone_angle))
-
-        # Apply local position offset
-        transform.translate(sprite.pos().x(), sprite.pos().y())
-
-        # Apply local rotation
-        transform.rotate(sprite.rotation())
-
-        # Set the sprite's transform
-        sprite.setTransform(transform)
-
-    def updateAllSpritessprites(self):
-        """Update all attached sprites when bone moves"""
-        for sprite in self.attached_sprites:
-            self.updateSpriteTransform(sprite)
-
     def itemChange(self, change, value):
         """Handle bone movement and update sprites"""
         if change == QGraphicsItem.ItemPositionChange:
             # Update sprites when bone moves
             self.update_all_sprites()
-
-        self.update_model()
         return super().itemChange(change, value)
 
     def paint(self, painter, option, widget):
@@ -208,12 +151,81 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             self.update()
         super().mousePressEvent(event)
 
-    def create_model_data(self) -> BoneData:
+    def calculateLength(self):
+        return math.sqrt(
+            (self.end_point.x() - self.start_point.x()) ** 2
+            + (self.end_point.y() - self.start_point.y()) ** 2
+        )
+
+    def calculateAngle(self):
+        dx = self.end_point.x() - self.start_point.x()
+        dy = self.end_point.y() - self.start_point.y()
+
+        return math.atan2(dy, dx)
+
+    def detachParentBone(self):
+        if self.parent_bone:
+            self.parent_bone.child_bones.remove(self)
+
+    def setParentBone(self, parent_bone: "BoneItem"):
+        self.detachParentBone()
+        self.parent_bone = parent_bone
+
+        if parent_bone:
+            parent_bone.child_bones.append(self)
+
+            # Update start point to parent's end point
+            self.start_point = parent_bone.end_point
+            self.update()
+
+    def updateChildrenTransform(self):
+        for child in self.child_bones:
+            # Update child's start point to match parent's end point
+            child.start_point = self.end_point
+            child.update()
+
+            # Recursively update all descendants
+            child.updateChildrenTransform()
+
+    def updateSpriteTransform(self, sprite):
+        """Update the transform of an attached sprite based on bone position"""
+
+        # Create transform
+        transform = QTransform()
+
+        # Move to bone start position
+        transform.translate(self.start_pos.x(), self.start_pos.y())
+
+        # Apply bone rotation
+        bone_angle = self.calculateAngle()
+        transform.rotate(math.degrees(bone_angle))
+
+        # Apply local position offset
+        transform.translate(sprite.pos().x(), sprite.pos().y())
+
+        # Apply local rotation
+        transform.rotate(sprite.rotation())
+
+        # Set the sprite's transform
+        sprite.setTransform(transform)
+
+    def updateAllSpritessprites(self):
+        """Update all attached sprites when bone moves"""
+        for sprite in self.attached_sprites:
+            self.updateSpriteTransform(sprite)
+
+    @property
+    def parent_id(self) -> str:
+        return "" if not self.parent_bone else self.parent_bone.item_id
+
+    def create_data_for_model(self) -> BoneData:
         return BoneData(
             id=self.item_id,
             start_point=tuple([self.start_point.x(), self.start_point.y()]),
             end_point=tuple([self.end_point.x(), self.end_point.y()]),
+            z_index=self.z_index,
+            parent_id=self.parent_id,
         )
 
-    def apply_model_data(self, data: BoneData):
+    def apply_data_from_model(self, data: BoneData):
         pass

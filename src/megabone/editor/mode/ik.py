@@ -26,6 +26,7 @@ class IKMode(AbstractEditorMode):
         if not self.target_indicator:
             self.target_indicator = QGraphicsEllipseItem(-5, -5, 10, 10)
             self.target_indicator.setPen(QPen(Qt.red, 1))
+            self.target_indicator.setZValue(999_999_999)
             self.target_indicator.hide()
             self.scene.addItem(self.target_indicator)
 
@@ -45,9 +46,9 @@ class IKMode(AbstractEditorMode):
                 current_bone = item
 
                 if len(current_bone.child_bones) == 0:
-                    pass
+                    pass  # TODO implement
 
-                # no child bones, this is the end effector
+                # No child bones, this is the end effector
                 # build the chain up to the root bone
                 while current_bone:
                     bones.insert(0, current_bone)

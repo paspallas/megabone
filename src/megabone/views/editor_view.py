@@ -26,6 +26,8 @@ class MainEditorView(QGraphicsView):
 
         self.grid = EditorGrid(self, size=grid_size)
         self.layer_manager = LayerManager(self)
+
+        # Bound document id
         self.doc_id = doc_id
 
         # Configure the view

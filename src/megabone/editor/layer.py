@@ -44,8 +44,8 @@ class LayerManager:
     def add_item(self, item: QGraphicsItem) -> None:
         self.items.append(item)
 
-        # New items are placed on top by default
-        item.update_z_value(len(self.items))
+        if item.z_index == 0:
+            item.update_z_value(len(self.items))
         self.sort_layer(item.layer)
 
     def remove_item(self, item: QGraphicsItem) -> None:
