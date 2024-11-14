@@ -25,11 +25,11 @@ class BaseCollectionModel(QObject):
         self._data_class = data_class
         self.key_name = key_name
 
-    def add_item(self, item_id: str, data: Serializable, source: UpdateSource):
+    def add_item(self, data: Serializable, source: UpdateSource):
         if not self._updating:
             self._updating = True
-            self._items[item_id] = data
-            self.itemAdded.emit(item_id)
+            self._items[data.id] = data
+            self.itemAdded.emit(data.id)
             self._updating = False
 
     def remove_item(self, item_id: str, source: UpdateSource):
@@ -39,11 +39,11 @@ class BaseCollectionModel(QObject):
             self.itemRemoved.emit(item_id)
             self._updating = False
 
-    def modify_item(self, item_id: str, data: Serializable, source: UpdateSource):
-        if not self._updating and item_id in self._items:
+    def modify_item(self, data: Serializable, source: UpdateSource):
+        if not self._updating and data.id in self._items:
             self._updating = True
-            self._items[item_id] = data
-            self.itemModified.emit(item_id, source)
+            self._items[data.id] = data
+            self.itemModified.emit(data.id, source)
             self._updating = False
 
     def get_item(self, item_id: str) -> Optional[Serializable]:

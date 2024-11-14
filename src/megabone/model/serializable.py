@@ -1,12 +1,19 @@
 from dataclasses import dataclass, fields
 from typing import Type, TypeVar
+from uuid import uuid4
+
+from PyQt5.QtCore import QPointF
 
 T = TypeVar("T", bound="Serializable")
 
 
 @dataclass
 class Serializable:
-    id: str
+    id: str = ""
+
+    def __post_init__(self):
+        if not self.id:
+            self.id = uuid4().hex
 
     def to_dict(self) -> dict:
         """Serialize instance to dictionary"""
@@ -16,6 +23,8 @@ class Serializable:
             # Handle type conversion
             if isinstance(value, tuple):
                 value = list(value)
+            elif isinstance(value, QPointF):
+                value = tuple([value.x(), value.y()])
             result[field.name] = value
         return result
 
@@ -28,7 +37,7 @@ class Serializable:
         for key, value in data.items():
             if key in field_types:
                 if field_types[key] == tuple and isinstance(value, (list, tuple)):
-                    value = tuple(value)
+                    value = QPointF(value[0], value[1])
             converted_data[key] = value
 
         return cls(**converted_data)

@@ -1,6 +1,7 @@
-import uuid
 from dataclasses import dataclass
 from typing import Optional
+
+from PyQt5.QtCore import QPointF
 
 from .collection import BaseCollectionModel
 from .serializable import Serializable
@@ -8,17 +9,17 @@ from .serializable import Serializable
 
 @dataclass
 class BoneData(Serializable):
-    start_point: tuple[float, float]
-    end_point: tuple[float, float]
+    start_point: Optional[QPointF] = None
+    end_point: Optional[QPointF] = None
     z_index: Optional[int] = 0
     parent_id: Optional[str] = ""
     sprite_id: Optional[str] = ""
 
-    @staticmethod
-    def create() -> "BoneData":
-        return BoneData(
-            id=uuid.uuid4().hex, start_point=(0.0, 0.0), end_point=(0.0, 0.0)
-        )
+    def __post_init__(self):
+        super().__post_init__()
+        if not self.start_point or not self.end_point:
+            self.start_point = QPointF(0, 0)
+            self.end_point = QPointF(0, 0)
 
 
 class BoneModel(BaseCollectionModel):

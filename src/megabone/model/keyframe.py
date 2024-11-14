@@ -16,10 +16,10 @@ class EaseType(Enum):
 
 @dataclass
 class KeyframeData(Serializable):
-    bone_id: str
-    frame: int
-    value: Any
-    easing: EaseType
+    bone_id: str = ""
+    frame: int = 0
+    value: Any = None
+    easing: EaseType = EaseType.LINEAR
 
     def interpolate(self, other_keyframe, t):
         """Interpolate between this keyframe and another"""

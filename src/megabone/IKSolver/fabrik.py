@@ -14,12 +14,12 @@ class FABRIK:
 
         # Calculate and store the original bone lengths
         for bone in bones:
-            length = bone.calculateLength()
+            length = bone.calculate_length()
             self.lengths.append(length)
             self.total_length += length
 
         # Store original bone positions for constraints
-        self.original_angles = [bone.calculateAngle() for bone in bones]
+        self.original_angles = [bone.calculate_angle() for bone in bones]
 
     # TODO manage pole vector
     def solve(self, target_pos, iterations=10):
@@ -136,5 +136,5 @@ class FABRIK:
             bone.start_point = points[i]
             bone.end_point = points[i + 1]
             bone.update()
-            bone.updateChildrenTransform()
+            bone.update_children_transform()
             bone.update_model()

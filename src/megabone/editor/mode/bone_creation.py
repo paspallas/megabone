@@ -24,11 +24,11 @@ class CreateBoneMode(AbstractEditorMode):
     def mousePressEvent(self, event, scene_pos):
         if event.button() == Qt.LeftButton:
             if self.new_bone is None:
-                bone_data = BoneData.create()
+                bone_data = BoneData()
 
                 # Create the bone item
                 self.new_bone = BoneItem(
-                    self.bones,
+                    self.bones_model,
                     scene_pos,
                     scene_pos + QPointF(1, 1),
                     bone_data.id,
@@ -38,12 +38,12 @@ class CreateBoneMode(AbstractEditorMode):
                     # If shift is held and we clicked on a bone, use it as parent
                     parent_bone = self.scene.itemAt(scene_pos, self.view.transform())
                     if isinstance(parent_bone, BoneItem):
-                        self.new_bone.setParentBone(parent_bone)
+                        self.new_bone.set_parent_bone(parent_bone)
 
-                self.view.add_item(self.new_bone)
+                self.view.add_items(self.new_bone)
 
                 # Add to the model
-                self.bones.add_item(bone_data.id, bone_data, UpdateSource.VIEW)
+                self.bones_model.add_item(bone_data, UpdateSource.VIEW)
 
                 # TODO remove this!
                 self.view.bones.append(self.new_bone)
@@ -56,6 +56,7 @@ class CreateBoneMode(AbstractEditorMode):
         if self.new_bone:
             self.new_bone.end_point = scene_pos
             self.new_bone.update()
+            self.new_bone.update_model()
 
     def mouseReleaseEvent(self, event, scene_pos):
         pass

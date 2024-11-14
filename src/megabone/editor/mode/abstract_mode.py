@@ -24,15 +24,15 @@ class AbstractEditorMode(ABC):
         return self.controller.current_view
 
     @property
-    def sprites(self) -> SpriteModel:
+    def sprites_model(self) -> SpriteModel:
         return self.controller.documents.get_active_document().sprites
 
     @property
-    def bones(self) -> BoneModel:
+    def bones_model(self) -> BoneModel:
         return self.controller.documents.get_active_document().bones
 
     @property
-    def keys(self) -> KeyframeModel:
+    def keys_model(self) -> KeyframeModel:
         return self.controller.documents.get_active_document().keyframes
 
     def activate(self):
@@ -45,12 +45,12 @@ class AbstractEditorMode(ABC):
 
     @abstractmethod
     def mousePressEvent(self, event, scene_pos):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def mouseMoveEvent(self, event, scene_pos):
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def mouseReleaseEvent(self, event, scene_pos):
-        pass
+        raise NotImplementedError()

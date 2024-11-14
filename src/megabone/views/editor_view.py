@@ -2,7 +2,7 @@ import math
 
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFrame, QGraphicsView, QSizePolicy
+from PyQt5.QtWidgets import QFrame, QGraphicsItem, QGraphicsView, QSizePolicy
 
 from megabone.editor.grid import EditorGrid
 from megabone.editor.item import BoneItem, SpriteItem
@@ -73,9 +73,10 @@ class MainEditorView(QGraphicsView):
         self.controller.handle_mouse_release(self, event)
         super().mouseReleaseEvent(event)
 
-    def add_item(self, item):
-        self.scene().addItem(item)
-        self.layer_manager.add_item(item)
+    def add_items(self, *items: QGraphicsItem):
+        for item in items:
+            self.scene().addItem(item)
+            self.layer_manager.add_item(item)
 
     def remove_item(self, item):
         self.scene().removeItem(item)
@@ -112,7 +113,7 @@ class MainEditorView(QGraphicsView):
         # Set default anchor point of the sprite to the end_point of the bone
         sprite.setTransformOriginPoint(sprite.mapFromItem(bone, bone.end_point))
         sprite.initial_rotation = sprite.rotation() - math.degrees(
-            bone.calculateAngle()
+            bone.calculate_angle()
         )
 
     def addSprite(self, pixmap: QPixmap, pos: QPointF = QPointF(0, 0)):

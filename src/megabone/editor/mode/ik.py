@@ -77,7 +77,7 @@ class IKMode(AbstractEditorMode):
                     new_pos = bone.end_point + sprite.bone_offset
                     sprite.setPos(new_pos)
                     new_rotation = (
-                        math.degrees(bone.calculateAngle()) + sprite.initial_rotation
+                        math.degrees(bone.calculate_angle()) + sprite.initial_rotation
                     )
                     sprite.setRotation(new_rotation)
 

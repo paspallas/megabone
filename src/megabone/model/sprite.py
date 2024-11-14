@@ -7,8 +7,8 @@ from .serializable import Serializable
 
 @dataclass
 class SpriteData(Serializable):
-    image_path: str
-    offset: tuple[float, float]
+    offset: tuple[float, float] = (0, 0)
+    image_path: str = ""
     bone_id: Optional[str] = ""
     z_index: Optional[int] = 0
 

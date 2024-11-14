@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from dataclasses import fields
 
 from PyQt5.QtWidgets import QGraphicsItem
 
@@ -23,13 +24,13 @@ class ModelBoundItem(QGraphicsItem):
             self._updating = False
 
     def update_model(self):
-        """Update model with current view state"""
+        """Update model with current item state"""
         if not self._updating:
             data = self.create_data_for_model()
-            self._model.modify_item(self.item_id, data, UpdateSource.VIEW)
+            self._model.modify_item(data, UpdateSource.VIEW)
 
     def update_from_model(self):
-        """Update view with current model state"""
+        """Update item with current model state"""
         data = self._model.get_item(self.item_id)
         if data:
             self.apply_data_from_model(data)
@@ -40,8 +41,10 @@ class ModelBoundItem(QGraphicsItem):
 
     @abstractmethod
     def create_data_for_model(self) -> Serializable:
-        pass
+        raise NotImplementedError()
 
-    @abstractmethod
     def apply_data_from_model(self, data: Serializable):
-        pass
+        """Populate the item with data from the model"""
+        for field in fields(data):
+            if hasattr(self, field.name):
+                setattr(self, field.name, getattr(data, field.name))

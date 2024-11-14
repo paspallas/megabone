@@ -21,23 +21,21 @@ from .model_item import ModelBoundItem
 class BoneItem(LayeredItemMixin, ModelBoundItem):
     _bone_width_start = 6
     _bone_width_end = 2
-    _primary_color = QColor(230, 230, 230)
+    _selected_color = QColor(230, 10, 230)
     _hover_color = QColor(200, 200, 255)
-    _selected_color = QColor(100, 150, 255)
+    _primary_color = QColor(100, 150, 255)
 
     def __init__(
         self,
         model: BoneModel,
-        start_point: QPointF,
-        end_point: QPointF,
-        item_id: str,
+        start_point: QPointF = None,
+        end_point: QPointF = None,
+        item_id: str = "",
         z_index: int = 0,
-        parent: QGraphicsItem = None,
     ):
         super().__init__(
             layer=Layer.BONE,
             z_index=z_index,
-            parent=parent,
             item_id=item_id,
             model=model,
         )
@@ -45,13 +43,15 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         self.is_selected = False
         self.start_point = start_point
         self.end_point = end_point
+
         self.parent_bone = None
         self.child_bones = []
         self.connected_sprites = []
 
         # Store the initial local transform
-        self.local_length = self.calculateLength()
-        self.local_angle = self.calculateAngle()
+        if self.start_point and self.end_point:
+            self.local_length = self.calculate_length()
+            self.local_angle = self.calculate_angle()
 
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -151,24 +151,24 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             self.update()
         super().mousePressEvent(event)
 
-    def calculateLength(self):
+    def calculate_length(self):
         return math.sqrt(
             (self.end_point.x() - self.start_point.x()) ** 2
             + (self.end_point.y() - self.start_point.y()) ** 2
         )
 
-    def calculateAngle(self):
+    def calculate_angle(self):
         dx = self.end_point.x() - self.start_point.x()
         dy = self.end_point.y() - self.start_point.y()
 
         return math.atan2(dy, dx)
 
-    def detachParentBone(self):
+    def dettach_parent_bone(self):
         if self.parent_bone:
             self.parent_bone.child_bones.remove(self)
 
-    def setParentBone(self, parent_bone: "BoneItem"):
-        self.detachParentBone()
+    def set_parent_bone(self, parent_bone: "BoneItem"):
+        self.dettach_parent_bone()
         self.parent_bone = parent_bone
 
         if parent_bone:
@@ -178,16 +178,16 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             self.start_point = parent_bone.end_point
             self.update()
 
-    def updateChildrenTransform(self):
+    def update_children_transform(self):
         for child in self.child_bones:
             # Update child's start point to match parent's end point
             child.start_point = self.end_point
             child.update()
 
             # Recursively update all descendants
-            child.updateChildrenTransform()
+            child.update_children_transform()
 
-    def updateSpriteTransform(self, sprite):
+    def update_sprite_transform(self, sprite):
         """Update the transform of an attached sprite based on bone position"""
 
         # Create transform
@@ -197,7 +197,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         transform.translate(self.start_pos.x(), self.start_pos.y())
 
         # Apply bone rotation
-        bone_angle = self.calculateAngle()
+        bone_angle = self.calculate_angle()
         transform.rotate(math.degrees(bone_angle))
 
         # Apply local position offset
@@ -209,10 +209,10 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         # Set the sprite's transform
         sprite.setTransform(transform)
 
-    def updateAllSpritessprites(self):
+    def update_all_sprites(self):
         """Update all attached sprites when bone moves"""
         for sprite in self.attached_sprites:
-            self.updateSpriteTransform(sprite)
+            self.update_sprite_transform(sprite)
 
     @property
     def parent_id(self) -> str:
@@ -221,11 +221,13 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
     def create_data_for_model(self) -> BoneData:
         return BoneData(
             id=self.item_id,
-            start_point=tuple([self.start_point.x(), self.start_point.y()]),
-            end_point=tuple([self.end_point.x(), self.end_point.y()]),
+            start_point=self.start_point,
+            end_point=self.end_point,
             z_index=self.z_index,
             parent_id=self.parent_id,
         )
 
     def apply_data_from_model(self, data: BoneData):
-        pass
+        super().apply_data_from_model(data)
+        self.calculate_length()
+        self.calculate_angle()
