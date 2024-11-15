@@ -5,7 +5,7 @@ from typing import OrderedDict
 from PyQt5.QtWidgets import QMenuBar
 
 from megabone.builder import MenuBuilder
-from megabone.manager import DocumentManager
+from megabone.manager import DocumentManager, RecentFilesManager
 
 from .main_controller import MainController
 
@@ -23,18 +23,22 @@ class MainMenuController:
         self.documents = documents
         self._menus: OrderedDict[MenuType, MenuBuilder] = OrderedDict()
 
+        self.recent_files = RecentFilesManager()
+        self.recent_files.recentFileOPen.connect(self.documents.load_document)
         self.create_menus()
 
-        # Connect to signals
+        # Connect signals
         self.documents.addedDocument.connect(self._on_document_created)
+        self.documents.openedDocument.connect(
+            lambda doc, path: self.recent_files.add_recent_file(path)
+        )
 
     def create_menus(self):
         self._menus[MenuType.FILE] = (
             MenuBuilder("File")
             .action("New", self.documents.create_document, "Ctrl+N")
             .action("Open...", self.documents.open_document, "Ctrl+O")
-            .submenu("Open Recent")
-            .disable()
+            .submenu("Recent Files")
             .back()
             .separator()
             .action("Save", self.documents.save_document, "Ctrl+S")
@@ -85,6 +89,11 @@ class MainMenuController:
         else:
             for menu in menus:
                 menubar.addMenu(self._menus.get(menu).build())
+
+        self.recent_files.set_menu(
+            self._menus[MenuType.FILE].get_submenu("Recent Files")
+        )
+        self.recent_files.update_menu()
 
     def get_builder(self, name: str) -> MenuBuilder:
         return self._menus.get(name, None)

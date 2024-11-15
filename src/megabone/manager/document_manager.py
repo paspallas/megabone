@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict, Optional, Set
 
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -14,7 +15,7 @@ class DocumentManager(QObject):
     closedDocument = pyqtSignal(str)  # id
     activeDocumentChanged = pyqtSignal(str)  # id
     savedDocumentAs = pyqtSignal(str, str)  # id, path
-    openedDocument = pyqtSignal(str, str)  # id, path
+    openedDocument = pyqtSignal(str, Path)  # id, path
     """An opened from file document was added to the collection"""
     createdDocument = pyqtSignal(str)
     """A newly created document was added to the collection"""
@@ -67,17 +68,20 @@ class DocumentManager(QObject):
     def open_document(self) -> None:
         path = FileDialog.open_file()
         if path:
-            try:
-                doc = Document().load(path)
-                self.add_document(doc)
-                self.openedDocument.emit(doc.doc_id, doc.path.stem)
-            except Exception:
-                QMessageBox.critical(
-                    None,
-                    "Open File Error",
-                    f"Unable to open project file: '{path}'",
-                    QMessageBox.Ok,
-                )
+            self.load_document(path)
+
+    def load_document(self, path: Path):
+        try:
+            doc = Document().load(path)
+            self.add_document(doc)
+            self.openedDocument.emit(doc.doc_id, doc.path)
+        except Exception:
+            QMessageBox.critical(
+                None,
+                "Open File Error",
+                f"Unable to open project file: '{path}'",
+                QMessageBox.Ok,
+            )
 
     def save_document(self, document: Document = None) -> None:
         doc = document or self.get_active_document()

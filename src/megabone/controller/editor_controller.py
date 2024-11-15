@@ -25,7 +25,9 @@ class EditorController(QObject):
         # Connect signals
         self.editor_views.viewActivated.connect(self.set_active_view)
         self.editor_views.viewClosed.connect(self.on_close_view)
-        self.documents.openedDocument.connect(self.editor_views.set_view_title)
+        self.documents.openedDocument.connect(
+            lambda doc, path: self.editor_views.set_view_title(doc, path.stem)
+        )
         self.documents.closedDocument.connect(self.editor_views.close_view)
         self.documents.savedDocumentAs.connect(self.editor_views.set_view_title)
         self.documents.createdDocument.connect(self.create_editor)
