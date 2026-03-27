@@ -3,8 +3,8 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QUndoStack
+from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtGui import QUndoStack
 
 from .bone import BoneModel
 from .keyframe import KeyframeModel

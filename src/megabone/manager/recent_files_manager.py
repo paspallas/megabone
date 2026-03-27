@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from PyQt5.QtCore import QObject, QSettings, pyqtSignal
-from PyQt5.QtWidgets import QAction, QMenu, QMessageBox
+from PyQt6.QtCore import QObject, QSettings, pyqtSignal
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QMenu, QMessageBox
 
 import megabone.util.constants as c
 
@@ -14,7 +15,7 @@ class RecentFilesManager(QObject):
         self.max_files = max_files
         self.settings = QSettings(c._SETTINGS_COMPANY_NAME, c._SETTINGS_APP_NAME)
         self.recent_files = []
-        self.menu: QMenu = None
+        self.menu: QMenu | None = None
 
         self.load_recent_files()
 

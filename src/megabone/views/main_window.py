@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QStatusBar, QToolBar
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QStatusBar, QToolBar
 
 from megabone.controller import (
     EditorController,
@@ -40,10 +40,12 @@ class MegaBoneMainWindow(ZenWindow):
             self, self.menu.get_builder(MenuType.VIEW).get_submenu("Show")
         )
         self.dock_manager.create_dock(
-            "Explorer", DockConfig(title="Explorer", area=Qt.RightDockWidgetArea)
+            "Explorer",
+            DockConfig(title="Explorer", area=Qt.DockWidgetArea.RightDockWidgetArea),
         )
         self.dock_manager.create_dock(
-            "History", DockConfig(title="History", area=Qt.RightDockWidgetArea)
+            "History",
+            DockConfig(title="History", area=Qt.DockWidgetArea.RightDockWidgetArea),
         )
         self.dock_manager.deactivate_all()
 

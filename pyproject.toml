@@ -1,0 +1,20 @@
+[project]
+name = "megabone"
+version = "0.1.0"
+description = "2d Skeletal animation tool"
+authors = [
+    {name = "paspallas",email = "paspallasdev@gmail.com"}
+]
+license = {text = "GPL"}
+requires-python = ">=3.14"
+dependencies = [
+    "pyqt6 (>=6.10.2,<7.0.0)",
+    "numpy (>=2.4.3,<3.0.0)",
+    "qtpy (>=2.4.3,<3.0.0)",
+    "qtmodern (>=0.2.0,<0.3.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

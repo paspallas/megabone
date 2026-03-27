@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, OrderedDict, Type
+from typing import Any, Dict, List, Optional, Type
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 
 from .serializable import Serializable
 

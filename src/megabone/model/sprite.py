@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from PyQt5.QtCore import QPointF
+from PyQt6.QtCore import QPointF
 
 from .collection import BaseCollectionModel
 from .serializable import Serializable

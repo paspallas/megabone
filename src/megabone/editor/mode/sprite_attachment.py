@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QGraphicsView
 
 from megabone.editor.item import BoneItem, SpriteItem
 
@@ -13,11 +13,11 @@ class SpriteAttachmentMode(AbstractEditorMode):
         super().__init__(controller)
 
     def activate(self):
-        self.view.setDragMode(QGraphicsView.NoDrag)
-        self.view.setCursor(Qt.PointingHandCursor)
+        self.view.setDragMode(QGraphicsView.DragMode.NoDrag)
+        self.view.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def mousePressEvent(self, event, scene_pos):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             item = self.scene.itemAt(scene_pos, self.view.transform())
             if isinstance(item, SpriteItem):
                 self.view.selectSprite(item)

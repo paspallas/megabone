@@ -1,9 +1,8 @@
 from enum import Enum, auto
-from typing import List
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QKeySequence
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsView, QShortcut
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QKeySequence, QShortcut
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsView
 
 
 class Layer(Enum):
@@ -36,7 +35,7 @@ class LayeredItemMixin:
 
 class LayerManager:
     def __init__(self, view: QGraphicsView) -> None:
-        self.items: LayeredItemMixin = []
+        self.items: list[LayeredItemMixin] = []
         self.view = view
 
         self._setup_shortcuts()
@@ -66,26 +65,26 @@ class LayerManager:
     def set_layer_selectability(self, layer: Layer, selectable: bool) -> None:
         for item in self.items:
             if item.layer == layer:
-                item.setFlag(QGraphicsItem.ItemIsSelectable, selectable)
+                item.setFlag(
+                    QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, selectable
+                )
 
     def _setup_shortcuts(self) -> None:
-        self.item_up = QShortcut(QKeySequence(Qt.Key_Up), self.view)
+        self.item_up = QShortcut(QKeySequence(Qt.Key.Key_Up), self.view)
         self.item_up.activated.connect(self._increase_z_index)
 
-        self.item_down = QShortcut(QKeySequence(Qt.Key_Down), self.view)
+        self.item_down = QShortcut(QKeySequence(Qt.Key.Key_Down), self.view)
         self.item_down.activated.connect(self._decrease_z_index)
 
     def _get_item(self) -> LayeredItemMixin:
         selected_items = self.view.scene().selectedItems()
         if selected_items:
-            # Assume only one item is selected
             return selected_items[0]
         return None
 
-    def _get_layer_items(self, layer: Layer) -> List[LayeredItemMixin]:
+    def _get_layer_items(self, layer: Layer) -> list[LayeredItemMixin]:
         items = [item for item in self.items if item.layer == layer]
         items.sort(key=lambda x: x.z_index)
-
         return items
 
     def _increase_z_index(self) -> None:

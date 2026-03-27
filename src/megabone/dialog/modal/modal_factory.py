@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-from PyQt5.QtWidgets import QWidget
+from PyQt6.QtWidgets import QWidget
 
 from .base_modal import BaseModalDialog
 from .name_input_modal import NameInputModalDialog

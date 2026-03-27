@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QRectF, Qt
-from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt6.QtCore import QRectF, Qt
+from PyQt6.QtGui import QColor, QPen
+from PyQt6.QtWidgets import QGraphicsItem
 
 from megabone.editor.item import BoneItem
 from megabone.editor.layer import Layer, LayeredItemMixin
@@ -13,22 +13,18 @@ from .target_control import TargetControl
 class IKHandle(LayeredItemMixin, QGraphicsItem):
     def __init__(self, start_bone: BoneItem, end_bone: BoneItem, parent=None):
         super().__init__(layer=Layer.GIZMO, parent=parent)
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.setAcceptHoverEvents(True)
 
-        # Store references to bones
         self.start_bone = start_bone
         self.end_bone = end_bone
 
-        # Create IK chain
         self.buildChain()
 
-        # Visual elements
         self.target = TargetControl(self)
         self.pole = PoleControl(self)
 
-        # State
         self.hovering = False
         self.selected = False
 
@@ -44,7 +40,6 @@ class IKHandle(LayeredItemMixin, QGraphicsItem):
         self.chain = FABRIK(bones)
 
     def boundingRect(self):
-        # Return rectangle that encompasses the entire chain
         rect = QRectF()
         for bone in self.chain.bones:
             rect = rect.united(
@@ -55,12 +50,10 @@ class IKHandle(LayeredItemMixin, QGraphicsItem):
                     bone.end_point.y() - bone.start_point.y(),
                 )
             )
-        # Add padding for controls
         rect = rect.adjusted(-20, -20, 20, 20)
         return rect
 
     def paint(self, painter, option, widget):
-        # Draw chain influence visualization
-        painter.setPen(QPen(QColor(255, 165, 0, 127), 1, Qt.DashLine))
+        painter.setPen(QPen(QColor(255, 165, 0, 127), 1, Qt.PenStyle.DashLine))
         for bone in self.chain.bones:
             painter.drawLine(bone.start_point, bone.end_point)

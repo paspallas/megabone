@@ -1,6 +1,6 @@
-from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtGui import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt6.QtCore import QPointF, Qt
+from PyQt6.QtGui import QColor, QPen
+from PyQt6.QtWidgets import QGraphicsEllipseItem, QGraphicsItem
 
 
 class PivotHandle(QGraphicsEllipseItem):
@@ -9,10 +9,10 @@ class PivotHandle(QGraphicsEllipseItem):
         self.sprite_item = parent
         self.setParentItem(parent)
         self.setZValue(1000)
-        self.setPen(QPen(Qt.white, 1))
+        self.setPen(QPen(Qt.GlobalColor.white, 1))
         self.setBrush(QColor(255, 255, 255, 64))
-        self.setFlag(QGraphicsItem.ItemIsMovable)
-        self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemSendsGeometryChanges)
         self.setRect(-size / 2, -size / 2, size, size)
 
         self.position = QPointF(0, 0)
@@ -20,24 +20,20 @@ class PivotHandle(QGraphicsEllipseItem):
     def paint(self, painter, option, widget):
         super().paint(painter, option, widget)
 
-        # Draw guide lines
-        painter.setPen(QPen(Qt.white, 1, Qt.DashLine))
+        painter.setPen(QPen(Qt.GlobalColor.white, 1, Qt.PenStyle.DashLine))
         rect = self.sprite_item.boundingRect()
 
-        # Horizontal
         painter.drawLine(
             QPointF(-self.pos().x(), 0),
             QPointF(rect.width() - self.pos().x(), 0),
         )
 
-        # Vertical
         painter.drawLine(
             QPointF(0, -self.pos().y()), QPointF(0, rect.height() - self.pos().y())
         )
 
     def itemChange(self, change, value):
-        if change == QGraphicsItem.ItemPositionChange:
-            # Constraint the pivot handle within the parent sprite
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange:
             parent = self.parentItem()
             if parent:
                 return QPointF(

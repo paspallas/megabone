@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QLabel, QStatusBar
-from PyQt5.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtWidgets import QLabel, QStatusBar
 
 
 class StatusBarManager:
@@ -38,7 +38,7 @@ class StatusBarManager:
     def set_html_status(self, html_message: str, region: str) -> None:
         if self.status_bar and region in self.regions:
             self.regions[region].setText(html_message)
-            self.regions[region].setTextFormat(Qt.RichText)
+            self.regions[region].setTextFormat(Qt.TextFormat.RichText)
 
     def clear_status(self, region: str = None) -> None:
         if self.status_bar:

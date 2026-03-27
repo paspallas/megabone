@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QPointF, Qt
+from PyQt6.QtCore import QPointF, Qt
 
 from megabone.editor.item import BoneItem
 from megabone.model.bone import BoneData
@@ -16,17 +16,16 @@ class CreateBoneMode(AbstractEditorMode):
         self.new_bone = None
 
     def activate(self):
-        self.view.setCursor(Qt.CrossCursor)
+        self.view.setCursor(Qt.CursorShape.CrossCursor)
 
     def deactivate(self):
-        self.view.setCursor(Qt.ArrowCursor)
+        self.view.setCursor(Qt.CursorShape.ArrowCursor)
 
     def mousePressEvent(self, event, scene_pos):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             if self.new_bone is None:
                 bone_data = BoneData()
 
-                # Create the bone item
                 self.new_bone = BoneItem(
                     self.bones_model,
                     scene_pos,
@@ -34,21 +33,18 @@ class CreateBoneMode(AbstractEditorMode):
                     bone_data.id,
                 )
 
-                if event.modifiers() & Qt.ShiftModifier:
-                    # If shift is held and we clicked on a bone, use it as parent
+                if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                     parent_bone = self.scene.itemAt(scene_pos, self.view.transform())
                     if isinstance(parent_bone, BoneItem):
                         self.new_bone.set_parent_bone(parent_bone)
 
                 self.view.add_items(self.new_bone)
 
-                # Add to the model
                 self.bones_model.add_item(bone_data, UpdateSource.VIEW)
 
                 # TODO remove this!
                 self.view.bones.append(self.new_bone)
             else:
-                # Finish drawing bone
                 self.new_bone.setSelected(False)
                 self.new_bone = None
 

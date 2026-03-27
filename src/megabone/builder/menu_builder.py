@@ -2,8 +2,8 @@ from collections import deque
 from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Union
 
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QMenu
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import QMenu
 
 
 @dataclass
@@ -25,7 +25,7 @@ class MenuBuilder:
 
         style = self.current_menu().styleSheet()
         self.current_menu().setStyleSheet(
-            f""" 
+            f"""
                 {style}
                 QMenu::separator {{
                     height: 15px;

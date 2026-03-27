@@ -1,13 +1,13 @@
 import math
 
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QFrame, QGraphicsItem, QGraphicsView, QSizePolicy
+from PyQt6.QtCore import QPointF, Qt
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtWidgets import QFrame, QGraphicsItem, QGraphicsView, QSizePolicy
 
 from megabone.editor.grid import EditorGrid
 from megabone.editor.item import BoneItem, SpriteItem
 from megabone.editor.layer import LayerManager
-from megabone.event_filter import *
+from megabone.event_filter import PanControl, ZoomControl
 
 from .editor_scene import ModalEditorScene
 
@@ -27,31 +27,27 @@ class MainEditorView(QGraphicsView):
         self.grid = EditorGrid(self, size=grid_size)
         self.layer_manager = LayerManager(self)
 
-        # Bound document id
         self.doc_id = doc_id
 
-        # Configure the view
         self.centerOn(0, 0)
         self.setContentsMargins(0, 0, 0, 0)
         self.setMouseTracking(True)
-        self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
-        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setTransformationAnchor(QGraphicsView.NoAnchor)
-        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        self.setCacheMode(QGraphicsView.CacheBackground)
-        self.setFrameStyle(QFrame.NoFrame)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setDragMode(QGraphicsView.RubberBandDrag)
+        self.setResizeAnchor(QGraphicsView.ViewportAnchor.AnchorViewCenter)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setTransformationAnchor(QGraphicsView.ViewportAnchor.NoAnchor)
+        self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
+        self.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
+        self.setFrameStyle(QFrame.Shape.NoFrame)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
         ZoomControl(self)
         PanControl(self)
 
-        # Editor properties
         self.selected_sprite = None
         self.selected_bone = None
         self.bones = []
 
-        # Connect signals
         self.modal_scene.dialogClose.connect(self.onModalDialogClose)
 
     def showModalDialog(self):
@@ -99,33 +95,22 @@ class MainEditorView(QGraphicsView):
             self.selected_sprite.setSelected(False)
             self.selected_sprite = None
 
-    # TODO move all operations to a controller class
-
     def attachSpriteToBone(self, sprite: SpriteItem, bone: BoneItem):
         if sprite.attached_bone:
             sprite.attached_bone.connected_sprites.remove(sprite)
 
-        # Add relationship between bone and sprite
         bone.connected_sprites.append(sprite)
         sprite.attached_bone = bone
         sprite.bone_offset = sprite.pos() - bone.end_point
 
-        # Set default anchor point of the sprite to the end_point of the bone
         sprite.setTransformOriginPoint(sprite.mapFromItem(bone, bone.end_point))
         sprite.initial_rotation = sprite.rotation() - math.degrees(
             bone.calculate_angle()
         )
 
     def addSprite(self, pixmap: QPixmap, pos: QPointF = QPointF(0, 0)):
-        # pixmap.setMask(pixmap.createMaskFromColor(Qt.magenta))
         sprite = SpriteItem(pixmap)
         sprite.setPos(pos)
         self.modal_scene.addItem(sprite)
         self.layer_manager.add_item(sprite)
         return sprite
-
-    def selectSprite(self, sprite):
-        if self.selected_sprite:
-            self.selected_sprite.setSelected(False)
-        self.selected_sprite = sprite
-        sprite.setSelected(True)

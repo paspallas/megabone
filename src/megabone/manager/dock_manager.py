@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Callable, Dict, Optional, Type
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QAction,
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import (
     QDockWidget,
     QLabel,
     QMainWindow,
@@ -21,8 +21,8 @@ class DockConfig:
     """Configuration for a dock widget"""
 
     title: str
-    area: Qt.DockWidgetArea = Qt.LeftDockWidgetArea
-    allowed_areas: Qt.DockWidgetAreas = Qt.AllDockWidgetAreas
+    area: Qt.DockWidgetArea = Qt.DockWidgetArea.LeftDockWidgetArea
+    allowed_areas: Qt.DockWidgetArea = Qt.DockWidgetArea.AllDockWidgetAreas
     widget: Optional[QWidget] = None
     widget_class: Optional[Type[QWidget]] = None
     floating: bool = False
@@ -40,9 +40,12 @@ class DockManager:
         self.hidden_docks: Dict[str, CustomDockWidget] = {}
 
         # Enable tabbed docking
-        self.main_window.setTabPosition(Qt.AllDockWidgetAreas, QTabWidget.North)
+        self.main_window.setTabPosition(
+            Qt.DockWidgetArea.AllDockWidgetAreas, QTabWidget.TabPosition.North
+        )
         self.main_window.setDockOptions(
-            QMainWindow.AllowTabbedDocks | QMainWindow.AllowNestedDocks
+            QMainWindow.DockOption.AllowTabbedDocks
+            | QMainWindow.DockOption.AllowNestedDocks
         )
 
     def create_dock(self, dock_id: str, config: DockConfig) -> CustomDockWidget:
@@ -58,9 +61,12 @@ class DockManager:
         dock.visibility_handler = config.on_visibility_changed
 
         # Configure dock features
-        features = QDockWidget.DockWidgetFloatable | QDockWidget.DockWidgetMovable
+        features = (
+            QDockWidget.DockWidgetFeature.DockWidgetFloatable
+            | QDockWidget.DockWidgetFeature.DockWidgetMovable
+        )
         if config.closable:
-            features |= QDockWidget.DockWidgetClosable
+            features |= QDockWidget.DockWidgetFeature.DockWidgetClosable
         dock.setFeatures(features)
 
         # Set allowed areas

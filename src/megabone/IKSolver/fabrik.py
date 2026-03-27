@@ -1,7 +1,7 @@
 import math
 from typing import List
 
-from PyQt5.QtCore import QPointF
+from PyQt6.QtCore import QPointF
 
 from megabone.editor.item import BoneItem
 

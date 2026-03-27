@@ -1,7 +1,7 @@
 from enum import Enum, auto
 
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QDockWidget
+from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtWidgets import QDockWidget
 
 
 class DockCloseAction(Enum):

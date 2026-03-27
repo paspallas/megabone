@@ -1,4 +1,4 @@
-from PyQt5.QtCore import (
+from PyQt6.QtCore import (
     QEasingCurve,
     QEvent,
     QObject,
@@ -7,7 +7,7 @@ from PyQt5.QtCore import (
     pyqtSignal,
     pyqtSlot,
 )
-from PyQt5.QtWidgets import QGraphicsView, QStyleOptionGraphicsItem
+from PyQt6.QtWidgets import QGraphicsView, QStyleOptionGraphicsItem
 
 
 class ZoomControl(QObject):
@@ -25,7 +25,7 @@ class ZoomControl(QObject):
         super().__init__(view)
 
         self._animation = QTimeLine(160, self)
-        self._animation.setEasingCurve(QEasingCurve.InOutCubic)
+        self._animation.setEasingCurve(QEasingCurve.Type.InOutCubic)
         self._animation.setUpdateInterval(16)
         self._animation.valueChanged.connect(self._scalingTime)
         self._animation.finished.connect(self._animationFinished)
@@ -45,11 +45,13 @@ class ZoomControl(QObject):
         if view is None:
             return super().eventFilter(obj, e)
 
-        if e.type() == QEvent.Wheel:
-            if e.modifiers() & (Qt.Modifier.CTRL | Qt.Modifier.ALT):
+        if e.type() == QEvent.Type.Wheel:
+            if e.modifiers() & (
+                Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier
+            ):
                 return False
 
-            self._eventPos = e.pos()
+            self._eventPos = e.position().toPoint()
             self._numDegrees = e.angleDelta().y() / 8
             self._numSteps = self._numDegrees / 15
             self._numScalings += self._numSteps
@@ -100,19 +102,21 @@ class ZoomControl(QObject):
     @pyqtSlot(float)
     def setValue(self, value: float) -> None:
         transform = self._view.transform()
-        m12 = transform.m12()  # Vertical shearing
-        m13 = transform.m13()  # Horizontal Projection
-        m21 = transform.m21()  # Horizontal shearing
-        m23 = transform.m23()  # Vertical Projection
-        m31 = transform.m31()  # Horizontal Position (DX)
-        m32 = transform.m32()  # Vertical Position (DY)
-        m33 = transform.m33()  # Additional Projection Factor
+        m12 = transform.m12()
+        m13 = transform.m13()
+        m21 = transform.m21()
+        m23 = transform.m23()
+        m31 = transform.m31()
+        m32 = transform.m32()
+        m33 = transform.m33()
 
         if self._eventPos is None:
-            self._view.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
+            self._view.setTransformationAnchor(
+                QGraphicsView.ViewportAnchor.AnchorViewCenter
+            )
             transform.setMatrix(value, m12, m13, m21, value, m23, m31, m32, m33)
             self._view.setTransform(transform)
-            self._view.setTransformationAnchor(QGraphicsView.NoAnchor)
+            self._view.setTransformationAnchor(QGraphicsView.ViewportAnchor.NoAnchor)
         else:
             oldPos = self._view.mapToScene(self._eventPos)
             transform.setMatrix(value, m12, m13, m21, value, m23, m31, m32, m33)

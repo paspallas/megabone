@@ -1,13 +1,11 @@
-from typing import Dict
-
-from PyQt5.QtCore import QFile, QIODevice
-from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtCore import QFile, QIODevice
+from PyQt6.QtGui import QIcon, QPixmap
+from PyQt6.QtWidgets import QApplication
 
 
 class ResourceManager:
-    _icon_cache: Dict[str, QIcon] = {}
-    _pixmap_cache: Dict[str, QPixmap] = {}
+    _icon_cache: dict[str, QIcon] = {}
+    _pixmap_cache: dict[str, QPixmap] = {}
 
     @staticmethod
     def get_icon(name: str) -> QIcon:
@@ -28,13 +26,13 @@ class ResourceManager:
     @staticmethod
     def get_pixmap(name: str) -> QPixmap:
         if name not in ResourceManager._pixmap_cache:
-            ResourceManager._pixmap_cache[name] = QPixmap(f"f:images/{name}")
+            ResourceManager._pixmap_cache[name] = QPixmap(f":images/{name}")
         return ResourceManager._pixmap_cache[name]
 
     @staticmethod
     def get_stylesheet(name: str) -> str:
         file = QFile(f"styles/{name}")
-        if file.open(QIODevice.ReadOnly | QIODevice.Text):
+        if file.open(QIODevice.OpenModeFlag.ReadOnly | QIODevice.OpenModeFlag.Text):
             return str(file.readAll(), encoding="utf-8")
         return ""
 

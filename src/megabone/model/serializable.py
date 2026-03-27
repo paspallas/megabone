@@ -1,10 +1,8 @@
 from dataclasses import dataclass, field, fields
-from typing import Type, TypeVar
+from typing import Self, get_type_hints
 from uuid import uuid4
 
-from PyQt5.QtCore import QPointF
-
-T = TypeVar("T", bound="Serializable")
+from PyQt6.QtCore import QPointF
 
 
 @dataclass
@@ -12,30 +10,24 @@ class Serializable:
     id: str = field(default_factory=lambda: uuid4().hex)
 
     def to_dict(self) -> dict:
-        """Serialize instance to dictionary"""
         result = {}
-
-        for field in fields(self):
-            value = getattr(self, field.name)
-            # Handle type conversion
+        for f in fields(self):
+            value = getattr(self, f.name)
             if isinstance(value, tuple):
                 value = list(value)
             elif isinstance(value, QPointF):
-                value = tuple([value.x(), value.y()])
-            result[field.name] = value
-
+                value = (value.x(), value.y())
+            result[f.name] = value
         return result
 
     @classmethod
-    def from_dict(cls: Type[T], data: dict) -> T:
-        """Deserialize instance from dictionary"""
-        field_types = {field.name: field.type for field in fields(cls)}
+    def from_dict(cls, data: dict) -> Self:
+        hints = get_type_hints(cls)
         converted_data = {}
 
         for key, value in data.items():
-            if key in field_types:
-                if field_types[key] == QPointF:
-                    value = QPointF(value[0], value[1])
+            if hints.get(key) is QPointF:
+                value = QPointF(value[0], value[1])
             converted_data[key] = value
 
         return cls(**converted_data)

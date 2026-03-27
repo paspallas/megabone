@@ -1,5 +1,5 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QToolBar
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QToolBar
 
 
 class ZenWindow(QMainWindow):
@@ -61,7 +61,7 @@ class ZenWindow(QMainWindow):
             self.showMaximized()
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
+        if event.key() == Qt.Key.Key_Escape:
             if self.is_zen_mode:
                 self.toggle_zen_mode()
             elif self.isFullScreen():

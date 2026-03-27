@@ -1,6 +1,6 @@
-from PyQt5.QtCore import QLineF, QPointF, QRectF, QSize, Qt
-from PyQt5.QtGui import QBrush, QColor, QPainter, QPen
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt6.QtCore import QLineF, QPointF, QRectF, QSize, Qt
+from PyQt6.QtGui import QBrush, QColor, QPainter, QPen
+from PyQt6.QtWidgets import QGraphicsView
 
 
 class EditorGrid:
@@ -17,7 +17,7 @@ class EditorGrid:
         self.view.drawBackground = self.drawBackground
 
     def drawBackground(self, painter: QPainter, rect: QRectF) -> None:
-        painter.setPen(QPen(Qt.NoPen))
+        painter.setPen(QPen(Qt.PenStyle.NoPen))
 
         left = int(rect.left() - rect.left() % self.grid_size)
         top = int(rect.top() - rect.top() % self.grid_size)
@@ -36,17 +36,15 @@ class EditorGrid:
         t = rect.top()
         b = rect.bottom()
 
-        # center visual indicator
         lines = [QLineF(l, 0, r, 0), QLineF(0, t, 0, b)]
 
-        pen = QPen(self.__backGridColor, 0, Qt.SolidLine)
+        pen = QPen(self.__backGridColor, 0, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(*lines)
+        painter.drawLines(lines)
         pen.setColor(self.__foreGridColor)
         painter.setPen(pen)
 
-        # Viewport rectangle
         painter.drawRect(
             QRectF(
                 -self.megadrive_res.width() / 2,
@@ -66,9 +64,9 @@ class EditorGrid:
             QLineF(0, start, 0, end),
         ]
 
-        painter.setRenderHint(QPainter.Antialiasing)
-        pen = QPen(self.__foreGridColor, 2, Qt.SolidLine)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pen = QPen(self.__foreGridColor, 2, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(*lines)
+        painter.drawLines(lines)
         painter.drawEllipse(QPointF(0, 0), 1, 1)

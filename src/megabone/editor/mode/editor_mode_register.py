@@ -1,9 +1,9 @@
 import re
 from collections import OrderedDict
 from enum import Enum
-from typing import Optional, OrderedDict, Type
+from typing import Optional, Type
 
-from PyQt5.QtWidgets import QAction, QActionGroup
+from PyQt6.QtGui import QAction, QActionGroup
 
 from megabone.manager.resource_manager import ResourceManager as res
 

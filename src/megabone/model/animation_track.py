@@ -1,4 +1,4 @@
-from .keyframe import Keyframe
+from megabone.model.keyframe import Keyframe
 
 
 class AnimationTrack:

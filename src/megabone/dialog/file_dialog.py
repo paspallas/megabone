@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from PyQt5.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QFileDialog
 
 import megabone.util.constants as c
 
@@ -9,8 +9,7 @@ import megabone.util.constants as c
 class FileDialog:
     @staticmethod
     def open_file() -> Optional[Path]:
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
+        options = QFileDialog.Option.DontUseNativeDialog
         file, _ = QFileDialog.getOpenFileName(
             None,
             "Open File...",
@@ -24,8 +23,7 @@ class FileDialog:
 
     @staticmethod
     def save_file() -> Optional[Path]:
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
+        options = QFileDialog.Option.DontUseNativeDialog
         file, _ = QFileDialog.getSaveFileName(
             None,
             "Save File As...",
@@ -46,7 +44,7 @@ class FileDialog:
             None,
             "Select Directory",
             "",
-            QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks,
+            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontResolveSymlinks,
         )
 
         if folder:

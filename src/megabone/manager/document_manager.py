@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Dict, Optional, Set
+from typing import Optional
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QMessageBox
+from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtWidgets import QMessageBox
 
 from megabone.dialog import FileDialog
 from megabone.model.document import Document
@@ -11,11 +11,11 @@ from megabone.model.document import Document
 class DocumentManager(QObject):
     """Manages a collection of documents and IO operations"""
 
-    addedDocument = pyqtSignal(str)  # id
-    closedDocument = pyqtSignal(str)  # id
-    activeDocumentChanged = pyqtSignal(str)  # id
-    savedDocumentAs = pyqtSignal(str, str)  # id, path
-    openedDocument = pyqtSignal(str, Path)  # id, path
+    addedDocument = pyqtSignal(str)
+    closedDocument = pyqtSignal(str)
+    activeDocumentChanged = pyqtSignal(str)
+    savedDocumentAs = pyqtSignal(str, str)
+    openedDocument = pyqtSignal(str, Path)
     """An opened from file document was added to the collection"""
     createdDocument = pyqtSignal(str)
     """A newly created document was added to the collection"""
@@ -23,9 +23,9 @@ class DocumentManager(QObject):
     def __init__(self):
         super().__init__()
 
-        self._documents: Dict[str, Document] = {}
+        self._documents: dict[str, Document] = {}
         self._active_document_id: Optional[str] = None
-        self._unsaved_changes: Set[str] = set()
+        self._unsaved_changes: set[str] = set()
 
     def connect_to_document(self, document: Document) -> None:
         document.documentModified.connect(
@@ -80,7 +80,7 @@ class DocumentManager(QObject):
                 None,
                 "Open File Error",
                 f"Unable to open project file: '{path}'",
-                QMessageBox.Ok,
+                QMessageBox.StandardButton.Ok,
             )
 
     def save_document(self, document: Document = None) -> None:
@@ -115,12 +115,14 @@ class DocumentManager(QObject):
                 None,
                 "Unsaved changes",
                 f"Save changes to '{name}'?",
-                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                QMessageBox.StandardButton.Save
+                | QMessageBox.StandardButton.Discard
+                | QMessageBox.StandardButton.Cancel,
             )
 
-            if response == QMessageBox.Cancel:
+            if response == QMessageBox.StandardButton.Cancel:
                 return
-            elif response == QMessageBox.Save:
+            elif response == QMessageBox.StandardButton.Save:
                 self.save_document(doc)
 
         self._documents.pop(doc_id)
@@ -147,5 +149,5 @@ class DocumentManager(QObject):
             None,
             "Save File Error",
             f"Unable to Save project file: '{document.path}'",
-            QMessageBox.Ok,
+            QMessageBox.StandardButton.Ok,
         )

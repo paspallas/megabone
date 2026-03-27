@@ -1,7 +1,7 @@
 import math
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import (
+from PyQt6.QtCore import QPointF, QRectF, Qt
+from PyQt6.QtGui import (
     QBrush,
     QColor,
     QLinearGradient,
@@ -10,7 +10,7 @@ from PyQt5.QtGui import (
     QPen,
     QTransform,
 )
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt6.QtWidgets import QGraphicsItem
 
 from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.model.bone import BoneData, BoneModel
@@ -55,7 +55,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             self.local_angle = self.calculate_angle()
 
         self.setAcceptHoverEvents(True)
-        self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
     def boundingRect(self) -> QRectF:
         return self.shape().boundingRect()
@@ -103,14 +103,12 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def itemChange(self, change, value):
         """Handle bone movement and update sprites"""
-        if change == QGraphicsItem.ItemPositionChange:
+        if change == QGraphicsItem.GraphicsItemChange.ItemPositionChange:
             # Update sprites when bone moves
             self.update_all_sprites()
         return super().itemChange(change, value)
 
     def paint(self, painter, option, widget):
-        painter.setRenderHint(QPainter.Antialiasing)
-
         # Create gradient for 3D effect
         gradient = QLinearGradient(self.start_point, self.end_point)
 
@@ -147,7 +145,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.is_selected = not self.is_selected
             self.update()
         super().mousePressEvent(event)

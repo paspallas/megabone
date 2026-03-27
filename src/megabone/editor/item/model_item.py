@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from dataclasses import fields
 
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt6.QtWidgets import QGraphicsItem
 
 from megabone.model.collection import BaseCollectionModel, UpdateSource
 from megabone.model.serializable import Serializable

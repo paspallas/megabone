@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt6.QtCore import Qt
 
 from megabone.editor.gizmo import IKHandle
 from megabone.editor.item import BoneItem
@@ -15,10 +15,10 @@ class IKHandleMode(AbstractEditorMode):
         self.start_bone = None
 
     def activate(self):
-        self.view.setCursor(Qt.CrossCursor)
+        self.view.setCursor(Qt.CursorShape.CrossCursor)
 
     def mousePressEvent(self, event, scene_pos):
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             item = self.scene.itemAt(scene_pos, self.view.transform())
 
             if isinstance(item, BoneItem):
@@ -26,7 +26,7 @@ class IKHandleMode(AbstractEditorMode):
                     # Start creating handle
                     self.creating_handle = True
                     self.start_bone = item
-                    self.view.setCursor(Qt.DragLinkCursor)
+                    self.view.setCursor(Qt.CursorShape.DragLinkCursor)
                 else:
                     # Finish creating handle
                     handle = IKHandle(self.start_bone, item)
@@ -36,7 +36,7 @@ class IKHandleMode(AbstractEditorMode):
 
                     self.creating_handle = False
                     self.start_bone = None
-                    self.view.setCursor(Qt.CrossCursor)
+                    self.view.setCursor(Qt.CursorShape.CrossCursor)
 
     def mouseMoveEvent(self, event, scene_pos):
         pass

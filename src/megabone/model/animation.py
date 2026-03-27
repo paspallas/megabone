@@ -5,7 +5,7 @@ from .property import PropertyType
 class Animation:
     def __init__(self, name):
         self.name = name
-        self.tracks = []  # List of AnimationTrack objects
+        self.tracks = []
         self.frame_start = 0
         self.frame_end = 100
         self.current_frame = 0

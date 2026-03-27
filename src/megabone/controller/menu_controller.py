@@ -1,8 +1,7 @@
 from collections import OrderedDict
 from enum import Enum, auto
-from typing import OrderedDict
 
-from PyQt5.QtWidgets import QMenuBar
+from PyQt6.QtWidgets import QMenuBar
 
 from megabone.builder import MenuBuilder
 from megabone.manager import DocumentManager, RecentFilesManager

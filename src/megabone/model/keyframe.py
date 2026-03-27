@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Any
 
-from PyQt5.QtCore import QPointF
+from PyQt6.QtCore import QPointF
 
 from .collection import BaseCollectionModel
 from .serializable import Serializable

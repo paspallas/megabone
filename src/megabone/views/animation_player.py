@@ -1,13 +1,13 @@
-from PyQt5.QtCore import QTimer, pyqtSignal
-from PyQt5.QtWidgets import (
-    QWidget,
-    QTreeWidget,
+from PyQt6.QtCore import QTimer, pyqtSignal
+from PyQt6.QtWidgets import (
     QHBoxLayout,
-    QPushButton,
     QLabel,
+    QPushButton,
     QSpinBox,
+    QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
+    QWidget,
 )
 
 
