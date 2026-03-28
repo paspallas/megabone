@@ -1,7 +1,7 @@
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QTabWidget, QVBoxLayout, QWidget
 
-from megabone.views import MainEditorView
+from megabone.views.editor_view import MainEditorView
 
 
 class TabManager(QTabWidget):
@@ -13,7 +13,6 @@ class TabManager(QTabWidget):
         self.setTabsClosable(True)
         self.setMovable(True)
 
-        # Connect signals
         self.tabCloseRequested.connect(self._on_tab_close)
         self.currentChanged.connect(self._handle_tab_change)
 
@@ -35,7 +34,10 @@ class TabManager(QTabWidget):
     def set_view_title(self, doc_id: str, title: str) -> None:
         for i in range(self.count()):
             container = self.widget(i)
+
+            assert container is not None
             view = container.findChild(MainEditorView)
+
             if view.doc_id == doc_id:
                 self.set_title(i, title)
                 break
@@ -43,7 +45,10 @@ class TabManager(QTabWidget):
     def close_view(self, doc_id) -> None:
         for i in range(self.count()):
             container = self.widget(i)
+
+            assert container is not None
             view = container.findChild(MainEditorView)
+
             if view.doc_id == doc_id:
                 self.removeTab(i)
                 break
@@ -52,11 +57,18 @@ class TabManager(QTabWidget):
         if index >= 0:
             # Get the container widget and find the editor view
             container = self.widget(index)
+
+            assert container is not None
             view = container.findChild(MainEditorView)
+
             if view:
                 self.viewActivated.emit(view)
 
     def _on_tab_close(self, index: int) -> None:
         container = self.widget(index)
+
+        assert container is not None
         view = container.findChild(MainEditorView)
-        self.viewClosed.emit(view)
+
+        if view:
+            self.viewClosed.emit(view)

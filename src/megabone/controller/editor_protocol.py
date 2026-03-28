@@ -1,0 +1,9 @@
+from typing import Protocol
+
+from PyQt6.QtWidgets import QGraphicsView
+
+
+class EditorControllerProtocol(Protocol):
+    def handle_mouse_press(self, view: QGraphicsView, event) -> None: ...
+    def handle_mouse_move(self, view: QGraphicsView, event) -> None: ...
+    def handle_mouse_release(self, view: QGraphicsView, event) -> None: ...

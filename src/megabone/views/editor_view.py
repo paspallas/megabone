@@ -4,6 +4,7 @@ from PyQt6.QtCore import QPointF, Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QFrame, QGraphicsItem, QGraphicsView, QSizePolicy
 
+from megabone.controller.editor_protocol import EditorControllerProtocol
 from megabone.editor.grid import EditorGrid
 from megabone.editor.item import BoneItem, SpriteItem
 from megabone.editor.layer import LayerManager
@@ -18,7 +19,10 @@ class MainEditorView(QGraphicsView):
 
     def __init__(self, parent=None, doc_id: str = "", grid_size: int = 32):
         super().__init__(parent)
+        self._configure_view()
+
         self.modal_scene = ModalEditorScene(self)
+        self.modal_scene.dialogClose.connect(self.onModalDialogClose)
         self.modal_scene.setSceneRect(
             -self._width / 2, -self._height / 2, self._width, self._height
         )
@@ -28,7 +32,13 @@ class MainEditorView(QGraphicsView):
         self.layer_manager = LayerManager(self)
 
         self.doc_id = doc_id
+        self.controller: EditorControllerProtocol | None = None
 
+        self.selected_sprite = None
+        self.selected_bone = None
+        self.bones = []
+
+    def _configure_view(self):
         self.centerOn(0, 0)
         self.setContentsMargins(0, 0, 0, 0)
         self.setMouseTracking(True)
@@ -44,38 +54,47 @@ class MainEditorView(QGraphicsView):
         ZoomControl(self)
         PanControl(self)
 
-        self.selected_sprite = None
-        self.selected_bone = None
-        self.bones = []
-
-        self.modal_scene.dialogClose.connect(self.onModalDialogClose)
-
     def showModalDialog(self):
-        self.modal_scene.setOverlaySize(self.viewport().rect())
+        viewport = self.viewport()
+        assert viewport is not None, "Editor view has no viewport"
+
+        self.modal_scene.setOverlaySize(viewport.rect())
         self.modal_scene.overlay.show()
 
     def onModalDialogClose(self):
         self.modal_scene.overlay.hide()
 
     def mousePressEvent(self, event):
+        assert self.controller is not None, "MainEditorView has no controller"
+
         self.controller.handle_mouse_press(self, event)
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
+        assert self.controller is not None, "MainEditorView has no controller"
+
         self.controller.handle_mouse_move(self, event)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        assert self.controller is not None, "MainEditorView has no controller"
+
         self.controller.handle_mouse_release(self, event)
         super().mouseReleaseEvent(event)
 
     def add_items(self, *items: QGraphicsItem):
+        scene = self.scene()
+        assert scene is not None, "MainEditorView has no scene set"
+
         for item in items:
-            self.scene().addItem(item)
+            scene.addItem(item)
             self.layer_manager.add_item(item)
 
     def remove_item(self, item):
-        self.scene().removeItem(item)
+        scene = self.scene()
+        assert scene is not None, "MainEditorView has no scene set"
+
+        scene.removeItem(item)
         self.layer_manager.remove_item(item)
 
     def selectBone(self, bone):

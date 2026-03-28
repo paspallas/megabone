@@ -35,6 +35,7 @@ class CreateBoneMode(AbstractEditorMode):
 
                 if event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
                     parent_bone = self.scene.itemAt(scene_pos, self.view.transform())
+
                     if isinstance(parent_bone, BoneItem):
                         self.new_bone.set_parent_bone(parent_bone)
 

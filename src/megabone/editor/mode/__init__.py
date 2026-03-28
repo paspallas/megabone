@@ -1,6 +1,6 @@
 from .abstract_mode import AbstractEditorMode
 from .bone_creation import CreateBoneMode
-from .editor_mode_register import AbstractEditorMode, EditorModeRegistry
+from .editor_mode_register import EditorModeRegistry
 from .ik import IKMode
 from .ik_handle import IKHandleMode
 from .selection import SelectionMode

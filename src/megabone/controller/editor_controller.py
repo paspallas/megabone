@@ -1,20 +1,23 @@
 from PyQt6.QtCore import QObject, pyqtSignal
+from PyQt6.QtWidgets import QGraphicsView
 
 from megabone.editor.item import ItemFactory
 from megabone.editor.mode import AbstractEditorMode, EditorModeRegistry, SelectionMode
 from megabone.manager import DocumentManager, TabManager
-from megabone.views import MainEditorView
+from megabone.views.editor_view import MainEditorView
 
 
 class EditorController(QObject):
-    """Manages all edit operations on the active document."""
+    """This controller acts as a hub for all documents and editors, routing user
+    interaction from edit tools to the active document
+    """
 
     activeViewChanged = pyqtSignal(MainEditorView)
 
     def __init__(self, documents: DocumentManager) -> None:
         super().__init__()
         self.documents = documents
-        self.views: dict[int, MainEditorView] = {}
+        self.views: dict[str, MainEditorView] = {}
         self.current_view: MainEditorView | None = None
         self.current_mode: AbstractEditorMode | None = None
 
@@ -29,23 +32,30 @@ class EditorController(QObject):
         self.documents.savedDocumentAs.connect(self.editor_views.set_view_title)
         self.documents.createdDocument.connect(self.create_editor)
 
+        # Register instances of editor tools
         EditorModeRegistry.init(self)
 
-    def views_container(self) -> TabManager:
+    def tab_views(self) -> TabManager:
         return self.editor_views
 
     def set_edit_mode(self, mode: type[AbstractEditorMode]):
-        new_mode = EditorModeRegistry.get_mode(mode)
+        """Sets the edit tool"""
 
-        if new_mode != self.current_mode:
+        mode_instance = EditorModeRegistry.get_mode(mode)
+
+        if mode_instance != self.current_mode:
             if self.current_mode:
                 self.current_mode.deactivate()
-            self.current_mode = new_mode
+
+            self.current_mode = mode_instance
             self.current_mode.activate()
 
     def create_editor(self, doc_id: str, title: str = "Untitled*") -> None:
+        """Create an editor view for the selected document"""
+
         view = MainEditorView(doc_id=doc_id)
         view.controller = self
+
         self.views[doc_id] = view
 
         self.editor_views.add_editor(view, title)
@@ -64,21 +74,23 @@ class EditorController(QObject):
     def on_close_view(self, view: MainEditorView) -> None:
         self.documents.close_document(view.doc_id)
 
-    def handle_mouse_press(self, view: MainEditorView, event) -> None:
+    def handle_mouse_press(self, view: QGraphicsView, event) -> None:
+        assert isinstance(view, MainEditorView)
         if view != self.current_view:
             self.current_view = view
+
         if self.current_mode:
             self.current_mode.mousePressEvent(
                 event, view.mapToScene(event.position().toPoint())
             )
 
-    def handle_mouse_move(self, view: MainEditorView, event) -> None:
+    def handle_mouse_move(self, view: QGraphicsView, event) -> None:
         if self.current_mode:
             self.current_mode.mouseMoveEvent(
                 event, view.mapToScene(event.position().toPoint())
             )
 
-    def handle_mouse_release(self, view: MainEditorView, event) -> None:
+    def handle_mouse_release(self, view: QGraphicsView, event) -> None:
         if self.current_mode:
             self.current_mode.mouseReleaseEvent(
                 event, view.mapToScene(event.position().toPoint())

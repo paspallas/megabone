@@ -30,7 +30,7 @@ class AppMainWindow(ZenWindow):
         assert menubar is not None, "Failed to create menubar"
         self.menu.populate_menu_bar(menubar)
 
-        self.setCentralWidget(self.edit.views_container())
+        self.setCentralWidget(self.edit.tab_views())
 
         # Create status bar
         self.status_bar = QStatusBar(self)

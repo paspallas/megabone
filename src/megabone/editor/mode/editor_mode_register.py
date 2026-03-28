@@ -10,7 +10,7 @@ from .abstract_mode import AbstractEditorMode
 class EditorModeRegistry:
     """Register tool edit modes"""
 
-    _mode_instances: dict[type[AbstractEditorMode], AbstractEditorMode] = {}
+    _mode_instances: dict[type[AbstractEditorMode], AbstractEditorMode | None] = {}
     _actions: OrderedDict[type[AbstractEditorMode], QAction] = OrderedDict()
 
     @classmethod
@@ -33,7 +33,10 @@ class EditorModeRegistry:
 
     @classmethod
     def get_mode(cls, mode_class: type[AbstractEditorMode]) -> AbstractEditorMode:
-        return cls._mode_instances[mode_class]
+        instance = cls._mode_instances[mode_class]
+
+        assert instance is not None
+        return instance
 
     @classmethod
     def create_actions(
@@ -43,6 +46,8 @@ class EditorModeRegistry:
         group.setExclusive(True)
 
         for mode_class, mode_instance in cls._mode_instances.items():
+            assert mode_instance is not None
+
             action = QAction(controller)
             action.setText(mode_instance.description)
             action.setCheckable(True)
