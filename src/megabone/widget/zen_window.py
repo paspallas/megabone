@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QByteArray, Qt
 from PyQt6.QtWidgets import QMainWindow, QToolBar
 
 
@@ -10,8 +10,8 @@ class ZenWindow(QMainWindow):
 
         # State tracking
         self.is_zen_mode = False
-        self.stored_window_state = None
-        self.stored_geometry = None
+        self.stored_window_state: QByteArray | None = None
+        self.stored_geometry: QByteArray | None = None
 
     def _save_state(self) -> None:
         self.stored_window_state = self.saveState()

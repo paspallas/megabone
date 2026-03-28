@@ -13,7 +13,7 @@ from megabone.manager import StatusBarManager as status
 from megabone.widget import ZenWindow
 
 
-class MegaBoneMainWindow(ZenWindow):
+class AppMainWindow(ZenWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Megabone")
@@ -24,7 +24,11 @@ class MegaBoneMainWindow(ZenWindow):
         self.edit = EditorController(self.documents)
         self.controller = MainController()
         self.menu = MainMenuController(self.controller, self.documents)
-        self.menu.populate_menu_bar(self.menuBar())
+
+        menubar = self.menuBar()
+
+        assert menubar is not None, "Failed to create menubar"
+        self.menu.populate_menu_bar(menubar)
 
         self.setCentralWidget(self.edit.views_container())
 

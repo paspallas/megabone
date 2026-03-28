@@ -98,7 +98,7 @@ class DockManager:
         return dock
 
     def _handle_dock_close(self, dock_id: str):
-        dock = self.docks.get(dock_id)
+        dock = self.docks[dock_id]
 
         if dock.close_handler:
             dock.close_handler()
@@ -130,6 +130,7 @@ class DockManager:
         elif dock_id in self.hidden_docks:
             dock = self.hidden_docks.get(dock_id)
             dock.setVisible(visible)
+
             if visible:
                 self.docks[dock_id] = dock
                 self.hidden_docks.pop(dock_id)
@@ -144,6 +145,9 @@ class DockManager:
     def hide(self):
         for dock in self.docks.keys():
             self.toggle_dock(dock, False)
+
+    def remove_dock(self, dock_id: str):
+        self.docks.pop(dock_id)
 
     def deactivate_all(self):
         for dock in self.docks.keys():

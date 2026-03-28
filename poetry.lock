@@ -166,6 +166,21 @@ files = [
 ]
 
 [[package]]
+name = "pyqt6-stubs"
+version = "20250824"
+description = "Collections of stubs for the PyQt6 framework and its extensions."
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "pyqt6_stubs-20250824-py3-none-any.whl", hash = "sha256:4b77dc40f5dab7ca4ba899fff4c1db8de9cc73799ee98f56cae63349f18a6e52"},
+    {file = "pyqt6_stubs-20250824.tar.gz", hash = "sha256:f56958e34fb69e52c19ce24f5b59f181dde9a1e2fe0738aa8780e6b9a9b809d9"},
+]
+
+[package.extras]
+dev = ["ruff"]
+
+[[package]]
 name = "qtmodern"
 version = "0.2.0"
 description = "Qt Widgets Modern User Interface"
@@ -201,4 +216,4 @@ test = ["pytest (>=6,!=7.0.0,!=7.0.1)", "pytest-cov (>=3.0.0)", "pytest-qt"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
-content-hash = "057a6c6b581e20c1f9d181de1844e9e166e38e54cca5fa3b1734dac1601516e9"
+content-hash = "1d88d3c56d2fa819f486a455d2f40c0578bc65d40e81158db5a3d27b3b762635"

@@ -1,23 +1,34 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+
+from PyQt6.QtWidgets import QGraphicsScene
 
 from megabone.model.bone import BoneModel
+from megabone.model.document import Document
 from megabone.model.keyframe import KeyframeModel
 from megabone.model.sprite import SpriteModel
-from megabone.views import MainEditorView, ModalEditorScene
+from megabone.views import MainEditorView
 
 
 class AbstractEditorMode(ABC):
     description: str = ""
-    icon_path: Optional[str] = None
-    shortcut: Optional[str] = None
+    icon_path: str | None = None
+    shortcut: str | None = None
 
     def __init__(self, controller):
         self.controller = controller
 
+    def _document(self) -> Document:
+        document = self.controller.documents.get_active_document()
+
+        assert document is not None
+        return document
+
     @property
-    def scene(self) -> ModalEditorScene:
-        return self.controller.current_view.scene()
+    def scene(self) -> QGraphicsScene:
+        scene = self.view.scene()
+
+        assert scene is not None
+        return scene
 
     @property
     def view(self) -> MainEditorView:
@@ -25,15 +36,15 @@ class AbstractEditorMode(ABC):
 
     @property
     def sprites_model(self) -> SpriteModel:
-        return self.controller.documents.get_active_document().sprites
+        return self._document().sprites
 
     @property
     def bones_model(self) -> BoneModel:
-        return self.controller.documents.get_active_document().bones
+        return self._document().bones
 
     @property
     def keys_model(self) -> KeyframeModel:
-        return self.controller.documents.get_active_document().keyframes
+        return self._document().keyframes
 
     def activate(self):
         """Called when entering this state"""

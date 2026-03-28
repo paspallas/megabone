@@ -14,5 +14,4 @@ __all__ = [
     "IKMode",
     "IKHandleMode",
     "SpriteAttachmentMode",
-    "AbstractEditorMode",
 ]

@@ -1,4 +1,3 @@
-from PyQt6.QtCore import QFile, QIODevice
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtWidgets import QApplication
 
@@ -14,13 +13,15 @@ class ResourceManager:
         return ResourceManager._icon_cache[name]
 
     @staticmethod
-    def get_scaled_icon(name: str, size: int) -> QIcon:
+    def get_scaled_icon(name: str, size: int) -> QIcon | None:
         icon = ResourceManager.get_icon(name)
         if icon:
             pixmap = icon.pixmap(size)
-            return QIcon(
-                pixmap.scaled(size * QApplication.instance().devicePixelRatio())
-            )
+
+            instance = QApplication.instance()
+            assert instance is not None
+
+            return QIcon(pixmap.scaled(size * instance.devicePixelRatio()))
         return None
 
     @staticmethod
@@ -28,13 +29,6 @@ class ResourceManager:
         if name not in ResourceManager._pixmap_cache:
             ResourceManager._pixmap_cache[name] = QPixmap(f":images/{name}")
         return ResourceManager._pixmap_cache[name]
-
-    @staticmethod
-    def get_stylesheet(name: str) -> str:
-        file = QFile(f"styles/{name}")
-        if file.open(QIODevice.OpenModeFlag.ReadOnly | QIODevice.OpenModeFlag.Text):
-            return str(file.readAll(), encoding="utf-8")
-        return ""
 
     @staticmethod
     def preload_resources(resources: str) -> None:

@@ -94,8 +94,8 @@ class MainMenuController:
         )
         self.recent_files.update_menu()
 
-    def get_builder(self, name: str) -> MenuBuilder:
-        return self._menus.get(name, None)
+    def get_builder(self, name: MenuType) -> MenuBuilder:
+        return self._menus.get(name)
 
     def _on_document_created(self):
         self._menus.get(MenuType.FILE).enable_items(

@@ -1,9 +1,7 @@
-from typing import Optional
-
 from PyQt6.QtCore import QObject, pyqtSignal
 
 from megabone.editor.item import ItemFactory
-from megabone.editor.mode import AbstractEditorMode, EditorModeRegistry
+from megabone.editor.mode import AbstractEditorMode, EditorModeRegistry, SelectionMode
 from megabone.manager import DocumentManager, TabManager
 from megabone.views import MainEditorView
 
@@ -17,8 +15,8 @@ class EditorController(QObject):
         super().__init__()
         self.documents = documents
         self.views: dict[int, MainEditorView] = {}
-        self.current_view: Optional[MainEditorView] = None
-        self.current_mode: Optional[AbstractEditorMode] = None
+        self.current_view: MainEditorView | None = None
+        self.current_mode: AbstractEditorMode | None = None
 
         self.editor_views = TabManager()
 
@@ -36,7 +34,7 @@ class EditorController(QObject):
     def views_container(self) -> TabManager:
         return self.editor_views
 
-    def set_edit_mode(self, mode: EditorModeRegistry.Mode):
+    def set_edit_mode(self, mode: type[AbstractEditorMode]):
         new_mode = EditorModeRegistry.get_mode(mode)
 
         if new_mode != self.current_mode:
@@ -51,15 +49,17 @@ class EditorController(QObject):
         self.views[doc_id] = view
 
         self.editor_views.add_editor(view, title)
-        self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
+        self.set_edit_mode(SelectionMode)
 
-        ItemFactory.add_items_from_document(self.documents.get_document(doc_id), view)
+        document = self.documents.get_document(doc_id)
+        assert document is not None, "Failed to get document"
+        ItemFactory.add_items_from_document(document, view)
 
     def set_active_view(self, view: MainEditorView) -> None:
         self.current_view = view
         self.documents.set_active_document(view.doc_id)
 
-        self.set_edit_mode(EditorModeRegistry.Mode.SELECTION_MODE)
+        self.set_edit_mode(SelectionMode)
 
     def on_close_view(self, view: MainEditorView) -> None:
         self.documents.close_document(view.doc_id)
