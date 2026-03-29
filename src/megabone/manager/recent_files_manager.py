@@ -1,14 +1,11 @@
 from pathlib import Path
 
-from PyQt6.QtCore import QObject, QSettings, pyqtSignal
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMenu, QMessageBox
-
 import megabone.util.constants as c
+from megabone.qt import QAction, QMenu, QMessageBox, QObject, QSettings, Signal
 
 
 class RecentFilesManager(QObject):
-    recentFileOPen = pyqtSignal(Path)
+    recentFileOPen = Signal(Path)
 
     def __init__(self, parent=None, max_files=10):
         super().__init__(parent)
@@ -24,6 +21,7 @@ class RecentFilesManager(QObject):
 
     def load_recent_files(self):
         """Load history from qsettings"""
+
         files = self.settings.value("recent_files", [])
 
         if isinstance(files, str):
@@ -33,6 +31,7 @@ class RecentFilesManager(QObject):
 
     def save_recent_files(self):
         """Save history to qsettings"""
+
         self.settings.setValue("recent_files", self.recent_files)
 
     def add_recent_file(self, filepath: Path):
@@ -73,6 +72,7 @@ class RecentFilesManager(QObject):
 
     def _formatted_filename(self, filepath: Path):
         """Get a formatted version for display"""
+
         return f"{filepath.name} ({filepath.parent})"
 
     def file_selected(self, filepath: Path):
@@ -80,7 +80,7 @@ class RecentFilesManager(QObject):
             self.recentFileOPen.emit(filepath)
         else:
             QMessageBox.warning(
-                self, "File Not Found", f"The file '{filepath}' no longer exists."
+                None, "File Not Found", f"The file '{filepath}' no longer exists."
             )
             self.recent_files.remove(filepath)
             self.save_recent_files()

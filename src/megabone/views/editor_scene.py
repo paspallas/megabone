@@ -1,11 +1,15 @@
 from typing import Optional
 
-from PyQt6.QtCore import QRect, pyqtSignal
-from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsScene
-
 from megabone.editor.item import BoneItem
 from megabone.model.document import Document
+from megabone.qt import (
+    QColor,
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsScene,
+    QRect,
+    Signal,
+)
 
 
 class OverlayItem(QGraphicsRectItem):
@@ -21,8 +25,8 @@ class OverlayItem(QGraphicsRectItem):
 
 
 class ModalEditorScene(QGraphicsScene):
-    dialogClose = pyqtSignal()
-    sceneRebuilt = pyqtSignal()
+    dialogClose = Signal()
+    sceneRebuilt = Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

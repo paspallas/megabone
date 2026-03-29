@@ -1,9 +1,7 @@
-from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QGraphicsView
-
 from megabone.editor.item import ItemFactory
 from megabone.editor.mode import AbstractEditorMode, EditorModeRegistry, SelectionMode
 from megabone.manager import DocumentManager, TabManager
+from megabone.qt import QGraphicsView, QObject, Signal
 from megabone.views.editor_view import MainEditorView
 
 
@@ -12,7 +10,7 @@ class EditorController(QObject):
     interaction from edit tools to the active document
     """
 
-    activeViewChanged = pyqtSignal(MainEditorView)
+    activeViewChanged = Signal(MainEditorView)
 
     def __init__(self, documents: DocumentManager) -> None:
         super().__init__()

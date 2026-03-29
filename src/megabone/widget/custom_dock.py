@@ -1,7 +1,6 @@
 from enum import Enum, auto
 
-from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import QDockWidget
+from megabone.qt import QCloseEvent, QDockWidget, Signal
 
 
 class DockCloseAction(Enum):
@@ -13,7 +12,7 @@ class DockCloseAction(Enum):
 class CustomDockWidget(QDockWidget):
     """Custom dock widget with close event handling"""
 
-    closeRequested = pyqtSignal()
+    closeRequested = Signal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,8 +20,10 @@ class CustomDockWidget(QDockWidget):
         self.close_handler = None
         self.visibility_handler = None
 
-    def closeEvent(self, event):
+    def closeEvent(self, event: QCloseEvent | None):
         self.closeRequested.emit()
+
+        assert event is not None
         if self.close_action == DockCloseAction.PREVENT:
             event.ignore()
         else:

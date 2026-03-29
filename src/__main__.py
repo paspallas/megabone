@@ -1,8 +1,8 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication
 from qtmodern import styles
 
+from megabone.qt import QApplication
 from megabone.views import AppMainWindow as Window
 
 if __name__ == "__main__":

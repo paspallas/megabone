@@ -1,9 +1,8 @@
 from collections import deque
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Union
+from typing import Callable, Union
 
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QMenu
+from megabone.qt import QAction, QIcon, QMenu
 
 
 @dataclass
@@ -11,7 +10,7 @@ class MenuItemState:
     enabled: bool = True
     visible: bool = True
     checked: bool = False
-    text: Optional[str] = None
+    text: str | None = None
 
 
 class MenuBuilder:
@@ -19,9 +18,9 @@ class MenuBuilder:
         self._menu = QMenu(title)
         self._menu_stack: deque = deque([self._menu])
 
-        self._actions: Dict[str, QAction] = {}
-        self._sub_menus: Dict[str, QMenu] = {}
-        self._state_handlers: Dict[str, Callable[[], bool]] = {}
+        self._actions: dict[str, QAction] = {}
+        self._sub_menus: dict[str, QMenu] = {}
+        self._state_handlers: dict[str, Callable[[], bool]] = {}
 
         style = self.current_menu().styleSheet()
         self.current_menu().setStyleSheet(
@@ -37,24 +36,27 @@ class MenuBuilder:
 
     def disable(self) -> "MenuBuilder":
         """Disable the current menu"""
+
         self.current_menu().setDisabled(True)
         return self
 
     def enable(self, submenu: str) -> None:
         """Enable a submenu"""
+
         self._sub_menus.get(submenu, None).setEnabled(True)
 
     def action(
         self,
         name: str,
-        callback: Optional[Callable] = None,
-        shortcut: Optional[str] = None,
-        icon: Optional[Union[QIcon, str]] = None,
+        callback: Callable | None = None,
+        shortcut: str | None = None,
+        icon: Union[QIcon, str] | None = None,
         checkable: bool = False,
-        tooltip: Optional[str] = None,
-        state_handler: Optional[Callable[[], bool]] = None,
+        tooltip: str | None = None,
+        state_handler: Callable[[], bool] | None = None,
     ) -> "MenuBuilder":
         """Add an action to the current menu"""
+
         action = QAction(name)
 
         if tooltip:
@@ -80,11 +82,13 @@ class MenuBuilder:
 
     def separator(self) -> "MenuBuilder":
         """Add spacing to the current menu"""
+
         self.current_menu().addSeparator()
         return self
 
     def update_item_state(self, identifier: str, state: MenuItemState) -> None:
         """Update the state of a specific menu item"""
+
         if action := self._actions.get(identifier):
             action.setEnabled(state.enabled)
             action.setVisible(state.visible)
@@ -95,6 +99,7 @@ class MenuBuilder:
 
     def enable_items(self, *identifiers: str) -> "MenuBuilder":
         """Enable specified menu items"""
+
         for identifier in identifiers:
             if action := self._actions.get(identifier):
                 action.setEnabled(True)
@@ -102,6 +107,7 @@ class MenuBuilder:
 
     def disable_items(self, *identifiers: str) -> "MenuBuilder":
         """Disable specified menu items"""
+
         for identifier in identifiers:
             if action := self._actions.get(identifier):
                 action.setEnabled(False)
@@ -109,20 +115,24 @@ class MenuBuilder:
 
     def update_all_states(self) -> None:
         """Update all menu items with registered state handlers"""
+
         for identifier, handler in self._state_handlers.items():
             if action := self._actions.get(identifier):
                 action.setEnabled(handler())
 
-    def get_action(self, identifier: str) -> Optional[QAction]:
+    def get_action(self, identifier: str) -> QAction | None:
         """Get an action by its identifier"""
+
         return self._actions.get(identifier)
 
     def current_menu(self) -> QMenu:
         """Return the current menu context"""
+
         return self._menu_stack[-1]
 
     def submenu(self, title: str) -> "MenuBuilder":
         """Start creating a submenu"""
+
         submenu = QMenu(title, self.current_menu())
         self.current_menu().addMenu(submenu)
         self._menu_stack.append(submenu)
@@ -131,14 +141,17 @@ class MenuBuilder:
 
     def back(self) -> "MenuBuilder":
         """Go back to the parent menu"""
+
         if len(self._menu_stack) > 1:
             self._menu_stack.pop()
         return self
 
     def get_submenu(self, name: str) -> QMenu:
         """Get a submenu by name"""
+
         return self._sub_menus.get(name, None)
 
     def build(self) -> QMenu:
         """Return the constructed menu"""
+
         return self._menu

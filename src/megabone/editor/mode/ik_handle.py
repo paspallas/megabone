@@ -1,7 +1,6 @@
-from PyQt6.QtCore import Qt
-
 from megabone.editor.gizmo import IKHandle
 from megabone.editor.item import BoneItem
+from megabone.qt import Qt
 
 from .abstract_mode import AbstractEditorMode
 from .editor_mode_register import EditorModeRegistry

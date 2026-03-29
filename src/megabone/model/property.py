@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class PropertyType(Enum):
+class PropertyType(StrEnum):
     POSITION = "position"
     ROTATION = "rotation"
     SCALE = "scale"

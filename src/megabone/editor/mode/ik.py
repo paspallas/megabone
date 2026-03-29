@@ -1,11 +1,8 @@
 import math
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPen
-from PyQt6.QtWidgets import QGraphicsEllipseItem
-
 from megabone.editor.item import BoneItem
 from megabone.IKSolver import FABRIK
+from megabone.qt import QGraphicsEllipseItem, QPen, Qt
 
 from .abstract_mode import AbstractEditorMode
 from .editor_mode_register import EditorModeRegistry

@@ -1,6 +1,4 @@
-from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QBrush, QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem
+from megabone.qt import QBrush, QColor, QGraphicsItem, QPen, QPointF, QRectF, Qt
 
 
 class PoleControl(QGraphicsItem):

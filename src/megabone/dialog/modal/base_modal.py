@@ -1,5 +1,4 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QDialog, QWidget
+from megabone.qt import QDialog, Qt, QWidget
 
 
 class BaseModalDialog(QDialog):

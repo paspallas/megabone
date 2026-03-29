@@ -3,8 +3,7 @@ import uuid
 from pathlib import Path
 from typing import Optional
 
-from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtGui import QUndoStack
+from megabone.qt import QObject, QUndoStack, Signal
 
 from .bone import BoneModel
 from .keyframe import KeyframeModel
@@ -14,7 +13,7 @@ from .sprite import SpriteModel
 class Document(QObject):
     """Document model"""
 
-    documentModified = pyqtSignal()
+    documentModified = Signal()
 
     def __init__(self, path: Optional[Path] = None) -> None:
         super().__init__()
@@ -52,6 +51,8 @@ class Document(QObject):
     def save(self, path: Optional[Path] = None) -> None:
         if path:
             self.path = path
+
+        assert self.path is not None, "No file save path set"
         self.path.write_text(json.dumps(self.to_dict(), indent=4), encoding="utf-8")
 
     @staticmethod

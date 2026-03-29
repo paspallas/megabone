@@ -1,9 +1,6 @@
-from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import QPainter, QPixmap
-from PyQt6.QtWidgets import QGraphicsItem
-
 from megabone.editor.gizmo import PivotHandle
 from megabone.editor.layer import Layer, LayeredItemMixin
+from megabone.qt import QGraphicsItem, QPainter, QPixmap, QPointF, QRectF, Qt
 
 
 class SpriteItem(LayeredItemMixin, QGraphicsItem):

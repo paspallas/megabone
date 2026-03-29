@@ -1,5 +1,4 @@
-from PyQt6.QtCore import QByteArray, Qt
-from PyQt6.QtWidgets import QMainWindow, QToolBar
+from megabone.qt import QByteArray, QMainWindow, Qt, QToolBar
 
 
 class ZenWindow(QMainWindow):

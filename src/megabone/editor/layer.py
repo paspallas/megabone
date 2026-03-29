@@ -1,8 +1,6 @@
 from enum import Enum, auto
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QKeySequence, QShortcut
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsView
+from megabone.qt import QGraphicsItem, QGraphicsView, QKeySequence, QShortcut, Qt
 
 
 class Layer(Enum):

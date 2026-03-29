@@ -1,6 +1,15 @@
-from PyQt6.QtCore import QLineF, QPointF, QRectF, QSize, Qt
-from PyQt6.QtGui import QBrush, QColor, QPainter, QPen
-from PyQt6.QtWidgets import QGraphicsView
+from megabone.qt import (
+    QBrush,
+    QColor,
+    QGraphicsView,
+    QLineF,
+    QPainter,
+    QPen,
+    QPointF,
+    QRectF,
+    QSize,
+    Qt,
+)
 
 
 class EditorGrid:
@@ -41,7 +50,7 @@ class EditorGrid:
         pen = QPen(self.__backGridColor, 0, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(lines)
+        painter.drawLines(*lines)
         pen.setColor(self.__foreGridColor)
         painter.setPen(pen)
 
@@ -68,5 +77,5 @@ class EditorGrid:
         pen = QPen(self.__foreGridColor, 2, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(lines)
+        painter.drawLines(*lines)
         painter.drawEllipse(QPointF(0, 0), 1, 1)

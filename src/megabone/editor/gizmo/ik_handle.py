@@ -1,10 +1,7 @@
-from PyQt6.QtCore import QRectF, Qt
-from PyQt6.QtGui import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem
-
 from megabone.editor.item import BoneItem
 from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.IKSolver import FABRIK
+from megabone.qt import QColor, QGraphicsItem, QPen, QRectF, Qt
 
 from .pole_vector import PoleControl
 from .target_control import TargetControl

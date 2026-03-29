@@ -1,19 +1,19 @@
 import math
 
-from PyQt6.QtCore import QPointF, QRectF, Qt
-from PyQt6.QtGui import (
-    QBrush,
-    QColor,
-    QLinearGradient,
-    QPainter,
-    QPainterPath,
-    QPen,
-    QTransform,
-)
-from PyQt6.QtWidgets import QGraphicsItem
-
 from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.model.bone import BoneData, BoneModel
+from megabone.qt import (
+    QBrush,
+    QColor,
+    QGraphicsItem,
+    QLinearGradient,
+    QPainterPath,
+    QPen,
+    QPointF,
+    QRectF,
+    Qt,
+    QTransform,
+)
 
 from .model_item import ModelBoundItem
 
@@ -28,8 +28,8 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
     def __init__(
         self,
         model: BoneModel,
-        start_point: QPointF = None,
-        end_point: QPointF = None,
+        start_point: QPointF | None = None,
+        end_point: QPointF | None = None,
         item_id: str = "",
         z_index: int = 0,
     ):
@@ -62,12 +62,15 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def shape(self) -> QPainterPath:
         # Calculate bone direction and perpendicular vectors
+        assert self.start_point is not None
+        assert self.end_point is not None
+
         dx = self.end_point.x() - self.start_point.x()
         dy = self.end_point.y() - self.start_point.y()
         length = math.sqrt(dx**2 + dy**2)
 
         if length < 1e-6:
-            return
+            return  # FIX me
 
         # Normalized perpendicular vector
         nx = -dy / length
@@ -110,6 +113,9 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def paint(self, painter, option, widget):
         # Create gradient for 3D effect
+
+        assert self.start_point is not None
+        assert self.end_point is not None
         gradient = QLinearGradient(self.start_point, self.end_point)
 
         # Set colors based on state
@@ -125,6 +131,8 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
         # Draw the bone
         path = self.shape()
+
+        assert painter is not None
         painter.setPen(QPen(base_color.darker(150), 1))
         painter.setBrush(QBrush(gradient))
         painter.drawPath(path)

@@ -1,10 +1,9 @@
 from collections import OrderedDict
 from enum import Enum, auto
 
-from PyQt6.QtWidgets import QMenuBar
-
 from megabone.builder import MenuBuilder
 from megabone.manager import DocumentManager, RecentFilesManager
+from megabone.qt import QMenuBar
 
 from .main_controller import MainController
 

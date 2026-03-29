@@ -1,12 +1,12 @@
-from PyQt6.QtCore import QObject, pyqtSignal
+from megabone.qt import QObject, Signal
 
 
 class MainController(QObject):
     """Main window controller"""
 
-    requestFullScreen = pyqtSignal()
-    requestZenMode = pyqtSignal()
-    requestQuit = pyqtSignal()
+    requestFullScreen = Signal()
+    requestZenMode = Signal()
+    requestQuit = Signal()
 
     def __init__(self) -> None:
         super().__init__()

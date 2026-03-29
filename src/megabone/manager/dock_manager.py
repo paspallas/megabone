@@ -1,18 +1,17 @@
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Type
+from typing import Callable, Optional, Type
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import (
+from megabone.qt import (
+    QAction,
     QDockWidget,
     QLabel,
     QMainWindow,
     QMenu,
+    Qt,
     QTabWidget,
     QVBoxLayout,
     QWidget,
 )
-
 from megabone.widget import CustomDockWidget, DockCloseAction
 
 
@@ -36,8 +35,8 @@ class DockManager:
     def __init__(self, main_window: QMainWindow, view_menu: QMenu):
         self.main_window = main_window
         self.view_menu = view_menu
-        self.docks: Dict[str, CustomDockWidget] = {}
-        self.hidden_docks: Dict[str, CustomDockWidget] = {}
+        self.docks: dict[str, CustomDockWidget] = {}
+        self.hidden_docks: dict[str, CustomDockWidget] = {}
 
         # Enable tabbed docking
         self.main_window.setTabPosition(
@@ -50,6 +49,7 @@ class DockManager:
 
     def create_dock(self, dock_id: str, config: DockConfig) -> CustomDockWidget:
         """Create a new dock widget with the given configuration"""
+
         if dock_id in self.docks:
             raise KeyError(f"Dock with ID {dock_id} already exists")
 

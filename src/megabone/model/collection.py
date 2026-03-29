@@ -2,7 +2,7 @@ from collections import OrderedDict
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Type
 
-from PyQt6.QtCore import QObject, pyqtSignal
+from megabone.qt import QObject, Signal
 
 from .serializable import Serializable
 
@@ -14,9 +14,9 @@ class UpdateSource(Enum):
 
 
 class BaseCollectionModel(QObject):
-    itemAdded = pyqtSignal(str)
-    itemRemoved = pyqtSignal(str)
-    itemModified = pyqtSignal(str, UpdateSource)
+    itemAdded = Signal(str)
+    itemRemoved = Signal(str)
+    itemModified = Signal(str, UpdateSource)
 
     def __init__(self, data_class: Type[Serializable], key_name: str):
         super().__init__()

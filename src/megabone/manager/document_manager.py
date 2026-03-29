@@ -1,23 +1,21 @@
 from pathlib import Path
 from typing import Optional
 
-from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QMessageBox
-
 from megabone.dialog import FileDialog
 from megabone.model.document import Document
+from megabone.qt import QMessageBox, QObject, Signal
 
 
 class DocumentManager(QObject):
     """Manages a collection of documents and IO operations"""
 
-    addedDocument = pyqtSignal(str)
-    closedDocument = pyqtSignal(str)
-    activeDocumentChanged = pyqtSignal(str)
-    savedDocumentAs = pyqtSignal(str, str)
-    openedDocument = pyqtSignal(str, Path)
+    addedDocument = Signal(str)
+    closedDocument = Signal(str)
+    activeDocumentChanged = Signal(str)
+    savedDocumentAs = Signal(str, str)
+    openedDocument = Signal(str, Path)
     """An opened from file document was added to the collection"""
-    createdDocument = pyqtSignal(str)
+    createdDocument = Signal(str)
     """A newly created document was added to the collection"""
 
     def __init__(self):

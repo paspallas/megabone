@@ -1,6 +1,3 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QStatusBar, QToolBar
-
 from megabone.controller import (
     EditorController,
     MainController,
@@ -10,6 +7,7 @@ from megabone.controller import (
 from megabone.editor.mode import EditorModeRegistry
 from megabone.manager import AutoSaveManager, DockConfig, DockManager, DocumentManager
 from megabone.manager import StatusBarManager as status
+from megabone.qt import QStatusBar, Qt, QToolBar
 from megabone.widget import ZenWindow
 
 

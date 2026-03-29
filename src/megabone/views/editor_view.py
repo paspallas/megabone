@@ -1,14 +1,19 @@
 import math
 
-from PyQt6.QtCore import QPointF, Qt
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QFrame, QGraphicsItem, QGraphicsView, QSizePolicy
-
 from megabone.controller.editor_protocol import EditorControllerProtocol
 from megabone.editor.grid import EditorGrid
 from megabone.editor.item import BoneItem, SpriteItem
 from megabone.editor.layer import LayerManager
 from megabone.event_filter import PanControl, ZoomControl
+from megabone.qt import (
+    QFrame,
+    QGraphicsItem,
+    QGraphicsView,
+    QPixmap,
+    QPointF,
+    QSizePolicy,
+    Qt,
+)
 
 from .editor_scene import ModalEditorScene
 

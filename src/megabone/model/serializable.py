@@ -2,7 +2,7 @@ from dataclasses import dataclass, field, fields
 from typing import Self, get_type_hints
 from uuid import uuid4
 
-from PyQt6.QtCore import QPointF
+from megabone.qt import QPointF
 
 
 @dataclass

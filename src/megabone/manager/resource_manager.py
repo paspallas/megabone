@@ -1,5 +1,4 @@
-from PyQt6.QtGui import QIcon, QPixmap
-from PyQt6.QtWidgets import QApplication
+from megabone.qt import QApplication, QIcon, QPixmap
 
 
 class ResourceManager:

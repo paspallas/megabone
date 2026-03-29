@@ -1,5 +1,12 @@
-from PyQt6.QtCore import QEvent, QObject, QPoint, Qt
-from PyQt6.QtWidgets import QAbstractScrollArea, QApplication, QGraphicsView
+from megabone.qt import (
+    QAbstractScrollArea,
+    QApplication,
+    QEvent,
+    QGraphicsView,
+    QObject,
+    QPoint,
+    Qt,
+)
 
 
 class PanControl(QObject):
@@ -12,41 +19,46 @@ class PanControl(QObject):
     def __init__(self, view: QGraphicsView):
         super().__init__(view)
 
-        view.viewport().installEventFilter(self)
+        viewport = view.viewport()
+
+        assert viewport is not None
+        viewport.installEventFilter(self)
         view.setDragMode(QGraphicsView.DragMode.RubberBandDrag)
 
-    def eventFilter(self, obj: QObject, e: QEvent) -> bool:
-        scroll_area: QAbstractScrollArea = obj.parent()
+    def eventFilter(self, a0: QObject | None, a1: QEvent | None) -> bool:
+        assert a0 is not None
+        scroll_area = a0.parent()
 
         if scroll_area is None:
-            return super().eventFilter(obj, e)
+            return super().eventFilter(a0, a1)
 
-        if e.type() == QEvent.Type.MouseButtonPress:
-            if e.button() == Qt.MouseButton.MiddleButton:
+        assert a1 is not None
+        if a1.type() == QEvent.Type.MouseButtonPress:
+            if a1.button() == Qt.MouseButton.MiddleButton:
                 QApplication.setOverrideCursor(Qt.CursorShape.OpenHandCursor)
 
                 self._start_pan_point = QPoint(
-                    scroll_area.horizontalScrollBar().value() + e.position().x(),
-                    scroll_area.verticalScrollBar().value() + e.position().y(),
+                    scroll_area.horizontalScrollBar().value() + int(a1.position().x()),
+                    scroll_area.verticalScrollBar().value() + int(a1.position().y()),
                 )
 
                 return True
 
-        elif e.type() == QEvent.Type.MouseMove:
+        elif a1.type() == QEvent.Type.MouseMove:
             if (
-                e.buttons() & Qt.MouseButton.MiddleButton
+                a1.buttons() & Qt.MouseButton.MiddleButton
             ) == Qt.MouseButton.MiddleButton:
                 scroll_area.horizontalScrollBar().setValue(
-                    self._start_pan_point.x() - e.position().x()
+                    self._start_pan_point.x() - int(a1.position().x())
                 )
                 scroll_area.verticalScrollBar().setValue(
-                    self._start_pan_point.y() - e.position().y()
+                    self._start_pan_point.y() - int(a1.position().y())
                 )
 
-        elif e.type() == QEvent.Type.MouseButtonRelease:
-            if e.button() == Qt.MouseButton.MiddleButton:
+        elif a1.type() == QEvent.Type.MouseButtonRelease:
+            if a1.button() == Qt.MouseButton.MiddleButton:
                 QApplication.restoreOverrideCursor()
 
                 return True
 
-        return super().eventFilter(obj, e)
+        return super().eventFilter(a0, a1)

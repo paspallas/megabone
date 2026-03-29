@@ -1,9 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
-from PyQt6.QtWidgets import QFileDialog
-
 import megabone.util.constants as c
+from megabone.qt import QFileDialog
 
 
 class FileDialog:

@@ -1,10 +1,9 @@
 from abc import abstractmethod
 from dataclasses import fields
 
-from PyQt6.QtWidgets import QGraphicsItem
-
 from megabone.model.collection import BaseCollectionModel, UpdateSource
 from megabone.model.serializable import Serializable
+from megabone.qt import QGraphicsItem
 
 
 class ModelBoundItem(QGraphicsItem):

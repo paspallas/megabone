@@ -1,5 +1,4 @@
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import QLabel, QStatusBar
+from megabone.qt import QLabel, QStatusBar, Qt, QTimer
 
 
 class StatusBarManager:

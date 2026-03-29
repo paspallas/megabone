@@ -1,6 +1,4 @@
-from PyQt6.QtCore import QPointF, Qt
-from PyQt6.QtGui import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsEllipseItem, QGraphicsItem
+from megabone.qt import QColor, QGraphicsEllipseItem, QGraphicsItem, QPen, QPointF, Qt
 
 
 class PivotHandle(QGraphicsEllipseItem):

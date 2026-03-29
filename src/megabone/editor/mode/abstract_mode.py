@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 
-from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView
-
 from megabone.model.bone import BoneModel
 from megabone.model.document import Document
 from megabone.model.keyframe import KeyframeModel
 from megabone.model.sprite import SpriteModel
+from megabone.qt import QGraphicsScene, QGraphicsView
 
 
 class AbstractEditorMode(ABC):

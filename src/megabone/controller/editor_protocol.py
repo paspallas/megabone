@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from PyQt6.QtWidgets import QGraphicsView
+from megabone.qt import QGraphicsView
 
 
 class EditorControllerProtocol(Protocol):

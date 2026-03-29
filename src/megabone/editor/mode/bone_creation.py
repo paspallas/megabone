@@ -1,8 +1,7 @@
-from PyQt6.QtCore import QPointF, Qt
-
 from megabone.editor.item import BoneItem
 from megabone.model.bone import BoneData
 from megabone.model.collection import UpdateSource
+from megabone.qt import QPointF, Qt
 
 from .abstract_mode import AbstractEditorMode
 from .editor_mode_register import EditorModeRegistry

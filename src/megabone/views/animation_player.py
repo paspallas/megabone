@@ -1,18 +1,19 @@
-from PyQt6.QtCore import QTimer, pyqtSignal
-from PyQt6.QtWidgets import (
+from megabone.qt import (
     QHBoxLayout,
     QLabel,
     QPushButton,
     QSpinBox,
+    QTimer,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
+    Signal,
 )
 
 
 class AnimationPlayer(QWidget):
-    frameChanged = pyqtSignal(int)
+    frameChanged = Signal(int)
 
     def __init__(self, parent=None):
         super().__init__(parent)

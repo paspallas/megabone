@@ -1,12 +1,10 @@
-from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import QTabWidget, QVBoxLayout, QWidget
-
+from megabone.qt import QTabWidget, QVBoxLayout, QWidget, Signal
 from megabone.views.editor_view import MainEditorView
 
 
 class TabManager(QTabWidget):
-    viewClosed = pyqtSignal(MainEditorView)
-    viewActivated = pyqtSignal(MainEditorView)
+    viewClosed = Signal(MainEditorView)
+    viewActivated = Signal(MainEditorView)
 
     def __init__(self, parent=None):
         super().__init__(parent)

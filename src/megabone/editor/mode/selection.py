@@ -1,7 +1,5 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QGraphicsView
-
 from megabone.editor.item import BoneItem, SpriteItem
+from megabone.qt import QGraphicsView, Qt
 
 from .abstract_mode import AbstractEditorMode
 from .editor_mode_register import EditorModeRegistry

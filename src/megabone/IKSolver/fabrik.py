@@ -1,9 +1,8 @@
 import math
 from typing import List
 
-from PyQt6.QtCore import QPointF
-
 from megabone.editor.item import BoneItem
+from megabone.qt import QPointF
 
 
 class FABRIK:
