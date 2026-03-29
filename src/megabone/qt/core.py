@@ -1,14 +1,14 @@
 try:
-    from PyQt6.QtCore import *
-except ImportError:
     from PySide6.QtCore import *
+except ImportError:
+    from PyQt6.QtCore import *
 
 try:
-    from PyQt6.QtCore import pyqtSignal as Signal
-except ImportError:
     from PySide6.QtCore import Signal
+except ImportError:
+    from PyQt6.QtCore import pyqtSignal as Signal
 
 try:
-    from PyQt6.QtCore import pyqtSlot as Slot
-except ImportError:
     from PySide6.QtCore import Slot
+except ImportError:
+    from PyQt6.QtCore import pyqtSlot as Slot

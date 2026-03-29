@@ -1,18 +1,18 @@
 [project]
 name = "megabone"
 version = "0.1.0"
-description = "2d Skeletal animation tool"
+description = "2d Skeletal animation editor"
 authors = [
     {name = "paspallas",email = "paspallasdev@gmail.com"}
 ]
-license = {text = "GPL"}
-requires-python = ">=3.14"
+license = {text = "LGPL"}
+requires-python = ">=3.14,<3.15"
 dependencies = [
-    "pyqt6 (>=6.10.2,<7.0.0)",
     "numpy (>=2.4.3,<3.0.0)",
     "qtpy (>=2.4.3,<3.0.0)",
     "qtmodern (>=0.2.0,<0.3.0)",
-    "pyqt6-stubs (>=20250824,<20250825)"
+    "pyqt6-stubs (>=20250824,<20250825)",
+    "pyside6 (>=6.11.0,<7.0.0)"
 ]
 
 [build-system]

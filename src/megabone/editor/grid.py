@@ -50,7 +50,7 @@ class EditorGrid:
         pen = QPen(self.__backGridColor, 0, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(*lines)
+        painter.drawLines(lines)
         pen.setColor(self.__foreGridColor)
         painter.setPen(pen)
 
@@ -77,5 +77,5 @@ class EditorGrid:
         pen = QPen(self.__foreGridColor, 2, Qt.PenStyle.SolidLine)
         pen.setCosmetic(True)
         painter.setPen(pen)
-        painter.drawLines(*lines)
+        painter.drawLines(lines)
         painter.drawEllipse(QPointF(0, 0), 1, 1)
