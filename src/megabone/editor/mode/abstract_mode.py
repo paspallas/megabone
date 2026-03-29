@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from megabone.model.attachment import AttachmentModel
 from megabone.model.bone import BoneModel
 from megabone.model.document import Document
 from megabone.model.keyframe import KeyframeModel
@@ -39,6 +40,10 @@ class AbstractEditorMode(ABC):
     @property
     def bones_model(self) -> BoneModel:
         return self._document().bones
+
+    @property
+    def attachment_model(self) -> AttachmentModel:
+        return self._document().attachments
 
     @property
     def keys_model(self) -> KeyframeModel:

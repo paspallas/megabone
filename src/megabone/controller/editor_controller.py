@@ -60,6 +60,7 @@ class EditorController(QObject):
         self.set_edit_mode(SelectionMode)
 
         document = self.documents.get_document(doc_id)
+
         assert document is not None, "Failed to get document"
         ItemFactory.add_items_from_document(document, view)
 

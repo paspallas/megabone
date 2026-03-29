@@ -31,7 +31,7 @@ class DocumentManager(QObject):
         )
 
     def disconnect_from_document(self, document: Document) -> None:
-        pass
+        document.documentModified.disconnect(self._on_document_changed)
 
     def track_changes(self, document: Document) -> None:
         self._unsaved_changes.add(document.doc_id)
@@ -70,7 +70,7 @@ class DocumentManager(QObject):
 
     def load_document(self, path: Path):
         try:
-            doc = Document().load(path)
+            doc = Document.load(path)
             self.add_document(doc)
             self.openedDocument.emit(doc.doc_id, doc.path)
         except Exception:
@@ -81,8 +81,11 @@ class DocumentManager(QObject):
                 QMessageBox.StandardButton.Ok,
             )
 
-    def save_document(self, document: Document = None) -> None:
+    def save_document(self, document: Document | None = None) -> None:
         doc = document or self.get_active_document()
+
+        assert doc is not None
+
         if doc.path:
             try:
                 doc.save()
@@ -91,9 +94,12 @@ class DocumentManager(QObject):
         else:
             self.save_document_as(doc)
 
-    def save_document_as(self, document: Document = None) -> None:
+    def save_document_as(self, document: Document | None = None) -> None:
         doc = document or self.get_active_document()
         path = FileDialog.save_file()
+
+        assert doc is not None
+
         if path:
             try:
                 doc.save(path)

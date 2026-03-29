@@ -1,23 +1,42 @@
-from megabone.model.bone import BoneData
 from megabone.model.document import Document
-from megabone.model.sprite import SpriteData
-
-from .bone import BoneItem
-from .sprite import SpriteItem
+from megabone.model.serializable import Serializable
 
 
 class ItemFactory:
-    @staticmethod
-    def add_items_from_document(document: Document, view):
-        bones: dict[str, tuple[BoneData, BoneItem]] = {}
+    """Create scene items from document model data"""
 
-        for data in document.bones.get_items():
-            item = BoneItem(model=document.bones)
-            item.apply_data_from_model(data)
-            bones[data.id] = (data, item)
+    _registry: dict[type, type] = {}
 
-        for data, item in bones.values():
-            if data.parent_id:
-                item.set_parent_bone(bones[data.parent_id][1])
+    @classmethod
+    def register(cls, data_type):
+        def decorator(item_cls):
+            cls._registry[data_type] = item_cls
+            return item_cls
 
-        view.add_items(*[item for _, item in bones.values()])
+        return decorator
+
+    @classmethod
+    def create_items(cls, document: Document):
+        created: dict[str, tuple[Serializable, object]] = {}
+
+        for collection in document.get_all_collections():
+            for data in collection.get_items():
+                item_cls = cls._registry[data.__class__]
+
+                item = item_cls(model=collection)
+                item.apply_data_from_model(data)
+
+                created[data.id] = (data, item)
+
+        return created
+
+    @classmethod
+    def add_items_from_document(cls, document: Document, view):
+        created = cls.create_items(document)
+
+        # resolve relationships
+        for _, item in created.values():
+            if hasattr(item, "resolve_references"):
+                item.resolve_references(created)
+
+        view.add_items(*[item for _, item in created.values()])

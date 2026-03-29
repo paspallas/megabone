@@ -1,9 +1,14 @@
 from megabone.editor.gizmo import PivotHandle
 from megabone.editor.layer import Layer, LayeredItemMixin
+from megabone.model.sprite import SpriteData
 from megabone.qt import QGraphicsItem, QPainter, QPixmap, QPointF, QRectF, Qt
 
+from .item_factory import ItemFactory
+from .model_item import ModelBoundItem
 
-class SpriteItem(LayeredItemMixin, QGraphicsItem):
+
+@ItemFactory.register(SpriteData)
+class SpriteItem(LayeredItemMixin, ModelBoundItem):
     def __init__(self, pixmap: QPixmap, anchor_point=QPointF(0, 0), parent=None):
         super().__init__(parent=parent, layer=Layer.SPRITE)
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
@@ -24,7 +29,7 @@ class SpriteItem(LayeredItemMixin, QGraphicsItem):
     def boundingRect(self) -> QRectF:
         return QRectF(self.pixmap.rect())
 
-    def paint(self, painter: QPainter, option, widget):
+    def paint(self, painter: QPainter, option, widget=None):
         painter.drawPixmap(0, 0, self.pixmap)
 
     def update_pivot_handle_pos(self):

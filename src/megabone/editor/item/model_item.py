@@ -24,12 +24,14 @@ class ModelBoundItem(QGraphicsItem):
 
     def update_model(self):
         """Update model with current item state"""
+
         if not self._updating:
             data = self.create_data_for_model()
             self._model.modify_item(data, UpdateSource.VIEW)
 
     def update_from_model(self):
         """Update item with current model state"""
+
         data = self._model.get_item(self.item_id)
         if data:
             self.apply_data_from_model(data)
@@ -44,6 +46,7 @@ class ModelBoundItem(QGraphicsItem):
 
     def apply_data_from_model(self, data: Serializable):
         """Populate the item with data from the model"""
+
         for field in fields(data):
             if hasattr(self, field.name):
                 setattr(self, field.name, getattr(data, field.name))

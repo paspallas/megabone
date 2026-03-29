@@ -1,11 +1,12 @@
 import json
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from megabone.qt import QObject, QUndoStack, Signal
 
+from .attachment import AttachmentModel
 from .bone import BoneModel
+from .collection import BaseCollectionModel
 from .keyframe import KeyframeModel
 from .sprite import SpriteModel
 
@@ -15,40 +16,48 @@ class Document(QObject):
 
     documentModified = Signal()
 
-    def __init__(self, path: Optional[Path] = None) -> None:
+    def __init__(self, path: Path | None = None) -> None:
         super().__init__()
         self.doc_id = uuid.uuid4().hex
+        self.path = path
         self.bones = BoneModel()
         self.sprites = SpriteModel()
         self.keyframes = KeyframeModel()
+        self.attachments = AttachmentModel()
         self.undo_stack = QUndoStack()
-        self.path = path
 
         # Connect submodel signals
-        for model in [self.bones, self.sprites, self.keyframes]:
+        for model in [self.bones, self.sprites, self.keyframes, self.attachments]:
             model.itemAdded.connect(self._on_content_changed)
             model.itemModified.connect(self._on_content_changed)
             model.itemRemoved.connect(self._on_content_changed)
 
+    def get_all_collections(self) -> list[BaseCollectionModel]:
+        return [self.bones, self.sprites]
+
     def to_dict(self) -> dict:
         """Serialize document to dictionary"""
+
         return {
             "doc_id": self.doc_id,
             self.bones.key_name: self.bones.to_list(),
             self.sprites.key_name: self.sprites.to_list(),
+            self.attachments.key_name: self.attachments.to_list(),
             self.keyframes.key_name: self.keyframes.to_list(),
         }
 
     def from_dict(self, data: dict) -> "Document":
         """Load document from dictionary"""
+
         self.doc_id = data.get("doc_id", self.doc_id)
         self.bones.from_list(data.get(self.bones.key_name, []))
         self.sprites.from_list(data.get(self.sprites.key_name, []))
+        self.attachments.from_list(data.get(self.attachments.key_name, []))
         self.keyframes.from_list(data.get(self.keyframes.key_name, []))
 
         return self
 
-    def save(self, path: Optional[Path] = None) -> None:
+    def save(self, path: Path | None = None) -> None:
         if path:
             self.path = path
 

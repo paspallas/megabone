@@ -4,7 +4,7 @@ from .editor_mode_register import EditorModeRegistry
 from .ik import IKMode
 from .ik_handle import IKHandleMode
 from .selection import SelectionMode
-from .sprite_attachment import SpriteAttachmentMode
+from .sprite_attachment import SpriteAttachMode
 
 __all__ = [
     "AbstractEditorMode",
@@ -13,5 +13,5 @@ __all__ = [
     "CreateBoneMode",
     "IKMode",
     "IKHandleMode",
-    "SpriteAttachmentMode",
+    "SpriteAttachMode",
 ]

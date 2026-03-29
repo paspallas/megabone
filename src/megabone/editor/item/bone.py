@@ -2,6 +2,7 @@ import math
 
 from megabone.editor.layer import Layer, LayeredItemMixin
 from megabone.model.bone import BoneData, BoneModel
+from megabone.model.serializable import Serializable
 from megabone.qt import (
     QBrush,
     QColor,
@@ -15,9 +16,11 @@ from megabone.qt import (
     QTransform,
 )
 
+from .item_factory import ItemFactory
 from .model_item import ModelBoundItem
 
 
+@ItemFactory.register(BoneData)
 class BoneItem(LayeredItemMixin, ModelBoundItem):
     _bone_width_start = 6
     _bone_width_end = 2
@@ -242,7 +245,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             parent_id=self.parent_id,
         )
 
-    def apply_data_from_model(self, data: BoneData):
+    def apply_data_from_model(self, data: Serializable):
         super().apply_data_from_model(data)
         self.calculate_length()
         self.calculate_angle()
