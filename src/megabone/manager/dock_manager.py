@@ -128,7 +128,7 @@ class DockManager:
         if dock_id in self.docks:
             self.docks[dock_id].setVisible(visible)
         elif dock_id in self.hidden_docks:
-            dock = self.hidden_docks.get(dock_id)
+            dock = self.hidden_docks[dock_id]
             dock.setVisible(visible)
 
             if visible:
@@ -142,13 +142,17 @@ class DockManager:
         self.toggle_dock(dock_id, False)
         self._uncheck_menu_item(dock_id)
 
-    def hide(self):
+    def hide(self) -> None:
         for dock in self.docks.keys():
             self.toggle_dock(dock, False)
 
-    def remove_dock(self, dock_id: str):
+    def remove_dock(self, dock_id: str) -> None:
         self.docks.pop(dock_id)
 
-    def deactivate_all(self):
+    def deactivate_all(self) -> None:
         for dock in self.docks.keys():
+            self.hide_dock(dock)
+
+    def deactivate(self, dock_id: list[str]) -> None:
+        for dock in dock_id:
             self.hide_dock(dock)

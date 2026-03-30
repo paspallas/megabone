@@ -27,7 +27,7 @@ class ModelBoundItem(QGraphicsItem):
 
         if not self._updating:
             data = self.create_data_for_model()
-            self._model.modify_item(data, UpdateSource.VIEW)
+            self._model.update_item(data, UpdateSource.VIEW)
 
     def update_from_model(self):
         """Update item with current model state"""

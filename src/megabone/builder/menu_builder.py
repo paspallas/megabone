@@ -43,7 +43,10 @@ class MenuBuilder:
     def enable(self, submenu: str) -> None:
         """Enable a submenu"""
 
-        self._sub_menus.get(submenu, None).setEnabled(True)
+        submenu_item = self._sub_menus.get(submenu)
+
+        assert submenu_item is not None
+        submenu_item.setEnabled(True)
 
     def action(
         self,
@@ -75,6 +78,13 @@ class MenuBuilder:
 
         if state_handler:
             self._state_handlers[name] = state_handler
+
+        self.current_menu().addAction(action)
+        self._actions[name] = action
+        return self
+
+    def qaction(self, name: str, action: QAction) -> "MenuBuilder":
+        """Add an instance of QAction to the current menu"""
 
         self.current_menu().addAction(action)
         self._actions[name] = action

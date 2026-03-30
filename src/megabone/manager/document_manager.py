@@ -1,9 +1,8 @@
 from pathlib import Path
-from typing import Optional
 
 from megabone.dialog import FileDialog
 from megabone.model.document import Document
-from megabone.qt import QMessageBox, QObject, Signal
+from megabone.qt import QMessageBox, QObject, QUndoGroup, Signal
 
 
 class DocumentManager(QObject):
@@ -13,8 +12,10 @@ class DocumentManager(QObject):
     closedDocument = Signal(str)
     activeDocumentChanged = Signal(str)
     savedDocumentAs = Signal(str, str)
+
     openedDocument = Signal(str, Path)
     """An opened from file document was added to the collection"""
+
     createdDocument = Signal(str)
     """A newly created document was added to the collection"""
 
@@ -22,8 +23,13 @@ class DocumentManager(QObject):
         super().__init__()
 
         self._documents: dict[str, Document] = {}
-        self._active_document_id: Optional[str] = None
+        self._active_document_id: str | None = None
         self._unsaved_changes: set[str] = set()
+        self._undo_group = QUndoGroup(self)
+
+    @property
+    def undo_group(self) -> QUndoGroup:
+        return self._undo_group
 
     def connect_to_document(self, document: Document) -> None:
         document.documentModified.connect(
@@ -36,12 +42,13 @@ class DocumentManager(QObject):
     def track_changes(self, document: Document) -> None:
         self._unsaved_changes.add(document.doc_id)
 
-    def get_document(self, doc_id: str) -> Optional[Document]:
-        return self._documents.get(doc_id, None)
+    def get_document(self, doc_id: str) -> Document | None:
+        return self._documents.get(doc_id)
 
     def add_document(self, document: Document) -> None:
         if document.doc_id not in self._documents:
             self._documents[document.doc_id] = document
+            self._undo_group.addStack(document.undo_stack)
 
             self.track_changes(document)
             self.connect_to_document(document)
@@ -49,8 +56,9 @@ class DocumentManager(QObject):
             self.addedDocument.emit(document.doc_id)
             self.createdDocument.emit(document.doc_id)
 
-    def get_active_document(self) -> Optional[Document]:
-        return self._documents.get(self._active_document_id, None)
+    def get_active_document(self) -> Document | None:
+        assert self._active_document_id is not None
+        return self._documents.get(self._active_document_id)
 
     def set_active_document(self, doc_id: str) -> None:
         if doc_id not in self._documents:
@@ -58,6 +66,8 @@ class DocumentManager(QObject):
 
         if self._active_document_id != doc_id:
             self._active_document_id = doc_id
+            self._undo_group.setActiveStack(self._documents[doc_id].undo_stack)
+
             self.activeDocumentChanged.emit(doc_id)
 
     def create_document(self) -> None:
@@ -107,12 +117,14 @@ class DocumentManager(QObject):
             except Exception:
                 self._save_error(doc)
 
-    def close_document(self, doc_id: Optional[str]) -> None:
+    def close_document(self, doc_id: str | None) -> None:
         if not doc_id:
             doc_id = self._active_document_id
 
         if doc_id in self._unsaved_changes:
             doc = self.get_document(doc_id)
+
+            assert doc is not None
             name = doc.path or "Untitled"
 
             response = QMessageBox.question(
@@ -129,6 +141,7 @@ class DocumentManager(QObject):
             elif response == QMessageBox.StandardButton.Save:
                 self.save_document(doc)
 
+        assert doc_id is not None
         self._documents.pop(doc_id)
         self._unsaved_changes.discard(doc_id)
         self.closedDocument.emit(doc_id)

@@ -13,6 +13,7 @@ class BoneData(Serializable):
     z_index: int = 0
     parent_id: str = ""
     sprite_id: str = ""
+    name: str = ""
 
 
 class BoneModel(BaseCollectionModel):

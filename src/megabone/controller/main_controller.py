@@ -11,12 +11,6 @@ class MainController(QObject):
     def __init__(self) -> None:
         super().__init__()
 
-    def on_undo(self) -> None:
-        pass
-
-    def on_redo(self) -> None:
-        pass
-
     def on_about(self) -> None:
         pass
 

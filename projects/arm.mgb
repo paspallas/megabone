@@ -46,7 +46,9 @@
     {
       "id": "03400340304",
       "offset": [23.0, 10.0],
-      "image_path": "~/repo/game-tool/megabone/projects/Xi Tiger_arm.png"
+      "image_path": "~/repo/game-tool/megabone/projects/Xi Tiger_arm.png",
+      "visible": true,
+      "z_index": 5
     }
   ],
   "keyframes": []

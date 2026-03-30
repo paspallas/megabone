@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Type
 
 from megabone.qt import QObject, Signal
 
@@ -10,7 +10,7 @@ from .serializable import Serializable
 class UpdateSource(Enum):
     MODEL = auto()
     VIEW = auto()
-    UNDO = auto()
+    COMMAND = auto()
 
 
 class BaseCollectionModel(QObject):
@@ -39,25 +39,27 @@ class BaseCollectionModel(QObject):
             self.itemRemoved.emit(item_id)
             self._updating = False
 
-    def modify_item(self, data: Serializable, source: UpdateSource):
+    def update_item(self, data: Serializable, source: UpdateSource):
         if not self._updating and data.id in self._items:
             self._updating = True
             self._items[data.id] = data
             self.itemModified.emit(data.id, source)
             self._updating = False
 
-    def get_item(self, item_id: str) -> Optional[Serializable]:
+    def get_item(self, item_id: str) -> Serializable | None:
         return self._items.get(item_id)
 
-    def get_items(self) -> List[Serializable]:
+    def get_items(self) -> list[Serializable]:
         return [item for item in self._items.values()]
 
-    def to_list(self) -> List[Dict[str, Any]]:
+    def to_list(self) -> list[dict[str, Any]]:
         """Serialize all items to list of dictionary"""
+
         return [item.to_dict() for item in self._items.values()]
 
-    def from_list(self, data: List[Dict[str, Any]]):
+    def from_list(self, data: list[dict[str, Any]]):
         """Load items from list of dictionary"""
+
         self._items.clear()
         for item_data in data:
             self._items[item_data.get("id", "")] = self._data_class.from_dict(item_data)

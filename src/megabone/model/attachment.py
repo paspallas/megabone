@@ -17,3 +17,6 @@ class AttachmentData(Serializable):
 class AttachmentModel(BaseCollectionModel):
     def __init__(self):
         super().__init__(AttachmentData, "attachments")
+
+    def get_items_for_bone(self, bone_id: str) -> list[Serializable]:
+        pass

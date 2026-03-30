@@ -2,7 +2,6 @@ import os
 import tempfile
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Set
 
 from megabone.model.document import Document
 from megabone.qt import QObject, QTimer, Signal
@@ -24,8 +23,8 @@ class AutoSaveManager(QObject):
 
         self.document_manager = document_manager
         self._autosave_timer = QTimer(self)
-        self._dirty_documents: Set[str] = set()
-        self._last_save_times: Dict[str, float] = {}
+        self._dirty_documents: set[str] = set()
+        self._last_save_times: dict[str, float] = {}
         self._backup_path = self._setup_backup_directory()
 
         # Configure timer
@@ -95,12 +94,12 @@ class AutoSaveManager(QObject):
         safe_id = "".join(c if c.isalnum() else "_" for c in doc_id)
         return self._backup_path / f"{safe_id}.backup"
 
-    def check_for_backups(self) -> List[str]:
+    def check_for_backups(self) -> list[str]:
         """Returns a list of document IDs with avalaible backups"""
 
         return [p.stem for p in self._backup_path.glob("*.backup")]
 
-    def recover_backup(self, doc_id: str) -> Optional[Document]:
+    def recover_backup(self, doc_id: str) -> Document | None:
         """Attempts to recover a document from backup"""
 
         backup_file = self._get_backup_path(doc_id)

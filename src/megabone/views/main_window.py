@@ -4,11 +4,10 @@ from megabone.controller import (
     MainMenuController,
     MenuType,
 )
-from megabone.editor.mode import EditorModeRegistry
 from megabone.manager import AutoSaveManager, DockConfig, DockManager, DocumentManager
 from megabone.manager import StatusBarManager as status
 from megabone.qt import QStatusBar, Qt, QToolBar
-from megabone.widget import ZenWindow
+from megabone.widget import SpritePalettePanel, ZenWindow
 
 
 class AppMainWindow(ZenWindow):
@@ -23,8 +22,9 @@ class AppMainWindow(ZenWindow):
         self.controller = MainController()
         self.menu = MainMenuController(self.controller, self.documents)
 
-        menubar = self.menuBar()
+        self._create_dock_widgets()
 
+        menubar = self.menuBar()
         assert menubar is not None, "Failed to create menubar"
         self.menu.populate_menu_bar(menubar)
 
@@ -37,7 +37,23 @@ class AppMainWindow(ZenWindow):
         status().add_region("left", 200)
         status().add_region("right", 800)
 
-        # Docked widgets
+        # Create unique toolbar
+        self.toolbar = QToolBar()
+        self.toolbar.setObjectName("ToolBar")
+        self.addToolBar(self.toolbar)
+
+        # Populate all registered edit modes
+        from megabone.editor.mode import EditorModeRegistry
+
+        for action in EditorModeRegistry.create_actions(self.edit).values():
+            self.toolbar.addAction(action)
+
+        # Connect signals to super class
+        self.controller.requestFullScreen.connect(self.toggle_full_screen)
+        self.controller.requestZenMode.connect(self.toggle_zen_mode)
+        self.controller.requestQuit.connect(self.close)
+
+    def _create_dock_widgets(self):
         self.dock_manager = DockManager(
             self, self.menu.get_builder(MenuType.VIEW).get_submenu("Show")
         )
@@ -49,17 +65,12 @@ class AppMainWindow(ZenWindow):
             "History",
             DockConfig(title="History", area=Qt.DockWidgetArea.RightDockWidgetArea),
         )
-        self.dock_manager.deactivate_all()
-
-        # Create unique toolbar
-        self.toolbar = QToolBar()
-        self.toolbar.setObjectName("ToolBar")
-        self.addToolBar(self.toolbar)
-
-        for action in EditorModeRegistry.create_actions(self.edit).values():
-            self.toolbar.addAction(action)
-
-        # Connect signals
-        self.controller.requestFullScreen.connect(self.toggle_full_screen)
-        self.controller.requestZenMode.connect(self.toggle_zen_mode)
-        self.controller.requestQuit.connect(self.close)
+        self.dock_manager.create_dock(
+            "Palette",
+            DockConfig(
+                title="Palette",
+                area=Qt.DockWidgetArea.RightDockWidgetArea,
+                widget=SpritePalettePanel(self),
+            ),
+        )
+        self.dock_manager.deactivate(["Explorer", "History"])

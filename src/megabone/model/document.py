@@ -5,6 +5,7 @@ from pathlib import Path
 from megabone.qt import QObject, QUndoStack, Signal
 
 from .attachment import AttachmentModel
+from .base_command import DocumentCommand
 from .bone import BoneModel
 from .collection import BaseCollectionModel
 from .keyframe import KeyframeModel
@@ -69,7 +70,7 @@ class Document(QObject):
         with path.open("r", encoding="utf-8") as f:
             return Document(path).from_dict(json.load(f))
 
-    def create_undo_command(self, command) -> None:
+    def push(self, command: DocumentCommand) -> None:
         self.undo_stack.push(command)
         self.documentModified.emit()
 

@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 from megabone.builder import MenuBuilder
 from megabone.manager import DocumentManager, RecentFilesManager
-from megabone.qt import QMenuBar
+from megabone.qt import QKeySequence, QMenuBar
 
 from .main_controller import MainController
 
@@ -19,6 +19,17 @@ class MainMenuController:
     def __init__(self, controller: MainController, documents: DocumentManager) -> None:
         self.controller = controller
         self.documents = documents
+
+        self.undo_action = self.documents.undo_group.createUndoAction(
+            self.controller, "Undo"
+        )
+        self.undo_action.setShortcut(QKeySequence.StandardKey.Undo)
+
+        self.redo_action = self.documents.undo_group.createRedoAction(
+            self.controller, "Redo"
+        )
+        self.redo_action.setShortcut(QKeySequence.StandardKey.Redo)
+
         self._menus: OrderedDict[MenuType, MenuBuilder] = OrderedDict()
 
         self.recent_files = RecentFilesManager()
@@ -59,8 +70,8 @@ class MainMenuController:
 
         self._menus[MenuType.EDIT] = (
             MenuBuilder("Edit")
-            .action("Undo", self.controller.on_undo, "Ctrl+Z")
-            .action("Redo", self.controller.on_redo, "Ctrl+Y")
+            .qaction("Undo", self.undo_action)
+            .qaction("Redo", self.redo_action)
             .disable_items("Undo", "Redo")
         )
 
@@ -86,7 +97,7 @@ class MainMenuController:
                 menubar.addMenu(menu.build())
         else:
             for menu in menus:
-                menubar.addMenu(self._menus.get(menu).build())
+                menubar.addMenu(self._menus[menu].build())
 
         self.recent_files.set_menu(
             self._menus[MenuType.FILE].get_submenu("Recent Files")
@@ -94,9 +105,7 @@ class MainMenuController:
         self.recent_files.update_menu()
 
     def get_builder(self, name: MenuType) -> MenuBuilder:
-        return self._menus.get(name)
+        return self._menus[name]
 
     def _on_document_created(self):
-        self._menus.get(MenuType.FILE).enable_items(
-            "Save", "Save As...", "Close Editor"
-        )
+        self._menus[MenuType.FILE].enable_items("Save", "Save As...", "Close Editor")

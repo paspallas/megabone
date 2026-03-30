@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from typing import Callable
 
 from megabone.qt import QCloseEvent, QDockWidget, Signal
 
@@ -17,8 +18,8 @@ class CustomDockWidget(QDockWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.close_action = DockCloseAction.HIDE
-        self.close_handler = None
-        self.visibility_handler = None
+        self.close_handler: Callable | None = None
+        self.visibility_handler: Callable | None = None
 
     def closeEvent(self, event: QCloseEvent | None):
         self.closeRequested.emit()
