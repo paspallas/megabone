@@ -3,7 +3,7 @@ from megabone.model.collection import UpdateSource
 from megabone.model.document import Document
 from megabone.qt import QPointF, QUndoCommand
 
-from .base_command import DocumentCommand
+from .document import DocumentCommand
 
 
 class MoveBoneCommand(DocumentCommand):
@@ -45,7 +45,7 @@ class MoveBoneCommand(DocumentCommand):
 
         assert isinstance(data, BoneData)
         data.end_point = self._old_end
-        self._document.bones.update_item(data, UpdateSource.COMMAND)
+        self._document.bones.modify_item(data, UpdateSource.COMMAND)
 
 
 class CreateBoneCommand(DocumentCommand):
@@ -99,4 +99,4 @@ class RenameBoneCommand(DocumentCommand):
 
         assert isinstance(data, BoneData)
         data.name = name
-        self._document.bones.update_item(data, UpdateSource.COMMAND)
+        self._document.bones.modify_item(data, UpdateSource.COMMAND)

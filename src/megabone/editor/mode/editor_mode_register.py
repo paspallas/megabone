@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from megabone.manager.resource_manager import ResourceManager as res
+from megabone.manager.resource import ResourceManager as res
 from megabone.qt import QAction, QActionGroup
 
 from .abstract_mode import AbstractEditorMode

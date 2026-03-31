@@ -17,15 +17,16 @@ class SelectionMode(AbstractEditorMode):
         self.view.setCursor(Qt.CursorShape.ArrowCursor)
 
     def mousePressEvent(self, event, scene_pos):
-        if event.button() == Qt.MouseButton.LeftButton:
-            item = self.scene.itemAt(scene_pos, self.view.transform())
-            if item:
-                if isinstance(item, BoneItem):
-                    self.view.selectBone(item)
-                elif isinstance(item, SpriteItem):
-                    self.view.selectSprite(item)
-            else:
-                self.view.clearSelection()
+        pass
+        # if event.button() == Qt.MouseButton.LeftButton:
+        #     item = self.scene.itemAt(scene_pos, self.view.transform())
+        #     if item:
+        #         if isinstance(item, BoneItem):
+        #             self.view.selectBone(item)
+        #         elif isinstance(item, SpriteItem):
+        #             self.view.selectSprite(item)
+        #     else:
+        #         self.view.clearSelection()
 
     def mouseMoveEvent(self, event, scene_pos):
         pass

@@ -1,52 +1,54 @@
 from abc import abstractmethod
-from dataclasses import fields
 
-from megabone.model.collection import BaseCollectionModel, UpdateSource
+from megabone.model.collection import BaseCollectionModel
+from megabone.model.document import Document
 from megabone.model.serializable import Serializable
 from megabone.qt import QGraphicsItem
 
 
 class ModelBoundItem(QGraphicsItem):
-    def __init__(self, *args, item_id: str, model: BaseCollectionModel, **kwargs):
+    """
+    Base for all scene items bound to a document model record.
+
+    Lifecycle:
+      - Created during scene rebuild with data from the model
+      - Reads initial state via apply_data_from_model()
+      - Writes back to model exclusively through document commands
+    """
+
+    def __init__(
+        self,
+        *args,
+        item_id: str,
+        model: BaseCollectionModel,
+        document: Document,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.item_id = item_id
         self._model = model
-        self._updating = False
+        self._document = document
 
-        # Connect to model signals
-        self._model.itemModified.connect(self._on_model_update)
+    def push_command(self, command) -> None:
+        """Push an undoable command to the document stack"""
 
-    def _on_model_update(self, item_id: str, source: UpdateSource):
-        if item_id == self.item_id and source != UpdateSource.VIEW:
-            self._updating = True
-            self.update_from_model()
-            self._updating = False
+        self._document.push(command)
 
-    def update_model(self):
-        """Update model with current item state"""
-
-        if not self._updating:
-            data = self.create_data_for_model()
-            self._model.update_item(data, UpdateSource.VIEW)
-
-    def update_from_model(self):
-        """Update item with current model state"""
+    def current_data(self) -> Serializable:
+        """Fetch the current model record for this item"""
 
         data = self._model.get_item(self.item_id)
-        if data:
-            self.apply_data_from_model(data)
+        assert data is not None, f"No model data for item {self.item_id}"
+        return data
 
-    def itemChange(self, change, value):
-        self.update_model()
-        return super().itemChange(change, value)
+    @abstractmethod
+    def apply_data_from_model(self, data: Serializable) -> None:
+        """Populate item state from model data. Called once during scene rebuild."""
+
+        raise NotImplementedError
 
     @abstractmethod
     def create_data_for_model(self) -> Serializable:
-        raise NotImplementedError()
+        """Snapshot current item state into a model data object for use in commands."""
 
-    def apply_data_from_model(self, data: Serializable):
-        """Populate the item with data from the model"""
-
-        for field in fields(data):
-            if hasattr(self, field.name):
-                setattr(self, field.name, getattr(data, field.name))
+        raise NotImplementedError

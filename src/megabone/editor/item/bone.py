@@ -1,7 +1,8 @@
 import math
 
 from megabone.editor.layer import Layer, LayeredItemMixin
-from megabone.model.bone import BoneData, BoneModel
+from megabone.model.bone import BoneData
+from megabone.model.document import Document
 from megabone.model.serializable import Serializable
 from megabone.qt import (
     QBrush,
@@ -30,7 +31,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def __init__(
         self,
-        model: BoneModel,
+        document: Document,
         start_point: QPointF | None = None,
         end_point: QPointF | None = None,
         item_id: str = "",
@@ -40,7 +41,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             layer=Layer.BONE,
             z_index=z_index,
             item_id=item_id,
-            model=model,
+            model=document.bones,
         )
         self.is_hovered = False
         self.is_selected = False
@@ -71,9 +72,6 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         dx = self.end_point.x() - self.start_point.x()
         dy = self.end_point.y() - self.start_point.y()
         length = math.sqrt(dx**2 + dy**2)
-
-        if length < 1e-6:
-            return  # FIX me
 
         # Normalized perpendicular vector
         nx = -dy / length
@@ -246,6 +244,5 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         )
 
     def apply_data_from_model(self, data: Serializable):
-        super().apply_data_from_model(data)
         self.calculate_length()
         self.calculate_angle()

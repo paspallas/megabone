@@ -1,13 +1,12 @@
-from typing import Callable
-
 from megabone.dialog import FileDialog
 from megabone.dialog.sprite_sheet_dialog import SpriteSheetDialog
 from megabone.event_filter import PanControl, ZoomControl
-from megabone.manager.resource_manager import ResourceManager
+from megabone.manager.resource import ResourceManager
 from megabone.model.sprite import FrameData, SpriteSheetData
 from megabone.qt import (
     QAction,
     QDialog,
+    QDrag,
     QFrame,
     QGraphicsPixmapItem,
     QGraphicsScene,
@@ -18,6 +17,7 @@ from megabone.qt import (
     QListWidgetItem,
     QMenu,
     QMessageBox,
+    QMimeData,
     QPixmap,
     QSizePolicy,
     QSplitter,
@@ -25,15 +25,10 @@ from megabone.qt import (
     QToolButton,
     QVBoxLayout,
     QWidget,
-    Signal,
 )
 
 
 class SpritePalettePanel(QWidget):
-    spriteSelected = Signal(
-        str, int, int, int
-    )  # path, frame_index, frame_width, frame_height
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self._sheets: dict[str, SpriteSheetData] = {}  # path → sheet
@@ -107,7 +102,7 @@ class SpritePalettePanel(QWidget):
         self._view.setFrameStyle(QFrame.Shape.NoFrame)
         self._view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self._view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self._view.setDragMode(QGraphicsView.DragMode.ScrollHandDrag)
+        self._view.setDragMode(QGraphicsView.DragMode.NoDrag)
         ZoomControl(self._view)
         PanControl(self._view)
 
@@ -207,7 +202,7 @@ class SpritePalettePanel(QWidget):
     def _populate(self, sheet: SpriteSheetData) -> None:
         self._scene.clear()
         padding = 4
-        cols = 8
+        cols = 2
 
         for i, frame in enumerate(sheet.frames):
             col = i % cols
@@ -215,12 +210,7 @@ class SpritePalettePanel(QWidget):
             x = col * (sheet.frame_width + padding)
             y = row * (sheet.frame_height + padding)
 
-            item = PaletteFrameItem(
-                frame.pixmap,
-                sheet.path,
-                frame.index,
-                on_click=lambda p, idx, w, h: self.spriteSelected.emit(p, idx, w, h),
-            )
+            item = PaletteFrameItem(frame.pixmap, sheet.path, frame.index)
             item.setPos(x, y)
             self._scene.addItem(item)
 
@@ -231,21 +221,37 @@ class PaletteFrameItem(QGraphicsPixmapItem):
         pixmap: QPixmap,
         path: str,
         index: int,
-        on_click: Callable[[str, int, int, int], None],
     ):
-        super().__init__(pixmap)
-        self._width = pixmap.width()
-        self._height = pixmap.height()
+        super().__init__(None)
+        self.setPixmap(pixmap)
         self._path = path
         self._index = index
-        self._on_click = on_click
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setAcceptHoverEvents(True)
 
     def mousePressEvent(self, event) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
-            self._on_click(self._path, self._index, self._width, self._height)
+            self._start_drag(event)
         super().mousePressEvent(event)
+
+    def _start_drag(self, event) -> None:
+        mime = QMimeData()
+        mime.setData(
+            "application/x-megabone-sprite", f"{self._path}|{self._index}".encode()
+        )
+
+        drag = QDrag(event.widget())
+        drag.setMimeData(mime)
+        thumb = self.pixmap().scaled(
+            64,
+            64,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.FastTransformation,
+        )
+        drag.setPixmap(thumb)
+        drag.setHotSpot(thumb.rect().center())
+        drag.exec(Qt.DropAction.CopyAction)
+        drag = None
 
     def hoverEnterEvent(self, event) -> None:
         self.setOpacity(0.75)

@@ -65,19 +65,29 @@ class ResourceManager:
         for row in range(rows):
             for col in range(cols):
                 frame = source.copy(col * fw, row * fh, fw, fh)
-                if not cls._is_empty(frame):
-                    frames.append(FrameData(index=len(frames), pixmap=frame))
+                frames.append(FrameData(index=len(frames), pixmap=frame))
 
         sheet = SpriteSheetData(path, fw, fh, frames)
         cls._sheet_cache[key] = sheet
         return sheet
 
     @classmethod
-    def _is_empty(cls, pixmap: QPixmap) -> bool:
-        image = pixmap.toImage()
+    def get_sheet(cls, path: str) -> SpriteSheetData | None:
+        for key, sheet in cls._sheet_cache.items():
+            if key[0] == path:
+                return sheet
+        return None
 
-        for y in range(image.height()):
-            for x in range(image.width()):
-                if image.pixel(x, y) >> 24 != 0:  # non-transparent pixel
-                    return False
-        return True
+    @classmethod
+    def get_all_sheets(cls) -> list[SpriteSheetData]:
+        seen = set()
+        result = []
+        for key, sheet in cls._sheet_cache.items():
+            if key[0] not in seen:
+                seen.add(key[0])
+                result.append(sheet)
+        return result
+
+    @classmethod
+    def get_frame(cls, path: str, index: int) -> QPixmap | None:
+        return cls._frame_cache.get((path, index))

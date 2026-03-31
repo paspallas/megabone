@@ -8,6 +8,7 @@ from megabone.qt import QPointF
 @dataclass
 class Serializable:
     id: str = field(default_factory=lambda: uuid4().hex)
+    name: str = ""
 
     def to_dict(self) -> dict:
         result = {}

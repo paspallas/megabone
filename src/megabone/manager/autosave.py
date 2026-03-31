@@ -6,7 +6,7 @@ from pathlib import Path
 from megabone.model.document import Document
 from megabone.qt import QObject, QTimer, Signal
 
-from .document_manager import DocumentManager
+from .document import DocumentManager
 
 
 class AutoSaveManager(QObject):

@@ -8,12 +8,12 @@ from .serializable import Serializable
 
 @dataclass
 class BoneData(Serializable):
+    name: str = "bone"
     start_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
     end_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
     z_index: int = 0
     parent_id: str = ""
     sprite_id: str = ""
-    name: str = ""
 
 
 class BoneModel(BaseCollectionModel):

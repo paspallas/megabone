@@ -7,7 +7,6 @@ class ZenWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        # State tracking
         self.is_zen_mode = False
         self.stored_window_state: QByteArray | None = None
         self.stored_geometry: QByteArray | None = None
@@ -17,7 +16,10 @@ class ZenWindow(QMainWindow):
         self.stored_geometry = self.saveGeometry()
 
     def _restore_state(self) -> None:
+        assert self.stored_window_state is not None
         self.restoreState(self.stored_window_state)
+
+        assert self.stored_geometry is not None
         self.restoreGeometry(self.stored_geometry)
 
     def toggle_full_screen(self) -> None:

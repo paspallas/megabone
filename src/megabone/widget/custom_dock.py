@@ -32,5 +32,6 @@ class CustomDockWidget(QDockWidget):
 
     def visibilityChanged(self, visible):
         super().visibilityChanged(visible)
+
         if self.visibility_handler:
             self.visibility_handler(visible)

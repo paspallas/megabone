@@ -2,10 +2,10 @@ import json
 import uuid
 from pathlib import Path
 
+from megabone.command.document import DocumentCommand
 from megabone.qt import QObject, QUndoStack, Signal
 
 from .attachment import AttachmentModel
-from .base_command import DocumentCommand
 from .bone import BoneModel
 from .collection import BaseCollectionModel
 from .keyframe import KeyframeModel
@@ -27,30 +27,26 @@ class Document(QObject):
         self.attachments = AttachmentModel()
         self.undo_stack = QUndoStack()
 
-        # Connect submodel signals
+        # Connect to collections signals
         for model in [self.bones, self.sprites, self.keyframes, self.attachments]:
             model.itemAdded.connect(self._on_content_changed)
             model.itemModified.connect(self._on_content_changed)
             model.itemRemoved.connect(self._on_content_changed)
 
     def get_all_collections(self) -> list[BaseCollectionModel]:
-        return [self.bones, self.sprites]
+        return [self.bones, self.sprites, self.keyframes, self.attachments]
 
     def to_dict(self) -> dict:
         """Serialize document to dictionary"""
 
         return {
-            "doc_id": self.doc_id,
-            self.bones.key_name: self.bones.to_list(),
-            self.sprites.key_name: self.sprites.to_list(),
-            self.attachments.key_name: self.attachments.to_list(),
-            self.keyframes.key_name: self.keyframes.to_list(),
+            collection.key_name: collection.to_list()
+            for collection in self.get_all_collections()
         }
 
     def from_dict(self, data: dict) -> "Document":
         """Load document from dictionary"""
 
-        self.doc_id = data.get("doc_id", self.doc_id)
         self.bones.from_list(data.get(self.bones.key_name, []))
         self.sprites.from_list(data.get(self.sprites.key_name, []))
         self.attachments.from_list(data.get(self.attachments.key_name, []))
@@ -72,7 +68,6 @@ class Document(QObject):
 
     def push(self, command: DocumentCommand) -> None:
         self.undo_stack.push(command)
-        self.documentModified.emit()
 
     def _on_content_changed(self, *args):
         self.documentModified.emit()

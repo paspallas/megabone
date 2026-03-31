@@ -1,0 +1,58 @@
+{
+    "bones": [],
+    "sprites": [
+        {
+            "id": "dd505f46955e4d15a2efb5c4727ba8cc",
+            "name": "Sprite",
+            "item_id": "",
+            "path": "/home/paspallas/repo/game-tool/megabone/projects/Xi Tiger_torso.png",
+            "offset": [
+                0.0,
+                0.0
+            ],
+            "bone_id": "",
+            "frame_index": 1,
+            "x": -47.36423107226538,
+            "y": -54.486387088279756,
+            "rotation": 0.0,
+            "z_index": 0,
+            "visible": true
+        },
+        {
+            "id": "c2d33dd1d0574e32bf16517b4320dda4",
+            "name": "Sprite 1",
+            "item_id": "",
+            "path": "/home/paspallas/repo/game-tool/megabone/projects/Xi Tiger_torso.png",
+            "offset": [
+                0.0,
+                0.0
+            ],
+            "bone_id": "",
+            "frame_index": 1,
+            "x": 44.351633617818536,
+            "y": -65.71680285579481,
+            "rotation": 0.0,
+            "z_index": 0,
+            "visible": true
+        },
+        {
+            "id": "494f0ef0e67f49c289f57641ff863915",
+            "name": "Sprite 2",
+            "item_id": "",
+            "path": "/home/paspallas/repo/game-tool/megabone/projects/Xi Tiger_torso.png",
+            "offset": [
+                0.0,
+                0.0
+            ],
+            "bone_id": "",
+            "frame_index": 1,
+            "x": 30.32224105587556,
+            "y": 18.980039709446014,
+            "rotation": 0.0,
+            "z_index": 0,
+            "visible": true
+        }
+    ],
+    "keyframes": [],
+    "attachments": []
+}

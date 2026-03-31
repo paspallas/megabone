@@ -1,4 +1,5 @@
 from megabone.qt import QTabWidget, QVBoxLayout, QWidget, Signal
+from megabone.views.editor_scene import ModalEditorScene
 from megabone.views.editor_view import MainEditorView
 
 
@@ -36,7 +37,11 @@ class TabManager(QTabWidget):
             assert container is not None
             view = container.findChild(MainEditorView)
 
-            if view.doc_id == doc_id:
+            assert view is not None
+            scene = view.scene()
+
+            assert isinstance(scene, ModalEditorScene)
+            if scene.document.doc_id == doc_id:
                 self.set_title(i, title)
                 break
 
@@ -47,7 +52,11 @@ class TabManager(QTabWidget):
             assert container is not None
             view = container.findChild(MainEditorView)
 
-            if view.doc_id == doc_id:
+            assert view is not None
+            scene = view.scene()
+
+            assert isinstance(scene, ModalEditorScene)
+            if scene.document.doc_id == doc_id:
                 self.removeTab(i)
                 break
 

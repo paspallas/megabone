@@ -9,7 +9,7 @@ from .serializable import Serializable
 @dataclass
 class FrameData:
     index: int
-    pixmap: QPixmap = field(repr=False)  # not serialized
+    pixmap: QPixmap = field(repr=False)
 
 
 @dataclass
@@ -24,10 +24,13 @@ class SpriteSheetData:
 class SpriteData(Serializable):
     item_id: str = ""
     name: str = "sprite"
-    image_path: str = ""
+    path: str = ""
     offset: tuple[float, float] = (0.0, 0.0)
-    position: tuple[float, float] = (0.0, 0.0)
     bone_id: str = ""
+    frame_index: int = 0
+    x: float = 0.0
+    y: float = 0.0
+    rotation: float = 0.0
     z_index: int = 0
     visible: bool = True
 

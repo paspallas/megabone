@@ -2,7 +2,8 @@ from collections import OrderedDict
 from enum import Enum, auto
 
 from megabone.builder import MenuBuilder
-from megabone.manager import DocumentManager, RecentFilesManager
+from megabone.manager.document import DocumentManager
+from megabone.manager.recent_files import RecentFilesManager
 from megabone.qt import QKeySequence, QMenuBar
 
 from .main_controller import MainController
@@ -72,7 +73,6 @@ class MainMenuController:
             MenuBuilder("Edit")
             .qaction("Undo", self.undo_action)
             .qaction("Redo", self.redo_action)
-            .disable_items("Undo", "Redo")
         )
 
         self._menus[MenuType.VIEW] = (

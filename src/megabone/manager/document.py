@@ -8,7 +8,7 @@ from megabone.qt import QMessageBox, QObject, QUndoGroup, Signal
 class DocumentManager(QObject):
     """Manages a collection of documents and IO operations"""
 
-    addedDocument = Signal(str)
+    addedDocument = Signal(Document)
     closedDocument = Signal(str)
     activeDocumentChanged = Signal(str)
     savedDocumentAs = Signal(str, str)
@@ -16,7 +16,7 @@ class DocumentManager(QObject):
     openedDocument = Signal(str, Path)
     """An opened from file document was added to the collection"""
 
-    createdDocument = Signal(str)
+    createdDocument = Signal(Document)
     """A newly created document was added to the collection"""
 
     def __init__(self):
@@ -53,8 +53,8 @@ class DocumentManager(QObject):
             self.track_changes(document)
             self.connect_to_document(document)
 
-            self.addedDocument.emit(document.doc_id)
-            self.createdDocument.emit(document.doc_id)
+            self.addedDocument.emit(document)
+            self.createdDocument.emit(document)
 
     def get_active_document(self) -> Document | None:
         assert self._active_document_id is not None
