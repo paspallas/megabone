@@ -1,5 +1,3 @@
-from zlib import Z_NO_COMPRESSION
-
 from megabone.command.sprite import CreateSpriteCommand
 from megabone.editor.item import BoneItem, ItemFactory
 from megabone.editor.item.model_item import ModelBoundItem
@@ -62,7 +60,7 @@ class ModalEditorScene(QGraphicsScene):
         self.removeItem(item)
 
     def rebuild(self) -> None:
-        """Recreate the scene with modelbounditems"""
+        """Recreate the scene with model bound items"""
 
         self.layer_manager.clear()
         self.clear()
@@ -77,6 +75,7 @@ class ModalEditorScene(QGraphicsScene):
                     item = SpriteItem(document=self.document, id=data.id)
 
                 if item:
+                    # TODO loaded files already have z index set in the model
                     data.z_index = self.add_item(item)
                     item.apply_data_from_model(data)
 

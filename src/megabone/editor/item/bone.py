@@ -29,7 +29,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
     _selected_color = QColor(230, 10, 230)
     _hover_color = QColor(200, 200, 255)
     _primary_color = QColor(100, 150, 255)
-    _ghost_color = QColor(180, 180, 255)
+    _ghost_color = QColor(255, 0, 255)
 
     def __init__(
         self,
@@ -47,7 +47,6 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
             model=document.bones,
             document=document,
         )
-        self._document = document
         self.start_point = start_point or Point(0, 0)
         self.end_point = end_point or Point(1, 1)
 
@@ -78,7 +77,6 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
         )
 
     def calculate_length(self) -> float:
-        assert isinstance(self.end_point, Point)
         return self.end_point.distance_to(self.start_point)
 
     def calculate_angle(self) -> float:
@@ -180,7 +178,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     @property
     def parent_id(self) -> str:
-        return self.parent_bone.item_id if self.parent_bone else ""
+        return self.parent_bone.id if self.parent_bone else ""
 
     def set_attachments(self, attachments: list[AttachmentData]) -> None:
         """Called by scene rebuild to wire up sprite attachments"""
@@ -205,7 +203,7 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
     def create_data_for_model(self) -> BoneData:
         return BoneData(
-            id=self.item_id,
+            id=self.id,
             start_point=self.start_point,
             end_point=self.end_point,
             z_index=self.z_index,
@@ -221,3 +219,8 @@ class BoneItem(LayeredItemMixin, ModelBoundItem):
 
         self.prepareGeometryChange()
         self.update()
+
+    def request_delete(self) -> None:
+        from megabone.command.bone import DeleteBoneCommand
+
+        self._document.push(DeleteBoneCommand(self._document, self.id))

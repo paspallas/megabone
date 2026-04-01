@@ -6,7 +6,7 @@ from megabone.manager.document import DocumentManager
 from megabone.manager.recent_files import RecentFilesManager
 from megabone.qt import QKeySequence, QMenuBar
 
-from .main_controller import MainController
+from .app import AppController
 
 
 class MenuType(Enum):
@@ -17,7 +17,7 @@ class MenuType(Enum):
 
 
 class MainMenuController:
-    def __init__(self, controller: MainController, documents: DocumentManager) -> None:
+    def __init__(self, controller: AppController, documents: DocumentManager) -> None:
         self.controller = controller
         self.documents = documents
 
@@ -78,7 +78,7 @@ class MainMenuController:
         self._menus[MenuType.VIEW] = (
             MenuBuilder("View")
             .action("Full Screen", self.controller.on_full_screen, "F11")
-            .action("Zen Mode", self.controller.on_zen_mode, "Ctrl+Shift+Z")
+            .action("Zen Mode", self.controller.on_zen_mode, "Ctrl+F11")
             .separator()
             .submenu("Show")
             .back()

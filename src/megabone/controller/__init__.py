@@ -1,3 +1,3 @@
-from .editor_controller import EditorController
-from .main_controller import MainController
-from .menu_controller import MainMenuController, MenuType
+from .app import AppController
+from .editor import EditorController
+from .menu import MainMenuController, MenuType

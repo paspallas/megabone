@@ -35,12 +35,25 @@ class ModelBoundItem(QGraphicsItem):
 
         self._document.push(command)
 
-    def current_data(self) -> Serializable:
+    def current_data_from_model(self) -> Serializable:
         """Fetch the current model data for this item"""
 
         data = self._model.get_item(self.id)
         assert data is not None, "No model data for item"
         return data
+
+    def contextMenuEvent(self, event) -> None:
+        from megabone.editor.item.context_menu_factory import ItemContextMenuFactory
+
+        menu = ItemContextMenuFactory.build_for(self, event.scenePos()).build()
+        menu.exec(event.screenPos())
+        event.accept()
+
+    @abstractmethod
+    def request_delete(self) -> None:
+        """Subclasses override to push the appropriate delete command"""
+
+        raise NotImplementedError
 
     @abstractmethod
     def apply_data_from_model(self, data: Serializable) -> None:

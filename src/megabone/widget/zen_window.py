@@ -45,7 +45,8 @@ class ZenWindow(QMainWindow):
                     child.hide()
 
             if hasattr(self, "dock_manager"):
-                self.dock_manager.hide()
+                attr = getattr(self, "dock_manager")
+                attr.hide()
 
             self.is_zen_mode = True
             self.showFullScreen()

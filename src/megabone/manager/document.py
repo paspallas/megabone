@@ -31,6 +31,10 @@ class DocumentManager(QObject):
     def undo_group(self) -> QUndoGroup:
         return self._undo_group
 
+    @property
+    def count(self) -> int:
+        return len(self._documents)
+
     def connect_to_document(self, document: Document) -> None:
         document.documentModified.connect(
             lambda: self._on_document_changed(document.doc_id)

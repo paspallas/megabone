@@ -1,16 +1,15 @@
 from megabone.model.bone import BoneData
 from megabone.model.collection import UpdateSource
 from megabone.model.document import Document
-from megabone.qt import QPointF, QUndoCommand
+from megabone.qt import QUndoCommand
+from megabone.util.types import Point
 
 from .document import DocumentCommand
 
 
 class MoveBoneCommand(DocumentCommand):
-    ID = 1001
-
     def __init__(
-        self, document: Document, bone_id: str, old_end: QPointF, new_end: QPointF
+        self, document: Document, bone_id: str, old_end: Point, new_end: Point
     ):
         super().__init__(document, "Move Bone")
         self._bone_id = bone_id
@@ -18,32 +17,25 @@ class MoveBoneCommand(DocumentCommand):
         self._new_end = new_end
 
     def id(self) -> int:
-        return self.ID
+        return 1001
 
     def mergeWith(self, other: QUndoCommand) -> bool:
-        if other.id != self.id:
+        if not isinstance(other, MoveBoneCommand):
             return False
 
-        # Only merge if same bone
-        assert isinstance(other, MoveBoneCommand)
         if other._bone_id != self._bone_id:
             return False
 
-        # Absorb the newer end position, keep our old start
         self._new_end = other._new_end
         return True
 
     def redo(self) -> None:
         data = self._document.bones.get_item(self._bone_id)
-
-        assert isinstance(data, BoneData)
         data.end_point = self._new_end
         self._document.bones.update_item(data, UpdateSource.COMMAND)
 
     def undo(self) -> None:
         data = self._document.bones.get_item(self._bone_id)
-
-        assert isinstance(data, BoneData)
         data.end_point = self._old_end
         self._document.bones.modify_item(data, UpdateSource.COMMAND)
 
@@ -67,18 +59,17 @@ class DeleteBoneCommand(DocumentCommand):
 
         # Snapshot full state before deletion
         self._bone_data = document.bones.get_item(bone_id)
-        self._attachments = document.attachments.get_items_for_bone(bone_id)
+        # self._attachments = document.attachments.get_items_for_bone(bone_id)
 
     def redo(self) -> None:
-        for att in self._attachments:
-            self._document.attachments.remove_item(att.id, UpdateSource.COMMAND)
+        # for att in self._attachments:
+        #     self._document.attachments.remove_item(att.id, UpdateSource.COMMAND)
         self._document.bones.remove_item(self._bone_id, UpdateSource.COMMAND)
 
     def undo(self) -> None:
-        assert self._bone_data is not None
         self._document.bones.add_item(self._bone_data, UpdateSource.COMMAND)
-        for att in self._attachments:
-            self._document.attachments.add_item(att, UpdateSource.COMMAND)
+        # for att in self._attachments:
+        #     self._document.attachments.add_item(att, UpdateSource.COMMAND)
 
 
 class RenameBoneCommand(DocumentCommand):

@@ -1,6 +1,6 @@
 from megabone.controller import (
+    AppController,
     EditorController,
-    MainController,
     MainMenuController,
     MenuType,
 )
@@ -18,14 +18,14 @@ class AppMainWindow(ZenWindow):
         self.setWindowTitle("Megabone")
         self.setMinimumSize(800, 600)
 
-        self.document_collection = DocumentManager()
-        self.autosave_manager = AutoSaveManager(self.document_collection)
+        self.documents = DocumentManager()
+        self.editor_controller = EditorController(self.documents)
+        self.app_controller = AppController(self.documents, self.editor_controller)
+        self.autosave_manager = AutoSaveManager(self.documents)
 
-        self.editor_controller = EditorController(self.document_collection)
-        self.main_controller = MainController()
-        self.menu = MainMenuController(self.main_controller, self.document_collection)
+        self.menu = MainMenuController(self.app_controller, self.documents)
         self.history_panel = HistoryPanel(self)
-        self.history_panel.set_group(self.document_collection.undo_group)
+        self.history_panel.set_group(self.documents.undo_group)
 
         self.setCentralWidget(self.editor_controller.tab_views())
 
@@ -57,14 +57,15 @@ class AppMainWindow(ZenWindow):
         self._connect_signals()
 
     def _connect_signals(self):
-        self.main_controller.requestFullScreen.connect(self.toggle_full_screen)
-        self.main_controller.requestZenMode.connect(self.toggle_zen_mode)
-        self.main_controller.requestQuit.connect(self.close)
+        self.app_controller.requestFullScreen.connect(self.toggle_full_screen)
+        self.app_controller.requestZenMode.connect(self.toggle_zen_mode)
+        self.app_controller.requestQuit.connect(self.close)
 
     def _populate_dock(self):
-        self.dock_manager = DockManager(
-            self, self.menu.get_builder(MenuType.VIEW).get_submenu("Show")
-        )
+        show_menu = self.menu.get_builder(MenuType.VIEW).get_submenu("Show")
+
+        assert show_menu is not None
+        self.dock_manager = DockManager(self, show_menu)
         self.dock_manager.create_dock(
             "Explorer",
             DockConfig(title="Explorer", area=Qt.DockWidgetArea.RightDockWidgetArea),

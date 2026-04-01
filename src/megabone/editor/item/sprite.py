@@ -47,14 +47,13 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
     def mouseReleaseEvent(self, event) -> None:
         super().mouseReleaseEvent(event)
 
-        old_data = self.current_data()
+        snapshot = self.current_data_from_model()
+        assert isinstance(snapshot, SpriteData)
 
-        assert isinstance(old_data, SpriteData)
-        # snapshot the values before any mutation
-        old_pos = old_data.position
+        old_pos = snapshot.position
 
-        new_data = self.create_data_for_model()
-        new_pos = new_data.position
+        current = self.create_data_for_model()
+        new_pos = current.position
 
         if old_pos != new_pos:
             self.push_command(
@@ -81,7 +80,7 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
         from copy import copy
 
         # Shallow copy, get a new reference to the model data object
-        data = copy(self.current_data())
+        data = copy(self.current_data_from_model())
 
         assert isinstance(data, SpriteData)
         data.position = Point.from_qpointf(self.pos())
@@ -115,6 +114,11 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
         px.fill(QColor(255, 0, 255, 128))
 
         return px
+
+    def request_delete(self) -> None:
+        from megabone.command.sprite import DeleteSpriteCommand
+
+        self._document.push(DeleteSpriteCommand(self._document, self.id))
 
     # def apply_bone_transform(self, bone: BoneItem, att: AttachmentData) -> None:
     #     """Called during live bone movement"""

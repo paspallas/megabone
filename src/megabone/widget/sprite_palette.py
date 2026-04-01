@@ -242,16 +242,9 @@ class PaletteFrameItem(QGraphicsPixmapItem):
 
         drag = QDrag(event.widget())
         drag.setMimeData(mime)
-        thumb = self.pixmap().scaled(
-            64,
-            64,
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.FastTransformation,
-        )
-        drag.setPixmap(thumb)
-        drag.setHotSpot(thumb.rect().center())
+        drag.setPixmap(self.pixmap())
+        drag.setHotSpot(self.pixmap().rect().center())
         drag.exec(Qt.DropAction.CopyAction)
-        drag = None
 
     def hoverEnterEvent(self, event) -> None:
         self.setOpacity(0.75)

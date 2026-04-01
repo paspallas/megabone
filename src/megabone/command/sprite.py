@@ -1,6 +1,7 @@
 from megabone.model.collection import UpdateSource
 from megabone.model.document import Document
 from megabone.model.sprite import SpriteData
+from megabone.qt import QUndoCommand
 from megabone.util.types import Point
 
 from .document import DocumentCommand
@@ -21,21 +22,23 @@ class CreateSpriteCommand(DocumentCommand):
 class DeleteSpriteCommand(DocumentCommand):
     def __init__(self, document: Document, sprite_id: str):
         super().__init__(document, "Delete Sprite")
+
         # Snapshot full state before deletion
         self._data = document.sprites.get_item(sprite_id)
-        self._attachments = document.attachments.get_items_for_sprite(sprite_id)
+        # self._attachments = document.attachments.get_items_for_sprite(sprite_id)
 
     def redo(self) -> None:
-        for att in self._attachments:
-            self._document.attachments.remove_item(att.id, UpdateSource.COMMAND)
+        # for att in self._attachments:
+        #     self._document.attachments.remove_item(att.id, UpdateSource.COMMAND)
 
         assert self._data is not None
         self._document.sprites.remove_item(self._data.id, UpdateSource.COMMAND)
 
     def undo(self) -> None:
         self._document.sprites.add_item(self._data, UpdateSource.COMMAND)
-        for att in self._attachments:
-            self._document.attachments.add_item(att, UpdateSource.COMMAND)
+
+        # for att in self._attachments:
+        #     self._document.attachments.add_item(att, UpdateSource.COMMAND)
 
 
 class MoveSpriteCommand(DocumentCommand):
@@ -51,11 +54,16 @@ class MoveSpriteCommand(DocumentCommand):
         self._old_pos = old_pos
         self._new_pos = new_pos
 
-    def mergeWith(self, other) -> bool:
+    def id(self) -> int:
+        return 1002
+
+    def mergeWith(self, other: QUndoCommand) -> bool:
         if not isinstance(other, MoveSpriteCommand):
             return False
+
         if other._sprite_id != self._sprite_id:
             return False
+
         self._new_pos = other._new_pos
         return True
 

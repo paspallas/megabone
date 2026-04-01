@@ -156,10 +156,10 @@ class MenuBuilder:
             self._menu_stack.pop()
         return self
 
-    def get_submenu(self, name: str) -> QMenu:
+    def get_submenu(self, name: str) -> QMenu | None:
         """Get a submenu by name"""
 
-        return self._sub_menus.get(name, None)
+        return self._sub_menus.get(name)
 
     def build(self) -> QMenu:
         """Return the constructed menu"""
