@@ -1,6 +1,7 @@
 from megabone.model.collection import UpdateSource
 from megabone.model.document import Document
 from megabone.model.sprite import SpriteData
+from megabone.util.types import Point
 
 from .document import DocumentCommand
 
@@ -38,22 +39,17 @@ class DeleteSpriteCommand(DocumentCommand):
 
 
 class MoveSpriteCommand(DocumentCommand):
-    ID = 1002
-
     def __init__(
         self,
         document: Document,
         sprite_id: str,
-        old_pos: tuple[float, float],
-        new_pos: tuple[float, float],
+        old_pos: Point,
+        new_pos: Point,
     ):
-        super().__init__(document, f"Move Sprite {sprite_id}")
+        super().__init__(document, "Move Sprite")
         self._sprite_id = sprite_id
         self._old_pos = old_pos
         self._new_pos = new_pos
-
-    def id(self) -> int:
-        return self.ID
 
     def mergeWith(self, other) -> bool:
         if not isinstance(other, MoveSpriteCommand):
@@ -69,9 +65,11 @@ class MoveSpriteCommand(DocumentCommand):
     def undo(self) -> None:
         self._apply(self._old_pos)
 
-    def _apply(self, pos: tuple[float, float]) -> None:
+    def _apply(self, pos: Point) -> None:
         data = self._document.sprites.get_item(self._sprite_id)
-        data.x, data.y = pos
+
+        assert isinstance(data, SpriteData)
+        data.position = pos
         self._document.sprites.modify_item(data, UpdateSource.COMMAND)
 
 

@@ -1,5 +1,6 @@
 from megabone.model.document import Document
 from megabone.model.serializable import Serializable
+from megabone.qt import QGraphicsItem, QGraphicsScene
 
 
 class ItemFactory:
@@ -31,7 +32,7 @@ class ItemFactory:
         return created
 
     @classmethod
-    def add_items_from_document(cls, document: Document, view):
+    def add_items_from_document(cls, document: Document, scene: QGraphicsScene):
         created = cls.create_items(document)
 
         # resolve relationships
@@ -39,4 +40,5 @@ class ItemFactory:
             if hasattr(item, "resolve_references"):
                 item.resolve_references(created)
 
-        view.add_items(*[item for _, item in created.values()])
+                assert isinstance(item, QGraphicsItem)
+                scene.addItem(item)

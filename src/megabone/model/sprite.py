@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 
 from megabone.qt import QPixmap
+from megabone.util.types import Point
 
 from .collection import BaseCollectionModel
 from .serializable import Serializable
@@ -22,17 +23,13 @@ class SpriteSheetData:
 
 @dataclass
 class SpriteData(Serializable):
-    item_id: str = ""
     name: str = "sprite"
     path: str = ""
-    offset: tuple[float, float] = (0.0, 0.0)
     bone_id: str = ""
     frame_index: int = 0
-    x: float = 0.0
-    y: float = 0.0
+    offset: Point = field(default_factory=lambda: Point())
+    position: Point = field(default_factory=lambda: Point())
     rotation: float = 0.0
-    z_index: int = 0
-    visible: bool = True
 
 
 class SpriteModel(BaseCollectionModel):

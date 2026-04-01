@@ -5,7 +5,8 @@ from megabone.model.bone import BoneModel
 from megabone.model.document import Document
 from megabone.model.keyframe import KeyframeModel
 from megabone.model.sprite import SpriteModel
-from megabone.qt import QGraphicsScene, QGraphicsView
+from megabone.qt import QGraphicsView
+from megabone.views.editor_scene import ModalEditorScene
 
 
 class AbstractEditorMode(ABC):
@@ -16,17 +17,18 @@ class AbstractEditorMode(ABC):
     def __init__(self, controller):
         self.controller = controller
 
-    def _document(self) -> Document:
-        document = self.controller.documents.get_active_document()
+    @property
+    def document(self) -> Document:
+        document = self.controller.document_collection.get_active_document()
 
         assert document is not None
         return document
 
     @property
-    def scene(self) -> QGraphicsScene:
+    def scene(self) -> ModalEditorScene:
         scene = self.view.scene()
 
-        assert scene is not None
+        assert isinstance(scene, ModalEditorScene)
         return scene
 
     @property
@@ -35,19 +37,19 @@ class AbstractEditorMode(ABC):
 
     @property
     def sprites_model(self) -> SpriteModel:
-        return self._document().sprites
+        return self.document.sprites
 
     @property
     def bones_model(self) -> BoneModel:
-        return self._document().bones
+        return self.document.bones
 
     @property
     def attachment_model(self) -> AttachmentModel:
-        return self._document().attachments
+        return self.document.attachments
 
     @property
     def keys_model(self) -> KeyframeModel:
-        return self._document().keyframes
+        return self.document.keyframes
 
     def activate(self):
         """Called when entering this state"""
@@ -59,12 +61,12 @@ class AbstractEditorMode(ABC):
 
     @abstractmethod
     def mousePressEvent(self, event, scene_pos):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def mouseMoveEvent(self, event, scene_pos):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @abstractmethod
     def mouseReleaseEvent(self, event, scene_pos):
-        raise NotImplementedError()
+        raise NotImplementedError

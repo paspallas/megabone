@@ -57,5 +57,6 @@ class BaseCollectionModel(QObject):
 
     def from_list(self, data: list[dict[str, Any]]) -> None:
         self._items.clear()
+
         for item_data in data:
             self._items[item_data["id"]] = self._data_class.from_dict(item_data)

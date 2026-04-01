@@ -5,6 +5,7 @@ from megabone.model.document import Document
 from megabone.model.serializable import Serializable
 from megabone.model.sprite import SpriteData
 from megabone.qt import QColor, QGraphicsItem, QPixmap, QRectF, Qt
+from megabone.util.types import Point
 
 from .item_factory import ItemFactory
 from .model_item import ModelBoundItem
@@ -12,18 +13,19 @@ from .model_item import ModelBoundItem
 
 @ItemFactory.register(SpriteData)
 class SpriteItem(LayeredItemMixin, ModelBoundItem):
-    def __init__(self, document: Document, item_id: str = ""):
+    def __init__(self, document: Document, id: str = ""):
         super().__init__(
             layer=Layer.SPRITE,
             z_index=0,
-            item_id=item_id,
+            id=id,
             model=document.sprites,
             document=document,
         )
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable)
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.setAcceptHoverEvents(True)
 
-        self._path = ""
+        self._sprite_sheet_path = ""
         self._pixmap: QPixmap = self._placeholder_pixmap()
 
     def boundingRect(self) -> QRectF:
@@ -49,16 +51,16 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
 
         assert isinstance(old_data, SpriteData)
         # snapshot the values before any mutation
-        old_pos = (old_data.x, old_data.y)
+        old_pos = old_data.position
 
         new_data = self.create_data_for_model()
-        new_pos = (new_data.x, new_data.y)
+        new_pos = new_data.position
 
         if old_pos != new_pos:
             self.push_command(
                 MoveSpriteCommand(
                     self._document,
-                    self.item_id,
+                    self.id,
                     old_pos,
                     new_pos,
                 )
@@ -67,23 +69,22 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
     def apply_data_from_model(self, data: Serializable) -> None:
         assert isinstance(data, SpriteData)
 
-        if data.path != self._path:
+        if data.path != self._sprite_sheet_path:
             self._load_pixmap(data.path, data.frame_index)
-            self._path = data.path
+            self._sprite_sheet_path = data.path
 
-        self.setPos(data.x, data.y)
+        self.setPos(data.position.to_qpointf())
         self.setRotation(data.rotation)
-        self.setVisible(data.visible)
         self.prepareGeometryChange()
 
     def create_data_for_model(self) -> SpriteData:
         from copy import copy
 
+        # Shallow copy, get a new reference to the model data object
         data = copy(self.current_data())
 
         assert isinstance(data, SpriteData)
-        data.x = self.pos().x()
-        data.y = self.pos().y()
+        data.position = Point.from_qpointf(self.pos())
         data.rotation = self.rotation()
         return data
 
@@ -110,7 +111,7 @@ class SpriteItem(LayeredItemMixin, ModelBoundItem):
 
     @staticmethod
     def _placeholder_pixmap() -> QPixmap:
-        px = QPixmap(32, 32)
+        px = QPixmap()
         px.fill(QColor(255, 0, 255, 128))
 
         return px

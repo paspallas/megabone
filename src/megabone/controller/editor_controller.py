@@ -1,12 +1,8 @@
-from megabone.command.sprite import CreateSpriteCommand
-from megabone.editor.item import ItemFactory
 from megabone.editor.mode import AbstractEditorMode, EditorModeRegistry, SelectionMode
 from megabone.manager.document import DocumentManager
-from megabone.manager.resource import ResourceManager
 from megabone.manager.tab import TabManager
 from megabone.model.document import Document
-from megabone.model.sprite import SpriteData
-from megabone.qt import QGraphicsView, QObject, QPointF, Signal
+from megabone.qt import QGraphicsView, QObject, Signal
 from megabone.views.editor_scene import ModalEditorScene
 from megabone.views.editor_view import MainEditorView
 
@@ -67,8 +63,6 @@ class EditorController(QObject):
         self.editor_views.add_editor(view, title)
         self.set_edit_mode(SelectionMode)
 
-        ItemFactory.add_items_from_document(document, view)
-
     def set_active_view(self, view: MainEditorView) -> None:
         self.current_view = view
         scene = view.scene()
@@ -105,22 +99,3 @@ class EditorController(QObject):
             self.current_mode.mouseReleaseEvent(
                 event, view.mapToScene(event.position().toPoint())
             )
-
-    def on_sprite_dropped(self, path: str, index: int, scene_pos: QPointF) -> None:
-        """Add sprite to document from sprite palette"""
-
-        sheet = ResourceManager.get_sheet(path)
-        if not sheet:
-            return
-
-        document = self.document_collection.get_active_document()
-        assert document is not None
-
-        data = SpriteData(
-            name=document.sprites.next_name("Sprite"),
-            path=path,
-            frame_index=index,
-            x=scene_pos.x(),
-            y=scene_pos.y(),
-        )
-        document.push(CreateSpriteCommand(document, data))

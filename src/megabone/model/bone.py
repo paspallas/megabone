@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from megabone.qt import QPointF
+from megabone.util.types import Point
 
 from .collection import BaseCollectionModel
 from .serializable import Serializable
@@ -9,11 +9,11 @@ from .serializable import Serializable
 @dataclass
 class BoneData(Serializable):
     name: str = "bone"
-    start_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
-    end_point: QPointF = field(default_factory=lambda: QPointF(0, 0))
-    z_index: int = 0
-    parent_id: str = ""
     sprite_id: str = ""
+    parent_id: str = ""
+    z_index: int = 0
+    start_point: Point = field(default_factory=lambda: Point())
+    end_point: Point = field(default_factory=lambda: Point())
 
 
 class BoneModel(BaseCollectionModel):

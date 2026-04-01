@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-from megabone.qt import QGraphicsItem, QGraphicsView, QKeySequence, QShortcut, Qt
+from megabone.qt import QGraphicsItem, QGraphicsScene, QKeySequence, QShortcut, Qt
 
 
 class Layer(Enum):
@@ -32,20 +32,31 @@ class LayeredItemMixin:
 
 
 class LayerManager:
-    def __init__(self, view: QGraphicsView) -> None:
+    def __init__(self, scene: QGraphicsScene) -> None:
+        self.scene = scene
         self.items: list[LayeredItemMixin] = []
-        self.view = view
-
         self._setup_shortcuts()
 
-    def add_item(self, item: QGraphicsItem) -> None:
+    def get_next_index(self) -> int:
+        if len(self.items) > 0:
+            return self.items[len(self.items) - 1].z_index + 1
+        return 0
+
+    def clear(self) -> None:
+        self.items.clear()
+
+    def add_item(self, item: QGraphicsItem) -> int:
+        assert isinstance(item, LayeredItemMixin)
         self.items.append(item)
 
         if item.z_index == 0:
             item.update_z_value(len(self.items))
         self.sort_layer(item.layer)
 
+        return item.z_index
+
     def remove_item(self, item: QGraphicsItem) -> None:
+        assert isinstance(item, LayeredItemMixin)
         self.items.remove(item)
         self.sort_layer(item.layer)
 
@@ -58,26 +69,29 @@ class LayerManager:
     def set_layer_visibility(self, layer: Layer, visible: bool) -> None:
         for item in self.items:
             if item.layer == layer:
+                assert isinstance(item, QGraphicsItem)
                 item.setVisible(visible)
 
     def set_layer_selectability(self, layer: Layer, selectable: bool) -> None:
         for item in self.items:
             if item.layer == layer:
+                assert isinstance(item, QGraphicsItem)
                 item.setFlag(
                     QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, selectable
                 )
 
     def _setup_shortcuts(self) -> None:
-        self.item_up = QShortcut(QKeySequence(Qt.Key.Key_Up), self.view)
+        self.item_up = QShortcut(QKeySequence(Qt.Key.Key_R), self.scene)
         self.item_up.activated.connect(self._increase_z_index)
 
-        self.item_down = QShortcut(QKeySequence(Qt.Key.Key_Down), self.view)
+        self.item_down = QShortcut(QKeySequence(Qt.Key.Key_F), self.scene)
         self.item_down.activated.connect(self._decrease_z_index)
 
-    def _get_item(self) -> LayeredItemMixin:
-        selected_items = self.view.scene().selectedItems()
+    def _get_item(self) -> QGraphicsItem | None:
+        selected_items = self.scene.selectedItems()
         if selected_items:
             return selected_items[0]
+
         return None
 
     def _get_layer_items(self, layer: Layer) -> list[LayeredItemMixin]:
@@ -87,6 +101,7 @@ class LayerManager:
 
     def _increase_z_index(self) -> None:
         if item := self._get_item():
+            assert isinstance(item, LayeredItemMixin)
             if item.layer != Layer.SPRITE:
                 return
 
@@ -99,6 +114,7 @@ class LayerManager:
 
     def _decrease_z_index(self) -> None:
         if item := self._get_item():
+            assert isinstance(item, LayeredItemMixin)
             if item.layer != Layer.SPRITE:
                 return
 

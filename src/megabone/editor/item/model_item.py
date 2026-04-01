@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from uuid import uuid4
 
 from megabone.model.collection import BaseCollectionModel
 from megabone.model.document import Document
@@ -19,13 +20,13 @@ class ModelBoundItem(QGraphicsItem):
     def __init__(
         self,
         *args,
-        item_id: str,
+        id: str | None = None,
         model: BaseCollectionModel,
         document: Document,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.item_id = item_id
+        self.id = id if id else uuid4().hex
         self._model = model
         self._document = document
 
@@ -35,10 +36,10 @@ class ModelBoundItem(QGraphicsItem):
         self._document.push(command)
 
     def current_data(self) -> Serializable:
-        """Fetch the current model record for this item"""
+        """Fetch the current model data for this item"""
 
-        data = self._model.get_item(self.item_id)
-        assert data is not None, f"No model data for item {self.item_id}"
+        data = self._model.get_item(self.id)
+        assert data is not None, "No model data for item"
         return data
 
     @abstractmethod
